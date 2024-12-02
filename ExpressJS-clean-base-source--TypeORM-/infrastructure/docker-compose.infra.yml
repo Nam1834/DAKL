@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: DAKL_postgreSQL
+    image: postgres:15.7
+    restart: unless-stopped
+    ports:
+      - "5440:5432"
+    env_file:
+      - docker-compose.infrastructure.env
+    volumes:
+      - ./.docker-data/postgres/data:/var/lib/postgresql/data
+    networks:
+      - main-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 200M
+
+  redis:
+    container_name: redis_typeorm_basesource
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./.docker-data/redis/data/redis:/data
+    networks:
+      - main-network
+    restart: unless-stopped
+networks:
+  main-network:
+    driver: bridge
