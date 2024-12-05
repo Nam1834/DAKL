@@ -1,7 +1,7 @@
 name: CAKL CD
 
 env:
-  SERVICE_FOLDER: /ExpressJS-clean-base-source--TypeORM-/main
+  SERVICE_FOLDER: /ExpressJS-clean-base-source--TypeORM-
   DEPLOY_FOLDER: /root/DAKL/BE
   ENV_FILE_PATH: /root/DAKL/ENV/.docker.env
 
@@ -35,7 +35,7 @@ jobs:
           password: ${{ secrets.DAKL_PASSWORD }}
           port: 22
           script: |
-            cp ${{ env.ENV_FILE_PATH }} ${{ env.DEPLOY_FOLDER }}${{ env.SERVICE_FOLDER }}/.env
-            cd ${{ env.DEPLOY_FOLDER }}${{ env.SERVICE_FOLDER }}
+            cp ${{ env.ENV_FILE_PATH }} ${{ env.DEPLOY_FOLDER }}${{ env.SERVICE_FOLDER }}/.docker.env
+            cd ${{ env.DEPLOY_FOLDER }}${{ env.SERVICE_FOLDER }}/main
             sudo docker compose down       
             docker compose up --build -d
