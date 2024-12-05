@@ -1,0 +1,41 @@
+name: CAKL CD
+
+env:
+  SERVICE_FOLDER: /ExpressJS-clean-base-source--TypeORM-/main
+  DEPLOY_FOLDER: /root/DAKL/BE
+  ENV_FILE_PATH: /root/DAKL/ENV/.docker.env
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy source code to server
+        uses: appleboy/scp-action@v0.1.1
+        with:
+          host: ${{ secrets.DAKL_HOST }}
+          username: ${{ secrets.DAKL_USER }}
+          password: ${{ secrets.DAKL_PASSWORD }}
+          source: "./*"
+          target: ${{ env.DEPLOY_FOLDER }}
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.DAKL_HOST }}
+          username: ${{ secrets.DAKL_USER }}
+          password: ${{ secrets.DAKL_PASSWORD }}
+          port: 22
+          script: |
+            cp ${{ env.ENV_FILE_PATH }} ${{ env.DEPLOY_FOLDER }}${{ env.SERVICE_FOLDER }}/.env
+            cd ${{ env.DEPLOY_FOLDER }}${{ env.SERVICE_FOLDER }}
+            sudo docker compose down       
+            docker compose up --build -d
