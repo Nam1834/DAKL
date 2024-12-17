@@ -2,9 +2,9 @@ import { AccountController } from '@/controller/account.controller';
 import { AccountService } from '@/service/account.service';
 import { Account } from '@/models/account.model';
 import { AccountRepository } from '@/repository/account.repository';
-import { IAccountService } from '@/service/interface/i.account.service';
 import { IAccountRepository } from '@/repository/interface/i.account.repository';
 import { BaseContainer } from '@/container/base.container';
+import { IAccountService } from '@/service/interface/i.account.service';
 
 class AccountContainer extends BaseContainer {
   constructor() {
