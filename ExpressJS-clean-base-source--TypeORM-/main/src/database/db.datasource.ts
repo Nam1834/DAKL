@@ -4,6 +4,12 @@ import { Role } from '../models/role.model';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { GlobalConfig } from '@/utils/config/global-config.util';
+import { User } from '@/models/user.model';
+import { UserProfile } from '@/models/user_profile.model';
+import { Admin } from '@/models/admin.model';
+import { AdminProfile } from '@/models/admin_profile.model';
+
+const models = [Account, Role, User, UserProfile, Admin, AdminProfile];
 
 export class AppDataSourceSingleton {
   private static instance: DataSource;
@@ -19,7 +25,7 @@ export class AppDataSourceSingleton {
         username: process.env.DB_USERNAME || 'postgres',
         password: process.env.DB_PASSWORD || 'admin',
         database: process.env.DB_NAME || 'test',
-        entities: [Account, Role],
+        entities: models,
         synchronize: GlobalConfig.database.sync,
         logging: true,
         migrations: [__dirname + '/migrations/*.js']
