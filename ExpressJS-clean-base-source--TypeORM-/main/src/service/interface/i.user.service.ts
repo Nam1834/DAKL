@@ -8,6 +8,10 @@ import { GetProfileRes } from '@/dto/user/get-profile-user.res';
 import { UpdateProfileUserReq } from '@/dto/user/update-profile-user.req';
 import { UpdateProfileUserRes } from '@/dto/user/update-profile-user.res';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
+import { VerifyOtpReq } from '@/dto/user/verify-otp.req';
+import { VerifyOtpRes } from '@/dto/user/verify-otp.res';
+import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
+import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
 
 export interface IUserService<T extends BaseModelType> extends IBaseCrudService<T> {
   register(data: RegisterUserReq): Promise<RegisterUserRes>;
@@ -15,4 +19,6 @@ export interface IUserService<T extends BaseModelType> extends IBaseCrudService<
   getProfile(userId: string): Promise<GetProfileRes>;
   updateProfile(userId: string, data: UpdateProfileUserReq): Promise<UpdateProfileUserRes>;
   forgotPassword(data: ForgotPasswordUserReq): Promise<void>;
+  verifyOtp(data: VerifyOtpReq): Promise<VerifyOtpRes>;
+  resetPassword(data: ResetPasswordReq): Promise<ResetPasswordRes>;
 }

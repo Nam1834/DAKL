@@ -24,6 +24,10 @@ import { UpdateProfileUserRes } from '@/dto/user/update-profile-user.res';
 import redis from '@/utils/redis/redis.util';
 import { createEmailOtpContent } from '@/utils/email/create-email-otp-content.util';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
+import { VerifyOtpRes } from '@/dto/user/verify-otp.res';
+import { VerifyOtpReq } from '@/dto/user/verify-otp.req';
+import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
+import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 
 @injectable()
@@ -190,5 +194,44 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       subject: 'OTP for Password Reset',
       text: emailContent
     });
+  }
+
+  async verifyOtp(data: VerifyOtpReq): Promise<VerifyOtpRes> {
+    const otp = await redis.get(`otp:${data.email}`);
+    if (!otp || otp !== data.otp) {
+      throw new Error('Invalid OTP');
+    }
+    return { message: 'OTP verified successfully' };
+  }
+
+  async resetPassword(data: ResetPasswordReq): Promise<ResetPasswordRes> {
+    const otp = await redis.get(`otp:${data.email}`);
+    if (!otp || otp !== data.otp) {
+      throw new Error('Invalid OTP');
+    }
+
+    await redis.del(`otp:${data.email}`);
+
+    const { newPassword, confirmPassword } = data;
+
+    if (newPassword !== confirmPassword) {
+      throw new Error('Passwords do not match');
+    }
+
+    const user = await this.userRepository.findOne({ filter: { email: data.email } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await this.userRepository.findOneAndUpdate({
+      filter: { userId: user.userId },
+      updateData: user
+    });
+
+    const response = convertToDto(ResetPasswordRes, user);
+    return response;
   }
 }

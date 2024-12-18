@@ -26,8 +26,19 @@ services:
       - "6379:6379"
     volumes:
       - ./.docker-data/redis/data/redis:/data
+      - ./docker-data/redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
     networks:
       - main-network
+    env_file: ./docker-compose.infratructure.env
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 600M
     restart: unless-stopped
 networks:
   main-network:
