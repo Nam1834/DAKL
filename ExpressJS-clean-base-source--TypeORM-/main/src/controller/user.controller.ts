@@ -3,8 +3,12 @@ import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
 import { GetProfileRes } from '@/dto/user/get-profile-user.res';
 import { LoginUserReq } from '@/dto/user/login-user.req';
 import { RegisterUserReq } from '@/dto/user/register-user.req';
+import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
+import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
 import { UpdateProfileUserReq } from '@/dto/user/update-profile-user.req';
 import { UpdateProfileUserRes } from '@/dto/user/update-profile-user.res';
+import { VerifyOtpReq } from '@/dto/user/verify-otp.req';
+import { VerifyOtpRes } from '@/dto/user/verify-otp.res';
 import { User } from '@/models/user.model';
 import { IUserService } from '@/service/interface/i.user.service';
 import { ITYPES } from '@/types/interface.types';
@@ -87,6 +91,28 @@ export class UserController {
       const requestBody: ForgotPasswordUserReq = req.body;
       await this.userService.forgotPassword(requestBody);
       res.send_ok('OTP sent successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const verifyOtpReq: VerifyOtpReq = req.body;
+      const result = await this.userService.verifyOtp(verifyOtpReq);
+      const responseBody = convertToDto(VerifyOtpRes, result);
+      res.send_ok(responseBody.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const resetPasswordReq: ResetPasswordReq = req.body;
+      const result = await this.userService.resetPassword(resetPasswordReq);
+
+      res.send_ok('Reset password successfully', result);
     } catch (error) {
       next(error);
     }
