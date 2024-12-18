@@ -40,6 +40,24 @@ services:
           cpus: "1"
           memory: 600M
     restart: unless-stopped
+
+  minio-service:
+    container_name: minio_dakl
+    image: minio/minio:latest
+    volumes:
+      - ./.docker-data/minio/data:/data
+    ports:
+      - "9000:9000"
+      - "9099:9099"
+    env_file:
+      - /root/DAKL/ENV/docker-compose.infrastructure.env
+    command: server --address ":9099" --console-address ":9000" /data
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 500M
 networks:
   main-network:
     driver: bridge
