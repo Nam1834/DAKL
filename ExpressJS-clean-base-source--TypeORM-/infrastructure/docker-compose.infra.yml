@@ -33,7 +33,7 @@ services:
       - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
     networks:
       - main-network
-    env_file: /root/DAKL/ENV/docker-compose.infratructure.env
+    env_file: /root/DAKL/ENV/docker-compose.infrastructure.env
     deploy:
       resources:
         limits:
