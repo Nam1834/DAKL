@@ -1,7 +1,9 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
 import { GetProfileRes } from '@/dto/user/get-profile-user.res';
+import { LoginMicrosoftRes } from '@/dto/user/login-microsoft.res';
 import { LoginUserReq } from '@/dto/user/login-user.req';
+import { LoginUserRes } from '@/dto/user/login-user.res';
 import { RegisterUserReq } from '@/dto/user/register-user.req';
 import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
 import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
@@ -28,11 +30,81 @@ export class UserController {
     this.common = common;
   }
 
+  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user;
+
+      const userId = user!.id;
+
+      await this.userService.logout(userId);
+
+      res.send_ok('Logout success');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestBody: RegisterUserReq = req.body;
       const result = await this.userService.register(requestBody);
       res.send_ok('Register Borrower successful', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMicrosoftAuthUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this.userService.getMicrosoftAuthUrl();
+      res.send_ok('Microsoft Auth URL generated successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleMicrosoftCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { code } = req.query;
+
+      if (!code) {
+        throw new Error('Authorization code not found.');
+      }
+      res.send_ok('Authorization code successful', code);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exchangeCodeForToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;
+
+      if (!code) {
+        res.status(400).send({ error: 'Invalid or missing authorization code.' });
+        return;
+      }
+      const result = await this.userService.exchangeCodeForToken(code);
+      res.status(200).json({
+        message: 'Microsoft Auth URL generated successfully',
+        data: result
+      });
+      res.send_ok('Microsoft Auth URL generated successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async loginMicrosoft(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;
+
+      if (!code) {
+        res.status(400).send({ error: 'Invalid or missing authorization code.' });
+        return;
+      }
+      const result = await this.userService.loginMicrosoft(code);
+      res.send_ok('Login successful', result);
     } catch (error) {
       next(error);
     }
@@ -52,8 +124,6 @@ export class UserController {
     try {
       const user = req.user;
       const userId = user?.id;
-
-      console.log(userId, 'aaaaaaaaaa');
 
       if (!userId) {
         throw new Error('You must login');

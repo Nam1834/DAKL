@@ -28,12 +28,23 @@ import { VerifyOtpRes } from '@/dto/user/verify-otp.res';
 import { VerifyOtpReq } from '@/dto/user/verify-otp.req';
 import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
 import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
+import axios from 'axios';
+import { MicrosoftTokenRes } from '@/dto/user/microsoft-token.res';
+import moment from 'moment';
+import { log } from 'console';
+import { RedisSchemaEnum } from '@/enums/redis-schema.enum';
 const SECRET_KEY: any = process.env.SECRET_KEY;
+const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
+const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
+const MICROSOFT_REDIRECT_URI: any = process.env.MICROSOFT_REDIRECT_URI;
+const MICROSOFT_CLIENT_SCOPE: any = process.env.MICROSOFT_CLIENT_SCOPE;
 
 @injectable()
 export class UserService extends BaseCrudService<User> implements IUserService<User> {
   private userRepository: IUserRepository<User>;
   private userProfileRepository: IUserProfileRepository<UserProfile>;
+
+  private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
   constructor(
     @inject('UserRepository') userRepository: IUserRepository<User>,
@@ -44,11 +55,25 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.userProfileRepository = userProfileRepository;
   }
 
+  async logout(userId: string): Promise<void> {
+    /*
+    Set token logout time => check token logout time when authenticate
+    And if token logout time >= token iat => not allow access
+    Also set expire time for this key to make sure that the token will be deleted after a period of time = token expire time
+    */
+    const currentTimeStamp = moment().unix();
+
+    await redis.set(`${RedisSchemaEnum.logoutTokenTime}:${userId}`, currentTimeStamp, 'EX', this.LOGIN_TOKEN_EXPIRE);
+
+    return;
+  }
+
   async register(data: RegisterUserReq): Promise<RegisterUserRes> {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     data.password = hashedPassword;
 
     const userProfile = new UserProfile();
+    userProfile.userDisplayName = data.fullname;
     userProfile.personalEmail = data.email;
     userProfile.fullname = data.fullname;
     userProfile.birthday = new Date(data.birthday);
@@ -75,7 +100,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     const emailContent = createEmailContent(data.fullname);
 
     sendEmail({
-      from: { name: 'Công ty Alpha' },
+      from: { name: 'GiaSuVLU' },
       to: { emailAddress: [result.email] },
       subject: 'Chúc mừng đăng ký tài khoản thành công',
       text: emailContent
@@ -111,9 +136,122 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     const claim = new JwtClaimDto(user.userId, '', [], '');
 
     const token = jwt.sign(_.toPlainObject(claim), SECRET_KEY, {
-      expiresIn: 3 * 60 * 60
+      expiresIn: this.LOGIN_TOKEN_EXPIRE
     });
 
+    const result = convertToDto(LoginUserRes, user);
+    result.token = token;
+
+    return result;
+  }
+
+  async getMicrosoftAuthUrl(): Promise<{ authUrl: string }> {
+    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${new URLSearchParams({
+      client_id: MICROSOFT_CLIENT_ID,
+      response_type: 'code',
+      redirect_uri: MICROSOFT_REDIRECT_URI,
+      response_mode: 'query',
+      scope: MICROSOFT_CLIENT_SCOPE
+    }).toString()}`;
+
+    return { authUrl };
+  }
+
+  async exchangeCodeForToken(code: string): Promise<any> {
+    if (!code || typeof code !== 'string' || !code.trim()) {
+      throw new Error('Invalid or missing authorization code.');
+    }
+    const response = await axios.post(
+      'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+      new URLSearchParams({
+        client_id: MICROSOFT_CLIENT_ID,
+        client_secret: MICROSOFT_CLIENT_SECRET,
+        code: code,
+        grant_type: 'authorization_code',
+        redirect_uri: MICROSOFT_REDIRECT_URI
+      }).toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    return response.data;
+  }
+
+  async loginMicrosoft(code: string): Promise<LoginUserRes> {
+    if (!code || typeof code !== 'string' || !code.trim()) {
+      throw new Error('Invalid or missing authorization code.');
+    }
+
+    // Bước 1: Gọi API Microsoft để lấy Access Token
+    const tokenResponse = await axios.post<MicrosoftTokenRes>(
+      'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+      new URLSearchParams({
+        client_id: MICROSOFT_CLIENT_ID,
+        client_secret: MICROSOFT_CLIENT_SECRET,
+        code: code,
+        grant_type: 'authorization_code',
+        redirect_uri: MICROSOFT_REDIRECT_URI
+      }).toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    if (!tokenResponse.data || !tokenResponse.data.access_token) {
+      throw new Error('Failed to retrieve access token from Microsoft');
+    }
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Bước 2: Lấy thông tin người dùng từ Microsoft
+    const userResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    if (!userResponse.data) {
+      throw new Error('Failed to retrieve user information from Microsoft');
+    }
+
+    const microsoftUser = userResponse.data as {
+      id: string;
+      displayName: string;
+      mail?: string;
+      userPrincipalName: string;
+      gender?: string;
+      birthdate?: string;
+    };
+
+    // Bước 3: Kiểm tra User tồn tại
+    let user = await this.userRepository.findOne({
+      filter: { microsoftId: microsoftUser.id },
+      relations: ['userProfile']
+    });
+
+    if (!user) {
+      user = await this.userRepository.create({
+        data: {
+          email: microsoftUser.mail || microsoftUser.userPrincipalName || `${microsoftUser.id}@microsoft.com`,
+          phoneNumber: '',
+          password: '',
+          microsoftId: microsoftUser.id,
+          userProfile: {
+            userDisplayName: microsoftUser.displayName || '',
+            fullname: microsoftUser.displayName || '',
+            personalEmail: microsoftUser.mail || '',
+            workEmail: microsoftUser.userPrincipalName || '',
+            homeAddress: '',
+            birthday: undefined,
+            gender: microsoftUser.gender ? (microsoftUser.gender === 'male' ? 'MALE' : 'FEMALE') : 'MALE'
+          }
+        }
+      });
+
+      // Lưu User và UserProfile vào database trong một thao tác
+      await this.userRepository.save(user);
+    }
+
+    // Bước 4: Tạo JWT Token
+    const claim = new JwtClaimDto(user.userId, '', [], '');
+    const token = jwt.sign(_.toPlainObject(claim), SECRET_KEY, { expiresIn: this.LOGIN_TOKEN_EXPIRE });
+
+    // Bước 5: Trả về thông tin User
     const result = convertToDto(LoginUserRes, user);
     result.token = token;
 
@@ -232,6 +370,9 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     });
 
     const response = convertToDto(ResetPasswordRes, user);
+
+    //Logout after reset password
+    await this.logout(user.userId);
     return response;
   }
 }

@@ -15,7 +15,6 @@ export async function authenticateJWT(req: any, res: any, next: any) {
     }
 
     const secretKey = process.env.SECRET_KEY || '';
-    console.log(secretKey);
 
     jwt.verify(token, secretKey, async (err: any, user: any) => {
       if (err) {

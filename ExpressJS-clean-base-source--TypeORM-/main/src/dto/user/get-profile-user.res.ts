@@ -23,7 +23,7 @@ export class GetProfileRes {
   homeAddress!: string;
 
   @Expose()
-  birthday!: Date;
+  birthday?: Date;
 
   @Expose()
   gender!: 'MALE' | 'FEMALE';

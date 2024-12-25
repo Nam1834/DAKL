@@ -10,7 +10,11 @@ import express from 'express';
 const userRouter = express.Router();
 userRouter
   .post('/register', classValidate(RegisterUserReq), userController.register.bind(userController))
+  .post('/logout', authenticateJWT, userController.logout.bind(userController))
   .post('/login', classValidate(LoginUserReq), userController.login.bind(userController))
+  .get('/auth/get-uri-microsoft', userController.getMicrosoftAuthUrl.bind(userController))
+  .post('/auth/exchange-code', userController.exchangeCodeForToken.bind(userController))
+  .post('/auth/callback', userController.loginMicrosoft.bind(userController))
   .get('/get-profile', authenticateJWT, userController.getProfile.bind(userController))
   .put('/update-profile', authenticateJWT, userController.updateProfile.bind(userController))
   .post('/forgot-password', classValidate(ForgotPasswordUserReq), userController.forgotPassword.bind(userController))

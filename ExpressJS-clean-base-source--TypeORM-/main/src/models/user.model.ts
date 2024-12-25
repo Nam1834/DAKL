@@ -18,6 +18,9 @@ export class User extends BaseModel {
   @Column('varchar', { length: 100 })
   password!: string;
 
+  @Column({ name: 'microsoft_id', nullable: true })
+  microsoftId?: string;
+
   @OneToOne(() => UserProfile, (user_profile) => user_profile.user, { cascade: true })
   userProfile!: UserProfile;
 }

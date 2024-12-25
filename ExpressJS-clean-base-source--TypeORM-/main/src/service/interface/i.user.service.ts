@@ -14,8 +14,12 @@ import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
 import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
 
 export interface IUserService<T extends BaseModelType> extends IBaseCrudService<T> {
+  logout(userId: string): Promise<void>;
   register(data: RegisterUserReq): Promise<RegisterUserRes>;
   login(data: LoginUserReq): Promise<LoginUserRes>;
+  getMicrosoftAuthUrl(): Promise<{ authUrl: string }>;
+  exchangeCodeForToken(code: string): Promise<any>;
+  loginMicrosoft(code: string): Promise<LoginUserRes>;
   getProfile(userId: string): Promise<GetProfileRes>;
   updateProfile(userId: string, data: UpdateProfileUserReq): Promise<UpdateProfileUserRes>;
   forgotPassword(data: ForgotPasswordUserReq): Promise<void>;
