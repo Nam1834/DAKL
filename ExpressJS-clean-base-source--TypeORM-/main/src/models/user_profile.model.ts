@@ -13,6 +13,9 @@ export class UserProfile extends BaseModel {
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
+  @Column('varchar', { length: 100, name: 'user_display_name', nullable: true })
+  userDisplayName?: string;
+
   @Column('varchar', { length: 100 })
   fullname!: string;
 
@@ -31,8 +34,8 @@ export class UserProfile extends BaseModel {
   @Column('varchar', { length: 255, name: 'home_address' })
   homeAddress!: string;
 
-  @Column('date')
-  birthday!: Date;
+  @Column('date', { nullable: true })
+  birthday?: Date;
 
   @Column({ type: 'enum', enum: ['MALE', 'FEMALE'], default: 'MALE' })
   gender!: 'MALE' | 'FEMALE';

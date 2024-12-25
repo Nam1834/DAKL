@@ -17,6 +17,9 @@ export class Admin extends BaseModel {
   @Column('varchar', { length: 100 })
   password!: string;
 
+  @Column({ name: 'microsoft_id', nullable: true })
+  microsoftId?: string;
+
   @OneToOne(() => AdminProfile, (admin_profile) => admin_profile.admin, { cascade: true })
   adminProfile!: AdminProfile;
 }

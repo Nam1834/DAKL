@@ -13,6 +13,9 @@ export class AdminProfile extends BaseModel {
   @JoinColumn({ name: 'admin_id' })
   admin!: Admin;
 
+  @Column('varchar', { length: 100, name: 'admin_display_name' })
+  adminDisplayName!: string;
+
   @Column('varchar', { length: 100 })
   fullname!: string;
 

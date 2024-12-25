@@ -1,6 +1,9 @@
 import { Expose } from 'class-transformer';
 
-export class UpdateProfileUserRes {
+export class GetProfileAdminRes {
+  @Expose()
+  adminId!: string;
+
   @Expose()
   fullname!: string;
 
