@@ -2,13 +2,15 @@ import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.control
 import { CreateAdminReq } from '@/dto/admin/create-admin.req';
 import { GetProfileAdminRes } from '@/dto/admin/get-profile-admin.res';
 import { LoginAdminReq } from '@/dto/admin/login-admin.req';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { Admin } from '@/models/admin.model';
 import { IAdminService } from '@/service/interface/i.admin.service';
 import { ITYPES } from '@/types/interface.types';
 import { convertToDto } from '@/utils/dto-convert/convert-to-dto.util';
+import { getSearchData } from '@/utils/get-search-data.util';
 import c from 'config';
 import { NextFunction, Request, Response } from 'express';
-import { inject, injectable } from 'inversify';
+import { id, inject, injectable } from 'inversify';
 
 @injectable()
 export class AdminController {
@@ -46,6 +48,16 @@ export class AdminController {
     }
   }
 
+  async searchAdmin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.adminService.search(searchData);
+      res.send_ok('Employees fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestBody: LoginAdminReq = req.body;
@@ -68,6 +80,24 @@ export class AdminController {
       const profileData = await this.adminService.getProfile(adminId);
       const responseBody = convertToDto(GetProfileAdminRes, profileData);
       res.send_ok('Get Profile success', responseBody);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getDetail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id;
+
+      const result = await this.adminService.findOne({
+        filter: {
+          adminId: id
+        },
+        relations: ['adminProfile']
+      });
+
+      delete (result as any).password;
+      res.send_ok('Admin fetched successfully', result);
     } catch (error) {
       next(error);
     }

@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { Account } from '../models/account.model';
 import { Role } from '../models/role.model';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
@@ -8,8 +7,11 @@ import { User } from '@/models/user.model';
 import { UserProfile } from '@/models/user_profile.model';
 import { Admin } from '@/models/admin.model';
 import { AdminProfile } from '@/models/admin_profile.model';
+import { Permission } from '@/models/permission.model';
+import { RolePermission } from '@/models/role_permission.model';
+import { Notification } from '@/models/notification.model';
 
-const models = [Account, Role, User, UserProfile, Admin, AdminProfile];
+const models = [Role, Permission, RolePermission, User, UserProfile, Admin, AdminProfile, Notification];
 
 export class AppDataSourceSingleton {
   private static instance: DataSource;

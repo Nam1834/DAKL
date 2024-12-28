@@ -11,45 +11,11 @@ import { get } from 'lodash';
 export class MenuService implements IMenuService {
   public MENU_MAP: MenuMapDto[] = [
     {
-      name: 'Quản lý danh mục',
-      isCollapsed: true,
-      icon: null,
-      permissions: [
-        Permissions.QUAN_LY_TINH_TP,
-        Permissions.QUAN_LY_LOAI_TAI_SAN,
-        Permissions.QUAN_LY_TAI_SAN,
-        Permissions.QUAN_LY_GOI_VAY
-      ],
-      children: [
-        {
-          name: 'Quản lý tỉnh thành phố',
-          isCollapsed: false,
-          permissions: [Permissions.QUAN_LY_TINH_TP],
-          children: null,
-          icon: null
-        },
-        {
-          name: 'Quản lý loại tài sản',
-          isCollapsed: false,
-          permissions: [Permissions.QUAN_LY_LOAI_TAI_SAN],
-          children: null,
-          icon: null
-        },
-        {
-          name: 'Quản lý tài sản',
-          isCollapsed: false,
-          permissions: [Permissions.QUAN_LY_TAI_SAN],
-          children: null,
-          icon: null
-        },
-        {
-          name: 'Quản lý gói vay',
-          isCollapsed: false,
-          permissions: [Permissions.QUAN_LY_GOI_VAY],
-          children: null,
-          icon: null
-        }
-      ]
+      name: 'QUẢN LÝ ADMIN',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_ADMIN],
+      children: null,
+      icon: null
     }
   ];
 
@@ -58,7 +24,9 @@ export class MenuService implements IMenuService {
    */
   async checkAndAddMenu(menu: MenuMapDto, permissionIds: string[]): Promise<MenuDto | null> {
     //Check if the menu have one of the permissions in the permissionIds?
+
     if (menu.permissions.some((permission) => permissionIds.includes(permission))) {
+      console.log('menu.permissions', menu.permissions);
       let getMenu = new MenuDto();
       getMenu = { ...menu };
       getMenu.children = null;
@@ -90,8 +58,8 @@ export class MenuService implements IMenuService {
   /**
    * * Get the menu of the current user
    */
-  async getMyMenu(admin: JwtClaimDto): Promise<MenuDto[]> {
-    const permissionIds = admin.permissionIds;
+  async getMyMenu(user: JwtClaimDto): Promise<MenuDto[]> {
+    const permissionIds = user.permissionIds;
 
     const result: MenuDto[] = [];
 
@@ -99,7 +67,7 @@ export class MenuService implements IMenuService {
       //Check if the menu have one of the permissions in the permissionIds?
       const getMenu = await this.checkAndAddMenu(menu, permissionIds);
 
-      // console.log('getMenu', getMenu);
+      //console.log('getMenu', getMenu);
 
       if (getMenu) {
         result.push(getMenu);
