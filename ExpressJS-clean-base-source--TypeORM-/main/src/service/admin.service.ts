@@ -18,8 +18,21 @@ import { JwtClaimDto } from '@/dto/jwt-claim.dto';
 import jwt from 'jsonwebtoken';
 import { LoginAdminReq } from '@/dto/admin/login-admin.req';
 import { LoginAdminRes } from '@/dto/admin/login-admin.res';
-import _ from 'lodash';
+import _, { filter } from 'lodash';
 import { GetProfileAdminRes } from '@/dto/admin/get-profile-admin.res';
+import { AdminStatus } from '@/enums/admin-status.enum';
+import { INotificationService } from './interface/i.notification.service';
+import { IRolePermissionRepository } from '@/repository/interface/i.role_permission.repository';
+import { RolePermission } from '@/models/role_permission.model';
+import { Notification } from '@/models/notification.model';
+import { IRoleRepository } from '@/repository/interface/i.role.repository';
+import { Role } from '@/models/role.model';
+import { IPermissionRepository } from '@/repository/interface/i.permission.repository';
+import { Permission } from '@/models/permission.model';
+import { roleRepository } from '@/container/role.container';
+import { SearchDataDto } from '@/dto/search-data.dto';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { SearchUtil } from '@/utils/search.util';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 
@@ -27,16 +40,51 @@ const SECRET_KEY: any = process.env.SECRET_KEY;
 export class AdminService extends BaseCrudService<Admin> implements IAdminService<Admin> {
   private adminRepository: IAdminRepository<Admin>;
   private adminProfileRepository: IAdminProfileRepository<AdminProfile>;
+  private roleRepository: IRoleRepository<Role>;
+  private notificationService: INotificationService<Notification>;
+  private rolePermissionRepository: IRolePermissionRepository<RolePermission>;
+  private permissionRepository: IPermissionRepository<Permission>;
 
   private LOGIN_TOKEN_EXPIRE = 8 * 60 * 60;
 
   constructor(
+    @inject('NotificationService')
+    notificationService: INotificationService<Notification>,
     @inject('AdminRepository') adminRepository: IAdminRepository<Admin>,
-    @inject('AdminProfileRepository') adminProfileRepository: IAdminProfileRepository<AdminProfile>
+    @inject('AdminProfileRepository') adminProfileRepository: IAdminProfileRepository<AdminProfile>,
+    @inject('PermissionRepository')
+    permissionRepository: IPermissionRepository<Permission>,
+    @inject('RolePermissionRepository') rolePermissionRepository: IRolePermissionRepository<RolePermission>,
+    @inject('RoleRepository') roleRepository: IRoleRepository<Role>
   ) {
     super(adminRepository);
     this.adminRepository = adminRepository;
     this.adminProfileRepository = adminProfileRepository;
+    this.permissionRepository = permissionRepository;
+    this.notificationService = notificationService;
+    this.rolePermissionRepository = rolePermissionRepository;
+    this.roleRepository = roleRepository;
+  }
+
+  async search(searchData: SearchDataDto): Promise<PagingResponseDto<Admin>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const admin = await this.adminRepository.findMany({
+      filter: where,
+      order: order,
+      paging: paging,
+      relations: ['adminProfile']
+    });
+
+    admin.forEach((admin) => {
+      delete (admin as any).password;
+    });
+
+    const total = await this.adminRepository.count({
+      filter: where
+    });
+
+    return new PagingResponseDto(total, admin);
   }
 
   async logout(adminId: string): Promise<void> {
@@ -52,9 +100,13 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     return;
   }
 
-  async createAdmin(data: CreateAdminReq): Promise<CreateAdminRes> {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    data.password = hashedPassword;
+  async convertCreateAdminReqToAdmin(data: CreateAdminReq): Promise<Admin> {
+    const admin = new Admin();
+    admin.email = data.email;
+    admin.phoneNumber = data.phoneNumber;
+    admin.password = await bcrypt.hash(data.password, 10);
+    admin.roleId = data.roleId;
+    admin.status = AdminStatus.ACTIVE;
 
     const adminProfile = new AdminProfile();
     adminProfile.adminDisplayName = data.fullname;
@@ -66,22 +118,38 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     adminProfile.phoneNumber = data.phoneNumber;
     adminProfile.gender = data.gender;
 
-    (data as unknown as Admin).adminProfile = adminProfile;
+    admin.adminProfile = adminProfile;
 
-    const admin = await this.adminRepository.create({
-      data: data
+    return admin;
+  }
+
+  async createAdmin(data: CreateAdminReq): Promise<CreateAdminRes> {
+    const emailExist = await this.exists({
+      filter: { email: data.email }
     });
-
-    const result = await this.adminRepository.findOne({
-      filter: { adminId: admin.adminId },
-      relations: ['adminProfile']
-    });
-
-    if (!result) {
-      throw new Error('Failed to find the registered admin');
+    if (emailExist) {
+      throw new BaseError(ErrorCode.ALREADY_EXISTS, 'Email has exist');
     }
 
-    return convertToDto(CreateAdminRes, result);
+    const phoneNumberExist = await this.exists({
+      filter: { phoneNumber: data.phoneNumber }
+    });
+    if (phoneNumberExist) {
+      throw new BaseError(ErrorCode.ALREADY_EXISTS, 'Phone Number has exist');
+    }
+
+    const existRole = await this.roleRepository.exists({
+      filter: { roleId: data.roleId }
+    });
+    if (!existRole) {
+      throw new Error('Role does not exist');
+    }
+
+    const admin = await this.convertCreateAdminReqToAdmin(data);
+
+    await this.adminRepository.save(admin);
+
+    return convertToDto(CreateAdminRes, admin);
   }
 
   async login(data: LoginAdminReq): Promise<LoginAdminRes> {
@@ -107,8 +175,16 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
       throw new BaseError(ErrorCode.AUTH_01, 'Password is incorrect');
     }
 
+    const rolePermission = await this.rolePermissionRepository.findMany({
+      filter: {
+        roleId: admin.roleId
+      }
+    });
+
+    const rolePermissionIds = rolePermission!.map((permission) => permission.permissionId) || [''];
+
     // Luu vao JWt
-    const claim = new JwtClaimDto(admin.adminId, '', [], '');
+    const claim = new JwtClaimDto(admin.adminId, '', rolePermissionIds, admin.roleId);
 
     const token = jwt.sign(_.toPlainObject(claim), SECRET_KEY, {
       expiresIn: this.LOGIN_TOKEN_EXPIRE

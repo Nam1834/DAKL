@@ -33,5 +33,11 @@ export enum ErrorCode {
   /**
    * API Not Exists
    */
-  API_NOT_EXISTS = 'API_NOT_EXISTS'
+  API_NOT_EXISTS = 'API_NOT_EXISTS',
+
+  /**
+   * The resource already exists
+   */
+  ALREADY_EXISTS = 'ALREADY_EXISTS',
+  MEDIA_NOT_FOUND = 'MEDIA_NOT_FOUND'
 }

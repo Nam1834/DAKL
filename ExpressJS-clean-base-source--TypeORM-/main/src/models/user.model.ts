@@ -1,6 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Index, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseModel } from './base.model';
 import { UserProfile } from './user_profile.model';
+import { Role } from './role.model';
+import { UserTypeEnum } from '@/enums/user-type.enum';
 
 @Entity('users')
 export class User extends BaseModel {
@@ -23,4 +25,11 @@ export class User extends BaseModel {
 
   @OneToOne(() => UserProfile, (user_profile) => user_profile.user, { cascade: true })
   userProfile!: UserProfile;
+
+  @Column({ name: 'role_id', nullable: true, default: UserTypeEnum.USER })
+  roleId!: string;
+
+  @ManyToOne(() => Role)
+  @JoinColumn({ name: 'role_id' })
+  role!: Role;
 }

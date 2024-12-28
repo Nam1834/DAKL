@@ -69,4 +69,8 @@ export class CreateAdminReq {
   @ValidateIf((o) => o.password !== undefined)
   @Validate(IsPasswordMatch)
   confirmPassword!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  roleId!: string;
 }

@@ -69,6 +69,20 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   }
 
   async register(data: RegisterUserReq): Promise<RegisterUserRes> {
+    const emailExist = await this.exists({
+      filter: { email: data.email }
+    });
+    if (emailExist) {
+      throw new Error('Email has exist');
+    }
+
+    const phoneNumberExist = await this.exists({
+      filter: { phoneNumber: data.phoneNumber }
+    });
+    if (phoneNumberExist) {
+      throw new Error('Phone Number has exist');
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
     data.password = hashedPassword;
 

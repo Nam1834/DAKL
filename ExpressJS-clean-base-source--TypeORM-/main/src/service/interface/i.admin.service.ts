@@ -5,8 +5,12 @@ import { CreateAdminReq } from '@/dto/admin/create-admin.req';
 import { LoginAdminReq } from '@/dto/admin/login-admin.req';
 import { LoginAdminRes } from '@/dto/admin/login-admin.res';
 import { GetProfileAdminRes } from '@/dto/admin/get-profile-admin.res';
+import { SearchDataDto } from '@/dto/search-data.dto';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { Admin } from '@/models/admin.model';
 
 export interface IAdminService<T extends BaseModelType> extends IBaseCrudService<T> {
+  search(searchData: SearchDataDto): Promise<PagingResponseDto<Admin>>;
   logout(adminId: string): Promise<void>;
   createAdmin(data: CreateAdminReq): Promise<CreateAdminRes>;
   login(data: LoginAdminReq): Promise<LoginAdminRes>;
