@@ -1,6 +1,3 @@
-const SERVICE_TYPES = {
-  Account: Symbol.for('Account'),
-  Role: Symbol.for('Role')
-};
+const SERVICE_TYPES = {};
 
 export { SERVICE_TYPES };
