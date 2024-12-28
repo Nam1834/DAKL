@@ -8,7 +8,6 @@ import menuRouter from '../menu.route';
 import mediaRouter from '../media.route';
 
 export function route(app: any, root_api: string) {
-  //app.use(`${root_api}/account`, accountRouter);
   app.use(`/role`, roleRouter);
   app.use(`/user`, userRouter);
   app.use(`/admin`, adminRouter);
