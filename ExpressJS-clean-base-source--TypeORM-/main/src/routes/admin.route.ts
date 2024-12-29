@@ -2,6 +2,7 @@ import { Permissions } from '@/constants/permission.constants';
 import { adminController } from '@/container/admin.container';
 import { CreateAdminReq } from '@/dto/admin/create-admin.req';
 import { LoginAdminReq } from '@/dto/admin/login-admin.req';
+import { UpdateAdminReq } from '@/dto/admin/update-admin.req';
 import { authenticateJWT } from '@/middleware/authenticate.middleware';
 import { checkPermission } from '@/middleware/check-permission.middleware';
 import { classValidate } from '@/middleware/class-validate.middleware';
@@ -10,6 +11,12 @@ const adminRouter = express.Router();
 adminRouter
   .post('/logout', authenticateJWT, adminController.logout.bind(adminController))
   .post('/create-admin', classValidate(CreateAdminReq), adminController.createAdmin.bind(adminController))
+  .put(
+    '/update-admin',
+    authenticateJWT,
+    classValidate(UpdateAdminReq),
+    adminController.updateAdmin.bind(adminController)
+  )
   .get(
     '/search',
     authenticateJWT,

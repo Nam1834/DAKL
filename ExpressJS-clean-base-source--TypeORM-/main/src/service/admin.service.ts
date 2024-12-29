@@ -33,6 +33,7 @@ import { roleRepository } from '@/container/role.container';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchUtil } from '@/utils/search.util';
+import { UpdateAdminReq } from '@/dto/admin/update-admin.req';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 
@@ -207,5 +208,40 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     }
 
     return admin.adminProfile;
+  }
+
+  async convertUpdateAdminReqToAdmin(data: UpdateAdminReq): Promise<Admin> {
+    const admin = new Admin();
+    admin.status = AdminStatus.ACTIVE;
+
+    const adminProfile = new AdminProfile();
+    adminProfile.adminDisplayName = data.fullname;
+    adminProfile.workEmail = data.workEmail;
+    adminProfile.fullname = data.fullname;
+    adminProfile.birthday = new Date(data.birthday);
+    adminProfile.homeAddress = data.homeAddress;
+    adminProfile.gender = data.gender;
+
+    admin.adminProfile = adminProfile;
+
+    return admin;
+  }
+
+  async updateAdmin(id: string, data: any): Promise<void> {
+    const existingAdmin = await this.adminRepository.findOne({
+      filter: {
+        adminId: id
+      }
+    });
+
+    if (!existingAdmin) {
+      throw new BaseError(ErrorCode.NF_01, 'Admin not found');
+    }
+
+    //Merge data to admin
+    const adminUpdate = await this.convertUpdateAdminReqToAdmin(data);
+    const updatedData: Admin = { ...existingAdmin, ...adminUpdate }; // Gộp dữ liệu cũ với dữ liệu mới
+
+    await this.adminRepository.save(updatedData);
   }
 }

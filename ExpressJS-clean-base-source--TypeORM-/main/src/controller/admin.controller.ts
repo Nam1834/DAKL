@@ -2,6 +2,7 @@ import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.control
 import { CreateAdminReq } from '@/dto/admin/create-admin.req';
 import { GetProfileAdminRes } from '@/dto/admin/get-profile-admin.res';
 import { LoginAdminReq } from '@/dto/admin/login-admin.req';
+import { UpdateAdminReq } from '@/dto/admin/update-admin.req';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { Admin } from '@/models/admin.model';
 import { IAdminService } from '@/service/interface/i.admin.service';
@@ -98,6 +99,17 @@ export class AdminController {
 
       delete (result as any).password;
       res.send_ok('Admin fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateAdmin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.id;
+      const data: UpdateAdminReq = req.body;
+      const result = await this.adminService.updateAdmin(id, data);
+      res.send_ok('Admin updated successfully', result);
     } catch (error) {
       next(error);
     }
