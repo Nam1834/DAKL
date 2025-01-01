@@ -16,6 +16,41 @@ export class MenuService implements IMenuService {
       permissions: [Permissions.QUAN_LY_ADMIN],
       children: null,
       icon: null
+    },
+    {
+      name: 'QUẢN LÝ BÀI ĐĂNG',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_BAI_DANG],
+      children: null,
+      icon: null
+    },
+    {
+      name: 'QUẢN LÝ NGƯỜI DÙNG',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_NGUOI_DUNG],
+      children: null,
+      icon: null
+    },
+    {
+      name: 'QUẢN LÝ YÊU CẦU',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_YEU_CAU],
+      children: null,
+      icon: null
+    },
+    {
+      name: 'TRẢ LỜI TIN NHẮN',
+      isCollapsed: false,
+      permissions: [Permissions.REPLY_MESSAGE],
+      children: null,
+      icon: null
+    },
+    {
+      name: 'GỬI TIN NHẮN',
+      isCollapsed: false,
+      permissions: [Permissions.SEND_MESSAGE],
+      children: null,
+      icon: null
     }
   ];
 
