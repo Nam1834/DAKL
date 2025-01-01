@@ -86,7 +86,7 @@ services:
       - kafka-trigger-strategy
     environment:
       DYNAMIC_CONFIG_ENABLED: "true"
-    olumes:
+    volumes:
       - ./.docker-data/kafka-ui/config:/etc/kafkaui
 networks:
   main-network:
