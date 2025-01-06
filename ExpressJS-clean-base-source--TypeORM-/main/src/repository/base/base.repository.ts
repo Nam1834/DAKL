@@ -20,7 +20,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
   }
 
   private hasDeleteAtColumn(): boolean {
-    return this.ormRepository.metadata.columns.some((column) => column.propertyName === 'deleteAt');
+    return this.ormRepository.metadata.columns.some((column) => column.propertyName === 'deletedAt');
   }
 
   async save(data: T): Promise<T> {
