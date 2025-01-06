@@ -41,7 +41,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     if (!recordToDelete) {
       throw new BaseError(ErrorCode.NF_01, 'Record not found with given filter: ' + JSON.stringify(filter));
     }
-    (recordToDelete as any).deleteAt = new Date();
+    (recordToDelete as any).deletedAt = new Date();
     await this.ormRepository.save(recordToDelete);
   }
 
@@ -49,8 +49,8 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     const { filter, updateData } = options;
 
     if (this.hasDeleteAtColumn()) {
-      if (filter && !filter.deleteAt) {
-        (filter as any).deleteAt = IsNull();
+      if (filter && !filter.deletedAt) {
+        (filter as any).deletedAt = IsNull();
       }
     }
 
@@ -75,8 +75,8 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     const { filter, relations, select } = options;
 
     if (this.hasDeleteAtColumn()) {
-      if (!filter.deleteAt) {
-        (filter as any).deleteAt = IsNull();
+      if (!filter.deletedAt) {
+        (filter as any).deletedAt = IsNull();
       }
     }
 
@@ -107,13 +107,13 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     }
 
     if (this.hasDeleteAtColumn()) {
-      if (filter && !filter.deleteAt) {
-        (filter as any).deleteAt = IsNull();
+      if (filter && !filter.deletedAt) {
+        (filter as any).deletedAt = IsNull();
       }
 
       if (!filter) {
         (filter as any) = {
-          deleteAt: IsNull()
+          deletedAt: IsNull()
         };
       }
     }
@@ -138,7 +138,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
   async findAll(): Promise<T[]> {
     const filter: Partial<T> = {};
     if (this.hasDeleteAtColumn()) {
-      (filter as any).deleteAt = IsNull();
+      (filter as any).deletedAt = IsNull();
     }
 
     return await this.ormRepository.find({
@@ -150,13 +150,13 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     const { filter } = options;
 
     if (this.hasDeleteAtColumn()) {
-      if (filter && !filter.deleteAt) {
-        (filter as any).deleteAt = IsNull();
+      if (filter && !filter.deletedAt) {
+        (filter as any).deletedAt = IsNull();
       }
 
       if (!filter) {
         (filter as any) = {
-          deleteAt: IsNull()
+          deletedAt: IsNull()
         };
       }
     }
@@ -170,8 +170,8 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     const { filter } = options;
 
     if (this.hasDeleteAtColumn()) {
-      if (filter && !filter.deleteAt) {
-        (filter as any).deleteAt = IsNull();
+      if (filter && !filter.deletedAt) {
+        (filter as any).deletedAt = IsNull();
       }
     }
 

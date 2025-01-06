@@ -10,8 +10,9 @@ import { AdminProfile } from '@/models/admin_profile.model';
 import { Permission } from '@/models/permission.model';
 import { RolePermission } from '@/models/role_permission.model';
 import { Notification } from '@/models/notification.model';
+import { Major } from '@/models/major.model';
 
-const models = [Role, Permission, RolePermission, User, UserProfile, Admin, AdminProfile, Notification];
+const models = [Role, Permission, RolePermission, User, UserProfile, Admin, AdminProfile, Notification, Major];
 
 export class AppDataSourceSingleton {
   private static instance: DataSource;
