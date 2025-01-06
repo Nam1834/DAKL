@@ -39,5 +39,6 @@ export enum ErrorCode {
    * The resource already exists
    */
   ALREADY_EXISTS = 'ALREADY_EXISTS',
+  DOES_NOT_EXISTS = 'DOES_NOT_EXISTS',
   MEDIA_NOT_FOUND = 'MEDIA_NOT_FOUND'
 }

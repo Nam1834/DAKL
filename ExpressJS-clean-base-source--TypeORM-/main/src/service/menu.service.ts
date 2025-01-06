@@ -39,6 +39,13 @@ export class MenuService implements IMenuService {
       icon: null
     },
     {
+      name: 'QUẢN LÝ NGÀNH',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_NGANH],
+      children: null,
+      icon: null
+    },
+    {
       name: 'TRẢ LỜI TIN NHẮN',
       isCollapsed: false,
       permissions: [Permissions.REPLY_MESSAGE],
