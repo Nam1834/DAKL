@@ -1,5 +1,6 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { CreateMajorReq } from '@/dto/major/create-major.req';
+import { PagingDto } from '@/dto/paging.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Major } from '@/models/major.model';
 import { IMajorService } from '@/service/interface/i.major.service';
@@ -77,5 +78,18 @@ export class MajorController {
     res.send_ok('Delete major successfully');
   }
 
-  async getListMajor(req: Request, res: Response, next: NextFunction): Promise<void> {}
+  async getListMajor(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = Number(req.query.page) || 1;
+      const rpp = Number(req.query.rpp) || 10;
+
+      const paging = new PagingDto(page, rpp);
+
+      const majors = await this.majorService.getList(paging);
+
+      res.send_ok('Get list majors success', majors);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

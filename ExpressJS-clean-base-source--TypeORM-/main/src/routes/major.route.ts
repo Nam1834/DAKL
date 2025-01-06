@@ -23,6 +23,12 @@ majorRouter
     authenticateJWT,
     checkPermission([Permissions.QUAN_LY_NGANH]),
     majorController.deleteMajorById.bind(majorController)
+  )
+  .get(
+    '/',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_NGANH]),
+    majorController.getListMajor.bind(majorController)
   );
 
 export default majorRouter;

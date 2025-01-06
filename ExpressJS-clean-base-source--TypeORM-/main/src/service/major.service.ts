@@ -1,3 +1,6 @@
+import { GetListMajorRes } from '@/dto/major/get-list-major.res';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { PagingDto } from '@/dto/paging.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Major } from '@/models/major.model';
 import { IMajorRepository } from '@/repository/interface/i.major.repository';
@@ -32,5 +35,22 @@ export class MajorService extends BaseCrudService<Major> implements IMajorServic
     });
 
     return updateMajor;
+  }
+
+  async getList(paging: PagingDto): Promise<PagingResponseDto<GetListMajorRes>> {
+    const majors = await this.majorRepository.findMany({
+      paging: paging,
+      select: {
+        majorId: true,
+        majorName: true
+      }
+    });
+
+    const total = await this.majorRepository.count({ filter: {} });
+
+    return {
+      items: majors,
+      total
+    };
   }
 }
