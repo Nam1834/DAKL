@@ -18,6 +18,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Delete source code from server
+        uses: appleboy/scp-action@v0.1.1
+        with:
+          host: ${{ secrets.DAKL_HOST }}
+          username: ${{ secrets.DAKL_USER }}
+          password: ${{ secrets.DAKL_PASSWORD }}
+          source: "./*"
+          target: ${{ env.DEPLOY_FOLDER }}
+
+      - name: Remove main from server
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.DAKL_HOST }}
+          username: ${{ secrets.DAKL_USER }}
+          password: ${{ secrets.DAKL_PASSWORD }}
+          port: 22
+          script: |
+            sudo rm -rf ${{ env.DEPLOY_FOLDER }}${{ env.SERVICE_FOLDER }}/main/*
+
       - name: Copy source code to server
         uses: appleboy/scp-action@v0.1.1
         with:
