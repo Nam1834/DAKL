@@ -31,12 +31,12 @@ export class UserProfile extends BaseModel {
   @Column('varchar', { nullable: true, length: 15, name: 'phone_number' })
   phoneNumber!: string;
 
-  @Column('varchar', { length: 255, name: 'home_address' })
+  @Column('varchar', { length: 255, name: 'home_address', nullable: true })
   homeAddress!: string;
 
   @Column('date', { nullable: true })
   birthday?: Date;
 
-  @Column({ type: 'enum', enum: ['MALE', 'FEMALE'], default: 'MALE' })
+  @Column({ type: 'enum', enum: ['MALE', 'FEMALE'], nullable: true })
   gender!: 'MALE' | 'FEMALE';
 }

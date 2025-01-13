@@ -1,3 +1,5 @@
 import { IBaseRepository } from '@/repository/interface/i.base.repository';
 
-export interface IUserRepository<T> extends IBaseRepository<T> {}
+export interface IUserRepository<T> extends IBaseRepository<T> {
+  totalNewRequest(): Promise<number>;
+}
