@@ -15,7 +15,7 @@ import BaseError from '@/utils/error/base.error';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { JwtClaimDto } from '@/dto/jwt-claim.dto';
 import jwt from 'jsonwebtoken';
-import _ from 'lodash';
+import _, { filter } from 'lodash';
 import { GetProfileRes } from '@/dto/user/get-profile-user.res';
 import { createEmailContent } from '@/utils/email/create-email-content.util';
 import { sendEmail } from '@/utils/email/email-sender.util';
@@ -31,8 +31,19 @@ import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
 import axios from 'axios';
 import { MicrosoftTokenRes } from '@/dto/user/microsoft-token.res';
 import moment from 'moment';
-import { log } from 'console';
+import { error, log } from 'console';
 import { RedisSchemaEnum } from '@/enums/redis-schema.enum';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
+import { TutorProfile } from '@/models/tutor_profile.model';
+import { UserStatus } from '@/enums/user-status.enum';
+import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
+import { PagingDto } from '@/dto/paging.dto';
+import { GetListRequestRes } from '@/dto/tutor/get-list-request.res';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { SearchUtil } from '@/utils/search.util';
+import { SearchDataDto } from '@/dto/search-data.dto';
+import { REFUSED } from 'dns';
+import { UserTypeEnum } from '@/enums/user-type.enum';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -43,16 +54,19 @@ const MICROSOFT_CLIENT_SCOPE: any = process.env.MICROSOFT_CLIENT_SCOPE;
 export class UserService extends BaseCrudService<User> implements IUserService<User> {
   private userRepository: IUserRepository<User>;
   private userProfileRepository: IUserProfileRepository<UserProfile>;
+  private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
   constructor(
     @inject('UserRepository') userRepository: IUserRepository<User>,
-    @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>
+    @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
+    @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>
   ) {
     super(userRepository);
     this.userRepository = userRepository;
     this.userProfileRepository = userProfileRepository;
+    this.tutorProfileRepository = tutorProfileRepository;
   }
 
   async logout(userId: string): Promise<void> {
@@ -388,5 +402,107 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     //Logout after reset password
     await this.logout(user.userId);
     return response;
+  }
+
+  async convertUserReqToTutor(data: RegisToTutorReq): Promise<User> {
+    const user = new User();
+    user.status = UserStatus.REQUEST;
+
+    const tutorProfile = new TutorProfile();
+    tutorProfile.avatar = data.avatar;
+    tutorProfile.majorName = data.majorName;
+    tutorProfile.teachingCetification = data.teachingCetification;
+    tutorProfile.degree = data.degree;
+    tutorProfile.univercity = data.univercity;
+    tutorProfile.GPA = data.GPA;
+    tutorProfile.educationalCertification = data.educationalCertification;
+    tutorProfile.dateTimeLearn = data.dateTimeLearn;
+    tutorProfile.teachingTime = data.teachingTime;
+    tutorProfile.amount = data.amount;
+    tutorProfile.teachingRoadMap = data.teachingRoadMap;
+    tutorProfile.description = data.description;
+    tutorProfile.videoUrl = data.videoUrl;
+
+    user.tutorProfile = tutorProfile;
+
+    return user;
+  }
+
+  async regisToTutor(id: string, data: RegisToTutorReq): Promise<void> {
+    const existingUser = await this.userRepository.findOne({
+      filter: {
+        userId: id
+      }
+    });
+
+    if (!existingUser) {
+      throw new BaseError(ErrorCode.NF_01, 'User not found');
+    }
+
+    const userUpdate = await this.convertUserReqToTutor(data);
+    const updatedData: User = { ...existingUser, ...userUpdate };
+
+    await this.userRepository.save(updatedData);
+  }
+
+  async getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    where.status = status;
+
+    const requests = await this.userRepository.findMany({
+      filter: where,
+      paging: paging,
+      relations: ['tutorProfile'],
+      order: order
+    });
+
+    requests.forEach((request) => {
+      delete (request as any).password;
+    });
+
+    const total = await this.userRepository.count({ filter: where });
+
+    const totalNewRequest = await this.userRepository.totalNewRequest();
+
+    return {
+      total: total,
+      items: requests,
+      counts: {
+        totalRequest: total,
+        totalNewRequest: totalNewRequest
+      }
+    };
+  }
+
+  async solveRequest(userId: string, click: string): Promise<void> {
+    const checkStatus = await this.userRepository.findOne({
+      filter: { status: UserStatus.REQUEST, userId: userId }
+    });
+
+    if (!checkStatus) {
+      throw new Error('You cant solve request ');
+    }
+
+    if (!Object.values(UserStatus).includes(click as UserStatus)) {
+      throw new Error('You need to transmit the correct data');
+    }
+
+    if (click === UserStatus.ACCEPT) {
+      await this.userRepository.findOneAndUpdate({
+        filter: { userId: userId },
+        updateData: {
+          roleId: UserTypeEnum.TUTOR,
+          status: UserStatus.ACCEPT
+        }
+      });
+    } else if (click === UserStatus.REFUSE) {
+      await this.userRepository.findOneAndUpdate({
+        filter: { userId: userId },
+        updateData: {
+          status: UserStatus.REFUSE
+        }
+      });
+    }
   }
 }

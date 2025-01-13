@@ -12,6 +12,9 @@ import { VerifyOtpReq } from '@/dto/user/verify-otp.req';
 import { VerifyOtpRes } from '@/dto/user/verify-otp.res';
 import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
 import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
+import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
+import { SearchDataDto } from '@/dto/search-data.dto';
+import { GetListRequestRes } from '@/dto/tutor/get-list-request.res';
 
 export interface IUserService<T extends BaseModelType> extends IBaseCrudService<T> {
   logout(userId: string): Promise<void>;
@@ -25,4 +28,7 @@ export interface IUserService<T extends BaseModelType> extends IBaseCrudService<
   forgotPassword(data: ForgotPasswordUserReq): Promise<void>;
   verifyOtp(data: VerifyOtpReq): Promise<VerifyOtpRes>;
   resetPassword(data: ResetPasswordReq): Promise<ResetPasswordRes>;
+  regisToTutor(id: string, data: RegisToTutorReq): Promise<void>;
+  getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes>;
+  solveRequest(userId: string, click: string): Promise<void>;
 }

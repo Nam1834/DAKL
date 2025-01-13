@@ -7,6 +7,8 @@ import { IUserRepository } from '@/repository/interface/i.user.repository';
 import { BaseContainer } from '@/container/base.container';
 import { IUserProfileRepository } from '@/repository/interface/i.user_profile.repository';
 import { userProfileRepository } from './user_profile.container';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
+import { tutorProfileRepository } from './tutor_profile.container';
 
 class UserContainer extends BaseContainer {
   constructor() {
@@ -17,6 +19,7 @@ class UserContainer extends BaseContainer {
 
     //Import
     this.container.bind<IUserProfileRepository<any>>('UserProfileRepository').toConstantValue(userProfileRepository);
+    this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
   export() {

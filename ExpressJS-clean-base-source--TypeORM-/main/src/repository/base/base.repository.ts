@@ -147,7 +147,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
   }
 
   async count(options: { filter?: Partial<T> }): Promise<number> {
-    const { filter } = options;
+    let { filter } = options;
 
     if (this.hasDeleteAtColumn()) {
       if (filter && !filter.deletedAt) {

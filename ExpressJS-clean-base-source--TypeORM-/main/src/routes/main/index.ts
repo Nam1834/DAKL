@@ -7,6 +7,7 @@ import authRouter from '../auth.route';
 import menuRouter from '../menu.route';
 import mediaRouter from '../media.route';
 import majorRouter from '../major.route';
+import meetingRouter from '../meeting.route';
 
 export function route(app: any, root_api: string) {
   app.use(`/role`, roleRouter);
@@ -16,6 +17,7 @@ export function route(app: any, root_api: string) {
   app.use(`/menu`, menuRouter);
   app.use(`/media`, mediaRouter);
   app.use(`/major`, majorRouter);
+  app.use(`/meeting`, meetingRouter);
   app.all('*', (req: any, res: any, next: any) => {
     const err = new BaseError(ErrorCode.API_NOT_EXISTS, 'API Not Exists');
     next(err);

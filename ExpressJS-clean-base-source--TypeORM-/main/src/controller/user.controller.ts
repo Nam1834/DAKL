@@ -1,4 +1,6 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
+import { SearchDataDto } from '@/dto/search-data.dto';
+import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
 import { GetProfileRes } from '@/dto/user/get-profile-user.res';
 import { LoginMicrosoftRes } from '@/dto/user/login-microsoft.res';
@@ -15,6 +17,7 @@ import { User } from '@/models/user.model';
 import { IUserService } from '@/service/interface/i.user.service';
 import { ITYPES } from '@/types/interface.types';
 import { convertToDto } from '@/utils/dto-convert/convert-to-dto.util';
+import { getSearchData } from '@/utils/get-search-data.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 
@@ -183,6 +186,49 @@ export class UserController {
       const result = await this.userService.resetPassword(resetPasswordReq);
 
       res.send_ok('Reset password successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async regisUserToTutor(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const requestBody: RegisToTutorReq = req.body;
+      const result = await this.userService.regisToTutor(userId, requestBody);
+      res.send_ok('Register Tutor successful', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getListRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const status = req.params.status;
+
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.userService.getListRequest(status, searchData);
+
+      res.send_ok('Request fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async solveRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.userId;
+
+      const click: string = req.body.click;
+      const result = await this.userService.solveRequest(userId, click);
+
+      res.send_ok('Request solve successfully', result);
     } catch (error) {
       next(error);
     }

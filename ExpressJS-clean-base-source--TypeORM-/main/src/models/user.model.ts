@@ -3,6 +3,8 @@ import { BaseModel } from './base.model';
 import { UserProfile } from './user_profile.model';
 import { Role } from './role.model';
 import { UserTypeEnum } from '@/enums/user-type.enum';
+import { UserStatus } from '@/enums/user-status.enum';
+import { TutorProfile } from './tutor_profile.model';
 
 @Entity('users')
 export class User extends BaseModel {
@@ -13,7 +15,6 @@ export class User extends BaseModel {
   @Column('varchar', { length: 100 })
   email!: string;
 
-  @Index({ unique: true })
   @Column('varchar', { length: 15, name: 'phone_number' })
   phoneNumber!: string;
 
@@ -26,10 +27,16 @@ export class User extends BaseModel {
   @OneToOne(() => UserProfile, (user_profile) => user_profile.user, { cascade: true })
   userProfile!: UserProfile;
 
+  @OneToOne(() => TutorProfile, (tutor_profile) => tutor_profile.user, { cascade: true })
+  tutorProfile!: TutorProfile;
+
   @Column({ name: 'role_id', nullable: true, default: UserTypeEnum.USER })
   roleId!: string;
 
   @ManyToOne(() => Role)
   @JoinColumn({ name: 'role_id' })
   role!: Role;
+
+  @Column({ nullable: true, default: UserStatus.PENDING })
+  status?: string;
 }
