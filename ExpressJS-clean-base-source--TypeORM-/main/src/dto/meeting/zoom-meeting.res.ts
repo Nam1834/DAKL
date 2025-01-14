@@ -1,6 +1,9 @@
 import { Expose, Type } from 'class-transformer';
 
-export class MicrosoftMeetingRes {
+export class ZoomMeetingRes {
+  @Expose()
+  zoomMeetingId!: string;
+
   @Expose()
   topic!: string;
 
@@ -8,8 +11,11 @@ export class MicrosoftMeetingRes {
   microsoftMeetingId!: string;
 
   @Expose()
-  joinUrl!: string;
+  join_url!: string;
 
   @Expose()
   start_time!: string;
+
+  @Expose()
+  password!: string;
 }

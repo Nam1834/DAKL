@@ -7,5 +7,5 @@ export interface IMeetingService<T extends BaseModelType> extends IBaseCrudServi
   getZoomAuth(): Promise<{ zoomAuthUrl: string }>;
   getMicrosoftAuthUrlForMeeting(): Promise<{ authUrl: string }>;
   getZoomAccessToken(authorizationCode: string): Promise<string>;
-  createMeeting(code: string, dataREQ: CreateMeetingReq): Promise<CreateMeetingRes>;
+  createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes>;
 }
