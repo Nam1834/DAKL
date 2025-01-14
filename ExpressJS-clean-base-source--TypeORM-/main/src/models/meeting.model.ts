@@ -6,13 +6,13 @@ export class Meeting extends BaseModel {
   @PrimaryGeneratedColumn('uuid', { name: 'meeting_id' })
   meetingId!: string;
 
-  @Column({ type: 'varchar', unique: true, name: 'microsoft_meeting_id' })
-  microsoftMeetingId!: string;
+  @Column({ type: 'varchar', unique: true, name: 'zoom_meeting_id', nullable: true })
+  zoomMeetingId!: string;
 
   @Column({ type: 'varchar', nullable: true })
   topic!: string;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'start_time' })
+  @Column({ type: 'timestamptz', nullable: true, name: 'start_time' })
   startTime!: Date;
 
   @Column({ type: 'int', nullable: true })
@@ -26,4 +26,7 @@ export class Meeting extends BaseModel {
 
   @Column({ type: 'varchar', nullable: true })
   password!: string;
+
+  @Column('varchar', { length: 100, nullable: true })
+  hostEmail!: string;
 }

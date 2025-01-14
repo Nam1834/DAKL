@@ -13,6 +13,7 @@ import { Notification } from '@/models/notification.model';
 import { Major } from '@/models/major.model';
 import { TutorProfile } from '@/models/tutor_profile.model';
 import { Meeting } from '@/models/meeting.model';
+import { ValueConfig } from '@/models/value_config.model';
 
 const models = [
   Role,
@@ -25,7 +26,8 @@ const models = [
   AdminProfile,
   Notification,
   Major,
-  Meeting
+  Meeting,
+  ValueConfig
 ];
 
 export class AppDataSourceSingleton {

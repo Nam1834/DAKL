@@ -1,8 +1,10 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { CreateMeetingReq } from '@/dto/meeting/create-meeting.req';
+import { ErrorCode } from '@/enums/error-code.enums';
 import { Meeting } from '@/models/meeting.model';
 import { IMeetingService } from '@/service/interface/i.meeting.service';
 import { ITYPES } from '@/types/interface.types';
+import BaseError from '@/utils/error/base.error';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 
@@ -69,14 +71,13 @@ export class MeetingController {
 
   async createMeeting(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;
+      const accessToken = req.headers.authorization?.split(' ')[1];
 
-      if (!code) {
-        res.status(400).send({ error: 'Invalid or missing authorization code.' });
-        return;
+      if (!accessToken) {
+        throw new BaseError(ErrorCode.AUTH_01, 'Missing or invalid authorization token.');
       }
       const data: CreateMeetingReq = req.body;
-      const result = await this.meetingService.createMeeting(code, data);
+      const result = await this.meetingService.createMeeting(accessToken, data);
       res.send_ok('Zoom Meeting created successfully', result);
     } catch (error) {
       next(error);

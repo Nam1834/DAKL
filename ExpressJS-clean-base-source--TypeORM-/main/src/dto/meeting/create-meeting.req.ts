@@ -5,4 +5,8 @@ export class CreateMeetingReq {
   @IsString()
   @MaxLength(100, { message: 'Topic must not exceed 100 characters' })
   topic!: string;
+
+  @IsOptional()
+  @IsString()
+  password!: string;
 }
