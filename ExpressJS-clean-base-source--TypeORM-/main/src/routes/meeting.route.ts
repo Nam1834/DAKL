@@ -8,6 +8,7 @@ meetingRouter
   .get('/get-uri-microsoft-meeting', meetingController.getMicrosoftAuthUrlForMeeting.bind(meetingController))
   .get('/callback', meetingController.handleZoomCallback.bind(meetingController))
   .post('/handle', meetingController.handleZoomRedirect.bind(meetingController))
+  .post('/zoom/refresh', meetingController.refreshZoomAccessToken.bind(meetingController))
   .post('/create', meetingController.createMeeting.bind(meetingController));
 
 export default meetingRouter;

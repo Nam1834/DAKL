@@ -69,6 +69,22 @@ export class MeetingController {
     }
   }
 
+  async refreshZoomAccessToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const refreshToken = typeof req.body.refreshToken === 'string' ? req.body.refreshToken.trim() : undefined;
+
+      if (!refreshToken) {
+        res.status(400).send({ error: 'Invalid or missing refresh token.' });
+        return;
+      }
+      const result = await this.meetingService.refreshZoomAccessToken(refreshToken);
+
+      res.send_ok('Refresh access token successfully', { result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createMeeting(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const accessToken = req.headers.authorization?.split(' ')[1];
