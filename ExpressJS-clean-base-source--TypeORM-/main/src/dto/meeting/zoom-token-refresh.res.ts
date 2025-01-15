@@ -1,9 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 
-export class ZoomTokenRes {
-  @Expose()
-  id!: string;
-
+export class ZoomTokenRefreshRes {
   @Expose()
   access_token!: string;
 

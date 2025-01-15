@@ -13,6 +13,7 @@ import axios from 'axios';
 import { Subject } from 'typeorm/persistence/Subject';
 import { MicrosoftTokenRes } from '@/dto/user/microsoft-token.res';
 import { ZoomMeetingRes } from '@/dto/meeting/zoom-meeting.res';
+import { ZoomTokenRefreshRes } from '@/dto/meeting/zoom-token-refresh.res';
 const ZOOM_CLIENT_ID = process.env.ZOOM_CLIENT_ID;
 const ZOOM_CLIENT_SECRET = process.env.ZOOM_CLIENT_SECRET;
 const ZOOM_REDIRECT_URI = process.env.ZOOM_REDIRECT_URI;
@@ -48,7 +49,9 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     return { authUrl };
   }
 
-  async getZoomAccessToken(authorizationCode: string): Promise<string> {
+  async getZoomAccessToken(
+    authorizationCode: string
+  ): Promise<{ userId: string; accessToken: string; refreshToken: string }> {
     const tokenUrl = 'https://zoom.us/oauth/token';
     const auth = Buffer.from(`${ZOOM_CLIENT_ID}:${ZOOM_CLIENT_SECRET}`).toString('base64');
 
@@ -68,13 +71,62 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
       }
     );
 
-    const data = response.data as { access_token: string };
+    const data = response.data;
 
-    if (!data.access_token) {
-      throw new BaseError(ErrorCode.AUTH_01, 'Failed to retrieve access token from Zoom API');
+    if (!data.access_token || !data.refresh_token) {
+      throw new BaseError(ErrorCode.AUTH_01, 'Failed to retrieve access token or refresh token from Zoom API');
     }
 
-    return data.access_token;
+    const userResponse = await axios.get('https://api.zoom.us/v2/users/me', {
+      headers: {
+        Authorization: `Bearer ${data.access_token}`
+      }
+    });
+
+    const userData = userResponse.data as ZoomTokenRes;
+
+    if (!userData.id) {
+      throw new BaseError(ErrorCode.AUTH_01, 'Failed to retrieve userId from Zoom API');
+    }
+
+    return {
+      userId: userData.id,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token
+    };
+  }
+
+  async refreshZoomAccessToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const tokenUrl = 'https://zoom.us/oauth/token';
+    const auth = Buffer.from(`${ZOOM_CLIENT_ID}:${ZOOM_CLIENT_SECRET}`).toString('base64');
+
+    // Gửi yêu cầu làm mới token
+    const response = await axios.post<ZoomTokenRefreshRes>(
+      tokenUrl,
+      {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      },
+      {
+        headers: {
+          Authorization: `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
+
+    const data = response.data;
+
+    // Kiểm tra nếu không có access_token hoặc refresh_token
+    if (!data.access_token || !data.refresh_token) {
+      throw new BaseError(ErrorCode.AUTH_01, 'Failed to refresh access token from Zoom API');
+    }
+
+    // Trả về accessToken và refreshToken mới
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token
+    };
   }
 
   async createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes> {
