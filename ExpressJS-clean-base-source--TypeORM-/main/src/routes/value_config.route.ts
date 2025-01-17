@@ -24,11 +24,6 @@ valueConfigRouter
     checkPermission([Permissions.QUAN_LY_GOI_THANH_TOAN]),
     valueConfigController.deleteValueConfigById.bind(valueConfigController)
   )
-  .get(
-    '/get-list',
-    authenticateJWT,
-    checkPermission([Permissions.QUAN_LY_GOI_THANH_TOAN]),
-    valueConfigController.getListValueConfig.bind(valueConfigController)
-  );
+  .get('/get-list', authenticateJWT, valueConfigController.getListValueConfig.bind(valueConfigController));
 
 export default valueConfigRouter;
