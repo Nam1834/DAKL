@@ -14,6 +14,9 @@ import { Major } from '@/models/major.model';
 import { TutorProfile } from '@/models/tutor_profile.model';
 import { Meeting } from '@/models/meeting.model';
 import { ValueConfig } from '@/models/value_config.model';
+import { Payment } from '@/models/payment.model';
+import { Order } from '@/models/order.model';
+import { OrderItem } from '@/models/order_item.model';
 
 const models = [
   Role,
@@ -27,7 +30,10 @@ const models = [
   Notification,
   Major,
   Meeting,
-  ValueConfig
+  ValueConfig,
+  Payment,
+  Order,
+  OrderItem
 ];
 
 export class AppDataSourceSingleton {
