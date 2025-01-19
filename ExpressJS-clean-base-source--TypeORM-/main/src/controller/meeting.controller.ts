@@ -61,9 +61,9 @@ export class MeetingController {
         return;
       }
 
-      const accessToken = await this.meetingService.getZoomAccessToken(authorizationCode);
+      const result = await this.meetingService.getZoomAccessToken(authorizationCode);
 
-      res.send_ok('Access token retrieved successfully', { accessToken });
+      res.send_ok('Access token retrieved successfully', { result });
     } catch (error) {
       next(error);
     }
