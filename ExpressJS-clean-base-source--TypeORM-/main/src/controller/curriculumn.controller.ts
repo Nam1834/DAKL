@@ -12,6 +12,7 @@ import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
+import { filter } from 'lodash';
 
 @injectable()
 export class CurriculumnController {
@@ -91,6 +92,18 @@ export class CurriculumnController {
       const curriculumns = await this.curriculumnService.getList(paging);
 
       res.send_ok('Get list curriculumns success', curriculumns);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id;
+
+      const curriculumn = await this.curriculumnService.findOne({ filter: { curriculumnId: id } });
+
+      res.send_ok('Get curriculumn success', curriculumn);
     } catch (error) {
       next(error);
     }
