@@ -23,6 +23,12 @@ curriculumnRouter
     authenticateJWT,
     checkPermission([Permissions.QUAN_LY_GIAO_TRINH]),
     curriculumnController.deleteCurriculumnById.bind(curriculumnController)
+  )
+  .get(
+    '/get-list',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_GIAO_TRINH]),
+    curriculumnController.getListCurriculumn.bind(curriculumnController)
   );
 
 export default curriculumnRouter;

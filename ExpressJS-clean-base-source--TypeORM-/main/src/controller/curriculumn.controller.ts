@@ -1,6 +1,8 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { CreateCurriculumnReq } from '@/dto/curriculumn/create-curriculumn.req';
 import { UpdateCurriculumnReq } from '@/dto/curriculumn/update-curriculumn.req';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { PagingDto } from '@/dto/paging.dto';
 import { AdminTypeEnum } from '@/enums/admin-type.enum';
 import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 import { ErrorCode } from '@/enums/error-code.enums';
@@ -44,6 +46,16 @@ export class CurriculumnController {
   async updateByAdminById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const id = req.params.id;
+
+      const existingCurriculumn = await this.curriculumnService.findOne({
+        filter: {
+          curriculumnId: id
+        }
+      });
+
+      if (!existingCurriculumn) {
+        throw new BaseError(ErrorCode.NF_01, 'Curriculumn not found');
+      }
       const data: UpdateCurriculumnReq = req.body;
 
       await this.curriculumnService.findOneAndUpdate({ filter: { curriculumnId: id }, updateData: data });
@@ -67,5 +79,20 @@ export class CurriculumnController {
     await this.curriculumnService.findOneAndDelete({ filter: { curriculumnId: id } });
 
     res.send_ok('Delete curriculumn successfully');
+  }
+
+  async getListCurriculumn(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = Number(req.query.page) || 1;
+      const rpp = Number(req.query.rpp) || 10;
+
+      const paging = new PagingDto(page, rpp);
+
+      const curriculumns = await this.curriculumnService.getList(paging);
+
+      res.send_ok('Get list curriculumns success', curriculumns);
+    } catch (error) {
+      next(error);
+    }
   }
 }
