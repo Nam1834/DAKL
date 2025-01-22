@@ -11,6 +11,7 @@ import meetingRouter from '../meeting.route';
 import valueConfigRouter from '../value_config.route';
 import orderRouter from '../order.route';
 import paymentRouter from '../payment.route';
+import curriculumnRouter from '../curriculumn.route';
 
 export function route(app: any, root_api: string) {
   app.use(`/role`, roleRouter);
@@ -24,6 +25,7 @@ export function route(app: any, root_api: string) {
   app.use(`/value-config`, valueConfigRouter);
   app.use(`/order`, orderRouter);
   app.use(`/payment`, paymentRouter);
+  app.use(`/curriculumn`, curriculumnRouter);
   app.all('*', (req: any, res: any, next: any) => {
     const err = new BaseError(ErrorCode.API_NOT_EXISTS, 'API Not Exists');
     next(err);

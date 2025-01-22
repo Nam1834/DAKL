@@ -17,6 +17,9 @@ import { ValueConfig } from '@/models/value_config.model';
 import { Payment } from '@/models/payment.model';
 import { Order } from '@/models/order.model';
 import { OrderItem } from '@/models/order_item.model';
+import { Curriculumn } from '@/models/curriculumn.model';
+import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
 
 const models = [
   Role,
@@ -33,7 +36,10 @@ const models = [
   ValueConfig,
   Payment,
   Order,
-  OrderItem
+  OrderItem,
+  Curriculumn,
+  MyCurriculumn,
+  MyCurriculumnItem
 ];
 
 export class AppDataSourceSingleton {

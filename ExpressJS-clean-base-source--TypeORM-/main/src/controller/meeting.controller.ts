@@ -29,15 +29,6 @@ export class MeetingController {
     }
   }
 
-  async getMicrosoftAuthUrlForMeeting(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const result = await this.meetingService.getMicrosoftAuthUrlForMeeting();
-      res.send_ok('Microsoft Auth URL generated successfully', result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   async handleZoomCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { code } = req.query;
