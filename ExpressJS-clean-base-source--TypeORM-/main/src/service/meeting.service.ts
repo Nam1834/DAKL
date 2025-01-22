@@ -14,13 +14,10 @@ import { Subject } from 'typeorm/persistence/Subject';
 import { MicrosoftTokenRes } from '@/dto/user/microsoft-token.res';
 import { ZoomMeetingRes } from '@/dto/meeting/zoom-meeting.res';
 import { ZoomTokenRefreshRes } from '@/dto/meeting/zoom-token-refresh.res';
+import * as jwt from 'jsonwebtoken';
 const ZOOM_CLIENT_ID = process.env.ZOOM_CLIENT_ID;
 const ZOOM_CLIENT_SECRET = process.env.ZOOM_CLIENT_SECRET;
 const ZOOM_REDIRECT_URI = process.env.ZOOM_REDIRECT_URI;
-const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
-const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
-const MICROSOFT_REDIRECT_URI: any = process.env.MICROSOFT_REDIRECT_URI;
-const MICROSOFT_CLIENT_SCOPE: any = process.env.MICROSOFT_CLIENT_SCOPE;
 
 @injectable()
 export class MeetingService extends BaseCrudService<Meeting> implements IMeetingService<Meeting> {
@@ -35,18 +32,6 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     const zoomAuthUrl = `https://zoom.us/oauth/authorize?response_type=code&client_id=${ZOOM_CLIENT_ID}&redirect_uri=${ZOOM_REDIRECT_URI}`;
 
     return { zoomAuthUrl };
-  }
-
-  async getMicrosoftAuthUrlForMeeting(): Promise<{ authUrl: string }> {
-    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${new URLSearchParams({
-      client_id: MICROSOFT_CLIENT_ID,
-      response_type: 'code',
-      redirect_uri: MICROSOFT_REDIRECT_URI,
-      response_mode: 'query',
-      scope: 'https://graph.microsoft.com/Calendars.ReadWrite https://graph.microsoft.com/OnlineMeetings.ReadWrite'
-    }).toString()}`;
-
-    return { authUrl };
   }
 
   async getZoomAccessToken(
@@ -129,6 +114,22 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     };
   }
 
+  // async generateZoomSignature(meetingNumber: string, role: number): Promise<string> {
+  //   const timestamp = new Date().getTime() - 30000; // Đảm bảo thời gian không bị lệch quá xa
+  //   const payload = {
+  //     sdkKey: ZOOM_CLIENT_ID, // Thay bằng SDK Key của bạn
+  //     mn: meetingNumber,
+  //     role,
+  //     iat: Math.floor(timestamp / 1000),
+  //     exp: Math.floor(timestamp / 1000) + 60 * 60, // Chữ ký hết hạn sau 1 giờ
+  //     appKey: ZOOM_CLIENT_ID,
+  //     tokenExp: Math.floor(timestamp / 1000) + 60 * 60
+  //   };
+
+  //   // Tạo chữ ký
+  //   return jwt.sign(payload, ZOOM_CLIENT_SECRET, { algorithm: 'HS256' });
+  // }
+
   async createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes> {
     const now = new Date();
     const startDateTime = new Date(now.getTime() + 5 * 60 * 1000);
@@ -169,63 +170,4 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
 
     return convertToDto(CreateMeetingRes, meeting);
   }
-
-  // async createMeeting(code: string, dataREQ: CreateMeetingReq): Promise<CreateMeetingRes> {
-  //   if (!code || typeof code !== 'string' || !code.trim()) {
-  //     throw new Error('Invalid or missing authorization code.');
-  //   }
-
-  //   const tokenResponse = await axios.post<MicrosoftTokenRes>(
-  //     'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-  //     new URLSearchParams({
-  //       client_id: MICROSOFT_CLIENT_ID,
-  //       client_secret: MICROSOFT_CLIENT_SECRET,
-  //       code: code,
-  //       grant_type: 'authorization_code',
-  //       redirect_uri: MICROSOFT_REDIRECT_URI
-  //     }).toString(),
-  //     { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-  //   );
-
-  //   if (!tokenResponse.data || !tokenResponse.data.access_token) {
-  //     throw new Error('Failed to retrieve access token from Microsoft');
-  //   }
-
-  //   const accessToken = tokenResponse.data.access_token;
-
-  //   // Bug
-  //   const now = new Date();
-  //   const startDateTime = new Date(now.getTime() + 5 * 60 * 1000).toISOString();
-  //   const endDateTime = new Date(now.getTime() + 65 * 60 * 1000).toISOString();
-  //   const response = await axios.post<MicrosoftMeetingRes>(
-  //     'https://graph.microsoft.com/v1.0/me/onlineMeetings',
-  //     {
-  //       startDateTime: startDateTime,
-  //       endDateTime: endDateTime,
-  //       subject: 'Test Meeting'
-  //     },
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //         'Content-Type': 'application/json'
-  //       }
-  //     }
-  //   );
-
-  //   if (!response.data) {
-  //     throw new Error('Failed to create meeting');
-  //   }
-
-  //   const meetingData = response.data;
-
-  //   const meeting = new Meeting();
-  //   meeting.microsoftMeetingId = meetingData.microsoftMeetingId;
-  //   meeting.topic = meetingData.topic;
-  //   meeting.startTime = new Date(meetingData.start_time);
-  //   meeting.joinUrl = meetingData.joinUrl;
-
-  //   await this.meetingRepository.save(meeting);
-
-  //   return convertToDto(CreateMeetingRes, meeting);
-  // }
 }
