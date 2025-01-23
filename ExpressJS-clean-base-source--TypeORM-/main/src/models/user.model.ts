@@ -39,4 +39,7 @@ export class User extends BaseModel {
 
   @Column({ nullable: true, default: UserStatus.PENDING })
   status?: string;
+
+  @Column({ name: 'coin', default: 0 })
+  coin!: number;
 }
