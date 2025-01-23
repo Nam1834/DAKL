@@ -7,6 +7,10 @@ import { IPaymentRepository } from '@/repository/interface/i.payment.repository'
 import { BaseContainer } from '@/container/base.container';
 import { IOrderRepository } from '@/repository/interface/i.order.repository';
 import { orderRepository } from './order.container';
+import { IValueConfigRepository } from '@/repository/interface/i.value_config.repository';
+import { valueConfigRepository } from './value_config.container';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { userRepository } from './user.container';
 
 class PaymentContainer extends BaseContainer {
   constructor() {
@@ -17,6 +21,8 @@ class PaymentContainer extends BaseContainer {
 
     //Import
     this.container.bind<IOrderRepository<any>>('OrderRepository').toConstantValue(orderRepository);
+    this.container.bind<IValueConfigRepository<any>>('ValueConfigRepository').toConstantValue(valueConfigRepository);
+    this.container.bind<IUserRepository<any>>('UserRepository').toConstantValue(userRepository);
   }
 
   export() {

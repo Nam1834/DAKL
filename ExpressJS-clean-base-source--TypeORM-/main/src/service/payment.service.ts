@@ -3,8 +3,12 @@ import { ErrorCode } from '@/enums/error-code.enums';
 import { OrderStatus } from '@/enums/order-status.enum';
 import { Order } from '@/models/order.model';
 import { Payment } from '@/models/payment.model';
+import { User } from '@/models/user.model';
+import { ValueConfig } from '@/models/value_config.model';
 import { IOrderRepository } from '@/repository/interface/i.order.repository';
 import { IPaymentRepository } from '@/repository/interface/i.payment.repository';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { IValueConfigRepository } from '@/repository/interface/i.value_config.repository';
 import { BaseCrudService } from '@/service/base/base.service';
 import { IPaymentService } from '@/service/interface/i.payment.service';
 import { sendEmail } from '@/utils/email/email-sender.util';
@@ -16,14 +20,20 @@ import { inject, injectable } from 'inversify';
 export class PaymentService extends BaseCrudService<Payment> implements IPaymentService<Payment> {
   private paymentRepository: IPaymentRepository<Payment>;
   private orderRepository: IOrderRepository<Order>;
+  private valueConfigRepository: IValueConfigRepository<ValueConfig>;
+  private userRepository: IUserRepository<User>;
 
   constructor(
     @inject('PaymentRepository') paymentRepository: IPaymentRepository<Payment>,
-    @inject('OrderRepository') orderRepository: IOrderRepository<Order>
+    @inject('OrderRepository') orderRepository: IOrderRepository<Order>,
+    @inject('ValueConfigRepository') valueConfigRepository: IValueConfigRepository<ValueConfig>,
+    @inject('UserRepository') userRepository: IUserRepository<User>
   ) {
     super(paymentRepository);
     this.paymentRepository = paymentRepository;
     this.orderRepository = orderRepository;
+    this.valueConfigRepository = valueConfigRepository;
+    this.userRepository = userRepository;
   }
 
   async handleVNPayReturn(vnp_Params: any): Promise<void> {
@@ -43,7 +53,7 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
       filter: {
         orderId: orderId
       },
-      relations: ['payment', 'items']
+      relations: ['payment', 'items', 'user']
     });
 
     if (!order) {
@@ -62,6 +72,28 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
         'Số tiền không khớp, phải trả ' + payment.amount + ' nhưng đã trả ' + amount
       );
     }
+
+    const valueConfig = await this.valueConfigRepository.findOne({
+      filter: {
+        price: payment.amount
+      }
+    });
+
+    if (!valueConfig) {
+      throw new BaseError(ErrorCode.NF_01, 'Không tìm thấy cấu hình giá trị');
+    }
+
+    const user = order.user;
+
+    if (!user) {
+      throw new BaseError(ErrorCode.NF_01, 'Không tìm thấy thông tin người dùng');
+    }
+
+    // Cộng coin vào tài khoản user
+    user.coin += valueConfig.coinConfig;
+
+    // Lưu thông tin user sau khi cộng coin
+    await this.userRepository.save(user);
 
     payment.paymentStatus = true;
     payment.payInfo = {
@@ -88,7 +120,7 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
           name: 'GiaSuVLU'
         },
         to: { emailAddress: [userEmail] },
-        subject: 'Thanh toán khóa học thành công',
+        subject: 'Thanh toán thành công',
         text: content
       });
     }
