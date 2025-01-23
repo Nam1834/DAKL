@@ -37,6 +37,13 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
   }
 
   async handleVNPayReturn(vnp_Params: any): Promise<void> {
+    const vnp_ResponseCode = vnp_Params['vnp_ResponseCode']; // Mã trạng thái giao dịch
+
+    // Kiểm tra trạng thái giao dịch
+    if (vnp_ResponseCode !== '00') {
+      throw new BaseError(ErrorCode.VALIDATION_ERROR, 'Giao dịch không thành công. Mã lỗi: ' + vnp_ResponseCode);
+    }
+
     const orderId = vnp_Params['vnp_TxnRef'];
     const amount = Number(vnp_Params['vnp_Amount']) / 100;
     const bankCode = vnp_Params['vnp_BankCode'];

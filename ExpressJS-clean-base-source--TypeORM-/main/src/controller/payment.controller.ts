@@ -47,6 +47,11 @@ export class PaymentController {
 
       const vnp_Params = req.query;
 
+      const vnp_ResponseCode = vnp_Params['vnp_ResponseCode'];
+      if (vnp_ResponseCode !== '00') {
+        return res.redirect(this.FE_FAIL_PAYMENT_URL); // Điều hướng đến trang thất bại
+      }
+
       await this.paymentService.handleVNPayReturn(vnp_Params);
 
       return res.redirect(this.FE_SUCCESS_PAYMENT_URL);
