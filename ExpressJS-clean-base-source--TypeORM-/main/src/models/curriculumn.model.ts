@@ -1,6 +1,7 @@
 import { Entity, PrimaryColumn, ManyToOne, Column, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { MyCurriculumn } from './my-curriculumn.model';
 import { BaseModel } from './base.model';
+import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 
 @Entity('curriculumns')
 export class Curriculumn extends BaseModel {
@@ -19,7 +20,7 @@ export class Curriculumn extends BaseModel {
   @Column()
   desciption!: string;
 
-  @Column()
+  @Column({ default: CurriculumnStatus.UNACTIVE })
   status!: string;
 
   @Column({ name: 'role_user_created' })

@@ -416,12 +416,13 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     tutorProfile.univercity = data.univercity;
     tutorProfile.GPA = data.GPA;
     tutorProfile.educationalCertification = data.educationalCertification;
-    tutorProfile.dateTimeLearn = data.dateTimeLearn;
+    tutorProfile.dateTimeLearn = data.dateTimeLearn.map((item) => JSON.stringify(item));
     tutorProfile.teachingTime = data.teachingTime;
     tutorProfile.amount = data.amount;
     tutorProfile.teachingRoadMap = data.teachingRoadMap;
     tutorProfile.description = data.description;
     tutorProfile.videoUrl = data.videoUrl;
+    tutorProfile.teachingMethod = data.teachingMethod;
 
     user.tutorProfile = tutorProfile;
 

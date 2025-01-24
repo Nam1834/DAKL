@@ -1,3 +1,4 @@
+import { TeachingMethod } from '@/enums/teaching-method.enum';
 import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
@@ -17,6 +18,21 @@ export enum DegreeEnum {
   MASTER = 'MASTER',
   DOCTOR = 'DOCTOR',
   FREELANCE = 'FREELANCE'
+}
+
+class DateTimeLearnDto {
+  @IsString({ message: 'Day must be a string' })
+  @IsNotEmpty({ message: 'Day must not be empty' })
+  day!: string;
+
+  @IsArray({ message: 'Times must be an array' })
+  @ArrayNotEmpty({ message: 'Times must not be empty' })
+  @IsString({ each: true, message: 'Each time must be a string' })
+  @Matches(/^\d{2}:\d{2}$/, {
+    each: true,
+    message: 'Each time must follow the format "HH:mm"'
+  })
+  times!: string[];
 }
 
 export class RegisToTutorReq {
@@ -53,12 +69,8 @@ export class RegisToTutorReq {
   @IsArray({ message: 'DateTimeLearn must be an array' })
   @ArrayNotEmpty({ message: 'DateTimeLearn must not be empty' })
   @ValidateNested({ each: true })
-  @Type(() => String)
-  @Matches(/^[A-Za-z]+\s:\s\d+h:\d{1,2}p$/, {
-    each: true,
-    message: 'Each item in DateTimeLearn must follow the format "Day : Xh:Xp" (e.g., Tuesday : 2h:15p)'
-  })
-  dateTimeLearn!: string[];
+  @Type(() => DateTimeLearnDto)
+  dateTimeLearn!: DateTimeLearnDto[];
 
   @IsNotEmpty()
   @IsNumber()
@@ -79,4 +91,8 @@ export class RegisToTutorReq {
   @IsNotEmpty()
   @IsString()
   videoUrl!: string;
+
+  @IsNotEmpty()
+  @IsEnum(TeachingMethod, { message: 'teachingMethod must be one of: ONLINE, OFFLINE, BOTH.' })
+  teachingMethod!: string;
 }

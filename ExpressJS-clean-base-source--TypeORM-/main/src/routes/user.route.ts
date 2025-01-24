@@ -23,7 +23,12 @@ userRouter
   .post('/forgot-password', classValidate(ForgotPasswordUserReq), userController.forgotPassword.bind(userController))
   .post('/verify-otp', classValidate(VerifyOtpReq), userController.verifyOtp.bind(userController))
   .post('/reset-password', classValidate(ResetPasswordReq), userController.resetPassword.bind(userController))
-  .post('/regis-to-tutor', authenticateJWT, userController.regisUserToTutor.bind(userController))
+  .post(
+    '/regis-to-tutor',
+    authenticateJWT,
+    classValidate(RegisToTutorReq),
+    userController.regisUserToTutor.bind(userController)
+  )
   .get(
     '/get-list/:status',
     authenticateJWT,
