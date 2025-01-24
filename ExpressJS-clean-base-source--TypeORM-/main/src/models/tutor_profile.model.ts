@@ -51,4 +51,7 @@ export class TutorProfile extends BaseModel {
 
   @Column({ nullable: true, name: 'video_url' })
   videoUrl!: string;
+
+  @Column({ nullable: true, name: 'teaching_method' })
+  teachingMethod!: string;
 }
