@@ -44,6 +44,10 @@ import { SearchUtil } from '@/utils/search.util';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { REFUSED } from 'dns';
 import { UserTypeEnum } from '@/enums/user-type.enum';
+import { Curriculumn } from '@/models/curriculumn.model';
+import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
+import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -55,18 +59,21 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   private userRepository: IUserRepository<User>;
   private userProfileRepository: IUserProfileRepository<UserProfile>;
   private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
+  private myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
   constructor(
     @inject('UserRepository') userRepository: IUserRepository<User>,
     @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
-    @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>
+    @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
+    @inject('MyCurriculumnRepository') myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>
   ) {
     super(userRepository);
     this.userRepository = userRepository;
     this.userProfileRepository = userProfileRepository;
     this.tutorProfileRepository = tutorProfileRepository;
+    this.myCurriculumnRepository = myCurriculumnRepository;
   }
 
   async logout(userId: string): Promise<void> {
@@ -266,7 +273,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
             workEmail: microsoftUser.userPrincipalName || '',
             homeAddress: '',
             birthday: undefined,
-            gender: microsoftUser.gender ? (microsoftUser.gender === 'male' ? 'MALE' : 'FEMALE') : 'MALE'
+            gender: microsoftUser.gender ? (microsoftUser.gender === 'male' ? 'MALE' : 'FEMALE') : undefined
           }
         }
       });
@@ -404,7 +411,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     return response;
   }
 
-  async convertUserReqToTutor(data: RegisToTutorReq): Promise<User> {
+  async convertUserReqToTutor(data: RegisToTutorReq): Promise<{ user: User; myCurriculumn: MyCurriculumn }> {
     const user = new User();
     user.status = UserStatus.REQUEST;
 
@@ -426,7 +433,22 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     user.tutorProfile = tutorProfile;
 
-    return user;
+    const myCurriculumn = new MyCurriculumn();
+    myCurriculumn.user = user;
+
+    const curriculumn = new Curriculumn();
+    curriculumn.curriculumnName = data.curriculumn.curriculumnName;
+    curriculumn.curriculumnMajor = data.curriculumn.curriculumnMajor;
+    curriculumn.curriculumnUrl = data.curriculumn.curriculumnUrl;
+    curriculumn.description = data.curriculumn.description;
+
+    const myCurriculumnItem = new MyCurriculumnItem();
+    myCurriculumnItem.curriculumn = curriculumn;
+    myCurriculumn.items = [myCurriculumnItem];
+
+    // (user as any).myCurriculumn = myCurriculumn;
+
+    return { user, myCurriculumn };
   }
 
   async regisToTutor(id: string, data: RegisToTutorReq): Promise<void> {
@@ -440,10 +462,11 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new BaseError(ErrorCode.NF_01, 'User not found');
     }
 
-    const userUpdate = await this.convertUserReqToTutor(data);
-    const updatedData: User = { ...existingUser, ...userUpdate };
+    const { user, myCurriculumn } = await this.convertUserReqToTutor(data);
+    const updatedUser: User = { ...existingUser, ...user };
 
-    await this.userRepository.save(updatedData);
+    await this.userRepository.save(updatedUser);
+    await this.myCurriculumnRepository.save(myCurriculumn);
   }
 
   async getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes> {

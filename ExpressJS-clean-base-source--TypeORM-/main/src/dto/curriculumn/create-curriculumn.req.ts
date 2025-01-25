@@ -15,5 +15,5 @@ export class CreateCurriculumnReq {
 
   @IsNotEmpty()
   @IsString()
-  desciption!: string;
+  description!: string;
 }

@@ -13,6 +13,7 @@ import {
   ValidateIf,
   ValidateNested
 } from 'class-validator';
+import { CreateCurriculumnReq } from '../curriculumn/create-curriculumn.req';
 export enum DegreeEnum {
   STUDENT = 'STUDENT',
   MASTER = 'MASTER',
@@ -95,4 +96,9 @@ export class RegisToTutorReq {
   @IsNotEmpty()
   @IsEnum(TeachingMethod, { message: 'teachingMethod must be one of: ONLINE, OFFLINE, BOTH.' })
   teachingMethod!: string;
+
+  @IsNotEmpty({ message: 'Curriculumn is required.' })
+  @ValidateNested()
+  @Type(() => CreateCurriculumnReq)
+  curriculumn!: CreateCurriculumnReq;
 }

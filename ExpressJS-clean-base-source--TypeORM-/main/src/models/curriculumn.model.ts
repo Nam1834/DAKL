@@ -18,7 +18,7 @@ export class Curriculumn extends BaseModel {
   curriculumnUrl!: string;
 
   @Column()
-  desciption!: string;
+  description!: string;
 
   @Column({ default: CurriculumnStatus.UNACTIVE })
   status!: string;
