@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer';
 
 export class GetProfileAdminRes {
   @Expose()
-  adminId!: string;
+  adminId?: string;
 
   @Expose()
   fullname!: string;

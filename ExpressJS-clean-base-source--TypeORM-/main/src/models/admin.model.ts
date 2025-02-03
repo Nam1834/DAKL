@@ -1,11 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Index, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  Index,
+  OneToOne,
+  ManyToOne,
+  JoinColumn,
+  PrimaryColumn
+} from 'typeorm';
 import { BaseModel } from './base.model';
 import { AdminProfile } from './admin_profile.model';
 import { Role } from './role.model';
 import { AdminTypeEnum } from '@/enums/admin-type.enum';
 @Entity('admins')
 export class Admin extends BaseModel {
-  @PrimaryGeneratedColumn('uuid', { name: 'admin_id' })
+  @PrimaryColumn({ name: 'admin_id' })
   adminId!: string;
 
   @Index({ unique: true })

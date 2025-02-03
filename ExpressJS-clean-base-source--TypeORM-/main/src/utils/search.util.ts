@@ -2,6 +2,7 @@ import { PagingDto } from '@/dto/paging.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { SearchOperator } from '@/enums/search-operator.enum';
 import { RecordOrderType } from '@/types/record-order.types';
+import { isUUID } from 'class-validator';
 import {
   Between,
   FindOptionsOrder,

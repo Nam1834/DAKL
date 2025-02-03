@@ -48,6 +48,7 @@ import { Curriculumn } from '@/models/curriculumn.model';
 import { MyCurriculumn } from '@/models/my-curriculumn.model';
 import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
 import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
+import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.repository';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -60,6 +61,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   private userProfileRepository: IUserProfileRepository<UserProfile>;
   private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
   private myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>;
+  private curriculumnRepository: ICurriculumnRepository<Curriculumn>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
@@ -67,13 +69,15 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     @inject('UserRepository') userRepository: IUserRepository<User>,
     @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
-    @inject('MyCurriculumnRepository') myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>
+    @inject('MyCurriculumnRepository') myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>,
+    @inject('CurriculumnRepository') curriculumnRepository: ICurriculumnRepository<Curriculumn>
   ) {
     super(userRepository);
     this.userRepository = userRepository;
     this.userProfileRepository = userProfileRepository;
     this.tutorProfileRepository = tutorProfileRepository;
     this.myCurriculumnRepository = myCurriculumnRepository;
+    this.curriculumnRepository = curriculumnRepository;
   }
 
   async logout(userId: string): Promise<void> {
@@ -411,9 +415,11 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     return response;
   }
 
-  async convertUserReqToTutor(data: RegisToTutorReq): Promise<{ user: User; myCurriculumn: MyCurriculumn }> {
-    const user = new User();
-    user.status = UserStatus.REQUEST;
+  async convertUserReqToTutor(
+    existingUser: User,
+    data: RegisToTutorReq
+  ): Promise<{ user: User; myCurriculumn: MyCurriculumn }> {
+    existingUser.status = UserStatus.REQUEST;
 
     const tutorProfile = new TutorProfile();
     tutorProfile.avatar = data.avatar;
@@ -431,24 +437,32 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     tutorProfile.videoUrl = data.videoUrl;
     tutorProfile.teachingMethod = data.teachingMethod;
 
-    user.tutorProfile = tutorProfile;
+    existingUser.tutorProfile = tutorProfile;
 
     const myCurriculumn = new MyCurriculumn();
-    myCurriculumn.user = user;
+    myCurriculumn.user = existingUser;
 
     const curriculumn = new Curriculumn();
     curriculumn.curriculumnName = data.curriculumn.curriculumnName;
     curriculumn.curriculumnMajor = data.curriculumn.curriculumnMajor;
     curriculumn.curriculumnUrl = data.curriculumn.curriculumnUrl;
     curriculumn.description = data.curriculumn.description;
+    curriculumn.roleUserCreated = existingUser.roleId;
+
+    await this.curriculumnRepository.save(curriculumn);
 
     const myCurriculumnItem = new MyCurriculumnItem();
     myCurriculumnItem.curriculumn = curriculumn;
+    myCurriculumnItem.curriculumnId = curriculumn.curriculumnId;
     myCurriculumn.items = [myCurriculumnItem];
+
+    if (!existingUser.userId) {
+      throw new Error('User ID is not set');
+    }
 
     // (user as any).myCurriculumn = myCurriculumn;
 
-    return { user, myCurriculumn };
+    return { user: existingUser, myCurriculumn };
   }
 
   async regisToTutor(id: string, data: RegisToTutorReq): Promise<void> {
@@ -462,7 +476,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new BaseError(ErrorCode.NF_01, 'User not found');
     }
 
-    const { user, myCurriculumn } = await this.convertUserReqToTutor(data);
+    const { user, myCurriculumn } = await this.convertUserReqToTutor(existingUser, data);
     const updatedUser: User = { ...existingUser, ...user };
 
     await this.userRepository.save(updatedUser);
