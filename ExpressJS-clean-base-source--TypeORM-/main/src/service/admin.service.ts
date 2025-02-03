@@ -70,14 +70,14 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<Admin>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    const admin = await this.adminRepository.findMany({
+    const admins = await this.adminRepository.findMany({
       filter: where,
       order: order,
       paging: paging,
       relations: ['adminProfile']
     });
 
-    admin.forEach((admin) => {
+    admins.forEach((admin) => {
       delete (admin as any).password;
     });
 
@@ -85,7 +85,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
       filter: where
     });
 
-    return new PagingResponseDto(total, admin);
+    return new PagingResponseDto(total, admins);
   }
 
   async logout(adminId: string): Promise<void> {
@@ -148,7 +148,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
 
     const admin = await this.convertCreateAdminReqToAdmin(data);
 
-    await this.adminRepository.save(admin);
+    await this.adminRepository.createNewAdmin(admin);
 
     return convertToDto(CreateAdminRes, admin);
   }
