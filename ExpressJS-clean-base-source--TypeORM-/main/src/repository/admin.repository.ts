@@ -27,7 +27,6 @@ export class AdminRepository extends BaseRepository<Admin> implements IAdminRepo
     // Gán adminId mới vào admin
     admin.adminId = newAdminId;
 
-    // Lưu admin vào bảng admin
     const createdAdmin = await this.ormRepository
       .createQueryBuilder()
       .insert()
