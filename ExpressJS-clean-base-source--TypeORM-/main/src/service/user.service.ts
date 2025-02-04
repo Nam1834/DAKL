@@ -49,6 +49,7 @@ import { MyCurriculumn } from '@/models/my-curriculumn.model';
 import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
 import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
 import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.repository';
+import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -62,6 +63,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
   private myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>;
   private curriculumnRepository: ICurriculumnRepository<Curriculumn>;
+  private myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
@@ -70,7 +72,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
     @inject('MyCurriculumnRepository') myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>,
-    @inject('CurriculumnRepository') curriculumnRepository: ICurriculumnRepository<Curriculumn>
+    @inject('CurriculumnRepository') curriculumnRepository: ICurriculumnRepository<Curriculumn>,
+    @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>
   ) {
     super(userRepository);
     this.userRepository = userRepository;
@@ -78,6 +81,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.tutorProfileRepository = tutorProfileRepository;
     this.myCurriculumnRepository = myCurriculumnRepository;
     this.curriculumnRepository = curriculumnRepository;
+    this.myCurriculumnItemRepository = myCurriculumnItemRepository;
   }
 
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<User>> {
@@ -460,9 +464,25 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     existingUser.tutorProfile = tutorProfile;
 
-    const myCurriculumn = new MyCurriculumn();
-    myCurriculumn.user = existingUser;
+    let myCurriculumn = await this.myCurriculumnRepository.findOne({
+      filter: { userId: existingUser.userId }
+    });
 
+    if (myCurriculumn) {
+      // Xóa toàn bộ MyCurriculumnItem cũ
+      await this.myCurriculumnItemRepository.findOneAndHardDelete({
+        filter: { myCurriculumnId: myCurriculumn.myCurriculumnId }
+      });
+
+      // Reset danh sách items
+      myCurriculumn.items = [];
+    } else {
+      // Nếu chưa có, tạo mới MyCurriculumn
+      myCurriculumn = new MyCurriculumn();
+      myCurriculumn.user = existingUser;
+    }
+
+    // Tạo mới Curriculumn
     const curriculumn = new Curriculumn();
     curriculumn.curriculumnName = data.curriculumn.curriculumnName;
     curriculumn.curriculumnMajor = data.curriculumn.curriculumnMajor;
@@ -472,16 +492,17 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     await this.curriculumnRepository.save(curriculumn);
 
+    // Tạo mới MyCurriculumnItem
     const myCurriculumnItem = new MyCurriculumnItem();
     myCurriculumnItem.curriculumn = curriculumn;
     myCurriculumnItem.curriculumnId = curriculumn.curriculumnId;
-    myCurriculumn.items = [myCurriculumnItem];
+
+    // Gán MyCurriculumnItem mới vào MyCurriculumn
+    myCurriculumn.items.push(myCurriculumnItem);
 
     if (!existingUser.userId) {
       throw new Error('User ID is not set');
     }
-
-    // (user as any).myCurriculumn = myCurriculumn;
 
     return { user: existingUser, myCurriculumn };
   }
