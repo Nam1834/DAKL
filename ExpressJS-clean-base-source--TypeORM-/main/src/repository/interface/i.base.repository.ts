@@ -27,6 +27,13 @@ export interface IBaseRepository<T> {
   findOneAndDelete(options: { filter: Partial<T> }): Promise<void>;
 
   /**
+   * Find a record by the given filter and delete it
+   * @param filter
+   * @returns The deleted record
+   */
+  findOneAndHardDelete(options: { filter: Partial<T> }): Promise<void>;
+
+  /**
    * Find a record by the given filter and update it
    * @param filter
    * @param updateData

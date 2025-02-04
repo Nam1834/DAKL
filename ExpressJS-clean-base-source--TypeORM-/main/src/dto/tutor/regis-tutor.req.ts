@@ -21,7 +21,7 @@ export enum DegreeEnum {
   FREELANCE = 'FREELANCE'
 }
 
-class DateTimeLearnDto {
+export class DateTimeLearnDto {
   @IsString({ message: 'Day must be a string' })
   @IsNotEmpty({ message: 'Day must not be empty' })
   day!: string;
