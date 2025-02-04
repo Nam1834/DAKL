@@ -34,6 +34,14 @@ import { SearchDataDto } from '@/dto/search-data.dto';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchUtil } from '@/utils/search.util';
 import { UpdateAdminReq } from '@/dto/admin/update-admin.req';
+import { MicrosoftTokenRes } from '@/dto/user/microsoft-token.res';
+import { AdminTypeEnum } from '@/enums/admin-type.enum';
+import axios from 'axios';
+
+const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
+const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
+const MICROSOFT_REDIRECT_URI: any = process.env.MICROSOFT_REDIRECT_URI;
+const MICROSOFT_CLIENT_SCOPE: any = process.env.MICROSOFT_CLIENT_SCOPE;
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 
@@ -151,6 +159,90 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     await this.adminRepository.createNewAdmin(admin);
 
     return convertToDto(CreateAdminRes, admin);
+  }
+
+  async loginMicrosoft(code: string): Promise<LoginAdminRes> {
+    if (!code || typeof code !== 'string' || !code.trim()) {
+      throw new Error('Invalid or missing authorization code.');
+    }
+
+    // Bước 1: Gọi API Microsoft để lấy Access Token
+    const tokenResponse = await axios.post<MicrosoftTokenRes>(
+      'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+      new URLSearchParams({
+        client_id: MICROSOFT_CLIENT_ID,
+        client_secret: MICROSOFT_CLIENT_SECRET,
+        code: code,
+        grant_type: 'authorization_code',
+        redirect_uri: MICROSOFT_REDIRECT_URI
+      }).toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    if (!tokenResponse.data || !tokenResponse.data.access_token) {
+      throw new Error('Failed to retrieve access token from Microsoft');
+    }
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Bước 2: Lấy thông tin người dùng từ Microsoft
+    const adminResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    if (!adminResponse.data) {
+      throw new Error('Failed to retrieve user information from Microsoft');
+    }
+
+    const microsoftUser = adminResponse.data as {
+      id: string;
+      displayName: string;
+      mail?: string;
+      userPrincipalName: string;
+      gender?: string;
+      birthdate?: string;
+    };
+
+    // Bước 3: Kiểm tra User tồn tại
+    let admin = await this.adminRepository.findOne({
+      filter: { microsoftId: microsoftUser.id },
+      relations: ['adminProfile']
+    });
+
+    if (!admin) {
+      admin = new Admin();
+      admin.email = microsoftUser.mail || microsoftUser.userPrincipalName || `${microsoftUser.id}@microsoft.com`;
+      admin.phoneNumber = ''; // Cập nhật nếu có
+      admin.password = ''; // Nếu là login từ Microsoft, bạn có thể để trống hoặc bỏ qua
+      admin.microsoftId = microsoftUser.id;
+      admin.roleId = AdminTypeEnum.UNKNOWN;
+      admin.status = AdminStatus.BLOCKED;
+
+      const adminProfile = new AdminProfile();
+      adminProfile.adminDisplayName = microsoftUser.displayName || '';
+      adminProfile.fullname = microsoftUser.displayName || '';
+      adminProfile.personalEmail = microsoftUser.mail || '';
+      adminProfile.workEmail = microsoftUser.userPrincipalName || '';
+      adminProfile.homeAddress = '';
+      adminProfile.birthday = microsoftUser.birthdate ? new Date(microsoftUser.birthdate) : new Date();
+      adminProfile.gender =
+        microsoftUser.gender === 'male' ? 'MALE' : microsoftUser.gender === 'female' ? 'FEMALE' : 'MALE';
+
+      admin.adminProfile = adminProfile;
+
+      // Lưu User và UserProfile vào database trong một thao tác
+      await this.adminRepository.createNewAdmin(admin);
+    }
+
+    // Bước 4: Tạo JWT Token
+    const claim = new JwtClaimDto(admin.adminId, '', [], '');
+    const token = jwt.sign(_.toPlainObject(claim), SECRET_KEY, { expiresIn: this.LOGIN_TOKEN_EXPIRE });
+
+    // Bước 5: Trả về thông tin User
+    const result = convertToDto(LoginAdminRes, admin);
+    result.token = token;
+
+    return result;
   }
 
   async login(data: LoginAdminReq): Promise<LoginAdminRes> {

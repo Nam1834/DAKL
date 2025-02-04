@@ -59,6 +59,21 @@ export class AdminController {
     }
   }
 
+  async loginMicrosoft(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;
+
+      if (!code) {
+        res.status(400).send({ error: 'Invalid or missing authorization code.' });
+        return;
+      }
+      const result = await this.adminService.loginMicrosoft(code);
+      res.send_ok('Login successful', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestBody: LoginAdminReq = req.body;
