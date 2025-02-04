@@ -33,6 +33,16 @@ export class UserController {
     this.common = common;
   }
 
+  async searchUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.userService.search(searchData);
+      res.send_ok('Users fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = req.user;
