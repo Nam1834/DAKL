@@ -80,6 +80,27 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.curriculumnRepository = curriculumnRepository;
   }
 
+  async search(searchData: SearchDataDto): Promise<PagingResponseDto<User>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const users = await this.userRepository.findMany({
+      filter: where,
+      order: order,
+      paging: paging,
+      relations: ['userProfile', 'tutorProfile']
+    });
+
+    users.forEach((admin) => {
+      delete (admin as any).password;
+    });
+
+    const total = await this.userRepository.count({
+      filter: where
+    });
+
+    return new PagingResponseDto(total, users);
+  }
+
   async logout(userId: string): Promise<void> {
     /*
     Set token logout time => check token logout time when authenticate

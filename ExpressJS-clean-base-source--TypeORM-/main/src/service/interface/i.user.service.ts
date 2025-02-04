@@ -15,8 +15,11 @@ import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { GetListRequestRes } from '@/dto/tutor/get-list-request.res';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { User } from '@/models/user.model';
 
 export interface IUserService<T extends BaseModelType> extends IBaseCrudService<T> {
+  search(searchData: SearchDataDto): Promise<PagingResponseDto<User>>;
   logout(userId: string): Promise<void>;
   register(data: RegisterUserReq): Promise<RegisterUserRes>;
   login(data: LoginUserReq): Promise<LoginUserRes>;
