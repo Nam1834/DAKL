@@ -59,6 +59,15 @@ export class AdminController {
     }
   }
 
+  async getMicrosoftAuthUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this.adminService.getMicrosoftAuthUrl();
+      res.send_ok('Microsoft Auth URL generated successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async loginMicrosoft(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;

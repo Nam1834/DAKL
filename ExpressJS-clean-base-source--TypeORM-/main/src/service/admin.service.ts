@@ -40,7 +40,7 @@ import axios from 'axios';
 
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
-const MICROSOFT_REDIRECT_URI: any = process.env.MICROSOFT_REDIRECT_URI;
+const MICROSOFT_REDIRECT_ADMIN_URI: any = process.env.MICROSOFT_REDIRECT_ADMIN_URI;
 const MICROSOFT_CLIENT_SCOPE: any = process.env.MICROSOFT_CLIENT_SCOPE;
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
@@ -161,6 +161,18 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     return convertToDto(CreateAdminRes, admin);
   }
 
+  async getMicrosoftAuthUrl(): Promise<{ authUrl: string }> {
+    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${new URLSearchParams({
+      client_id: MICROSOFT_CLIENT_ID,
+      response_type: 'code',
+      redirect_uri: MICROSOFT_REDIRECT_ADMIN_URI,
+      response_mode: 'query',
+      scope: MICROSOFT_CLIENT_SCOPE
+    }).toString()}`;
+
+    return { authUrl };
+  }
+
   async loginMicrosoft(code: string): Promise<LoginAdminRes> {
     if (!code || typeof code !== 'string' || !code.trim()) {
       throw new Error('Invalid or missing authorization code.');
@@ -174,7 +186,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
         client_secret: MICROSOFT_CLIENT_SECRET,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: MICROSOFT_REDIRECT_URI
+        redirect_uri: MICROSOFT_REDIRECT_ADMIN_URI
       }).toString(),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
