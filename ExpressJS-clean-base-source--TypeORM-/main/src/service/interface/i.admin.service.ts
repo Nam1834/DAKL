@@ -13,6 +13,7 @@ export interface IAdminService<T extends BaseModelType> extends IBaseCrudService
   search(searchData: SearchDataDto): Promise<PagingResponseDto<Admin>>;
   logout(adminId: string): Promise<void>;
   createAdmin(data: CreateAdminReq): Promise<CreateAdminRes>;
+  getMicrosoftAuthUrl(): Promise<{ authUrl: string }>;
   loginMicrosoft(code: string): Promise<LoginAdminRes>;
   login(data: LoginAdminReq): Promise<LoginAdminRes>;
   getProfile(adminId: string): Promise<GetProfileAdminRes>;

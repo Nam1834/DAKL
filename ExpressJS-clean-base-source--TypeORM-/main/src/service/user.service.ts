@@ -53,7 +53,7 @@ import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curric
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
-const MICROSOFT_REDIRECT_URI: any = process.env.MICROSOFT_REDIRECT_URI;
+const MICROSOFT_REDIRECT_USER_URI: any = process.env.MICROSOFT_REDIRECT_USER_URI;
 const MICROSOFT_CLIENT_SCOPE: any = process.env.MICROSOFT_CLIENT_SCOPE;
 
 @injectable()
@@ -213,7 +213,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${new URLSearchParams({
       client_id: MICROSOFT_CLIENT_ID,
       response_type: 'code',
-      redirect_uri: MICROSOFT_REDIRECT_URI,
+      redirect_uri: MICROSOFT_REDIRECT_USER_URI,
       response_mode: 'query',
       scope: MICROSOFT_CLIENT_SCOPE
     }).toString()}`;
@@ -232,7 +232,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
         client_secret: MICROSOFT_CLIENT_SECRET,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: MICROSOFT_REDIRECT_URI
+        redirect_uri: MICROSOFT_REDIRECT_USER_URI
       }).toString(),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
@@ -253,7 +253,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
         client_secret: MICROSOFT_CLIENT_SECRET,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: MICROSOFT_REDIRECT_URI
+        redirect_uri: MICROSOFT_REDIRECT_USER_URI
       }).toString(),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
