@@ -50,6 +50,7 @@ import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
 import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
 import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.repository';
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
+import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -574,6 +575,25 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
           status: UserStatus.ACCEPT
         }
       });
+
+      const myCurriculumn = await this.myCurriculumnRepository.findOne({
+        filter: { userId: userId },
+        relations: ['items', 'items.curriculumn'] // Lấy các liên kết
+      });
+
+      if (!myCurriculumn || myCurriculumn.items.length === 0) {
+        throw new BaseError(ErrorCode.NOT_FOUND, 'My Curriculumn or My Curriculumn Items does not exist');
+      }
+
+      // Cập nhật trạng thái của curriculumn thành ACTIVE
+      for (const item of myCurriculumn.items) {
+        await this.curriculumnRepository.findOneAndUpdate({
+          filter: { curriculumnId: item.curriculumn.curriculumnId },
+          updateData: {
+            status: CurriculumnStatus.ACTIVE
+          }
+        });
+      }
     } else if (click === UserStatus.REFUSE) {
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },
