@@ -443,7 +443,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   async convertUserReqToTutor(
     existingUser: User,
     data: RegisToTutorReq
-  ): Promise<{ user: User; myCurriculumn: MyCurriculumn }> {
+  ): Promise<{ user: User; myCurriculumn: MyCurriculumn; curriculumn: Curriculumn }> {
     existingUser.status = UserStatus.REQUEST;
 
     const tutorProfile = new TutorProfile();
@@ -480,6 +480,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       // Nếu chưa có, tạo mới MyCurriculumn
       myCurriculumn = new MyCurriculumn();
       myCurriculumn.user = existingUser;
+      myCurriculumn.items = [];
     }
 
     // Tạo mới Curriculumn
@@ -504,7 +505,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new Error('User ID is not set');
     }
 
-    return { user: existingUser, myCurriculumn };
+    return { user: existingUser, myCurriculumn, curriculumn };
   }
 
   async regisToTutor(id: string, data: RegisToTutorReq): Promise<void> {
@@ -518,11 +519,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new BaseError(ErrorCode.NF_01, 'User not found');
     }
 
-    const { user, myCurriculumn } = await this.convertUserReqToTutor(existingUser, data);
-    const updatedUser: User = { ...existingUser, ...user };
-
-    await this.userRepository.save(updatedUser);
-    await this.myCurriculumnRepository.save(myCurriculumn);
+    const { user, myCurriculumn, curriculumn } = await this.convertUserReqToTutor(existingUser, data);
+    await this.userRepository.updateUserWithTransaction(user, myCurriculumn, curriculumn);
   }
 
   async getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes> {
