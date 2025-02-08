@@ -3,6 +3,6 @@ export const createEmailOtpContent = (otp: string): string => {
     Mã OTP của bạn là: ${otp}. Mã này có hiệu lực trong 5 phút.
 
     Trân trọng,
-    Công ty Alpha
+    Công ty GiaSuVLU
   `;
 };

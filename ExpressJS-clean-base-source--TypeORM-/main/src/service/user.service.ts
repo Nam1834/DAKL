@@ -119,23 +119,71 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     return;
   }
 
-  async register(data: RegisterUserReq): Promise<RegisterUserRes> {
-    const emailExist = await this.exists({
-      filter: { email: data.email }
-    });
+  async sendOtp(data: RegisterUserReq): Promise<void> {
+    const emailExist = await this.exists({ filter: { email: data.email } });
     if (emailExist) {
-      throw new Error('Email has exist');
+      throw new Error('Email has already been registered');
     }
 
-    const phoneNumberExist = await this.exists({
-      filter: { phoneNumber: data.phoneNumber }
-    });
+    const phoneNumberExist = await this.exists({ filter: { phoneNumber: data.phoneNumber } });
     if (phoneNumberExist) {
-      throw new Error('Phone Number has exist');
+      throw new Error('Phone number already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    data.password = hashedPassword;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await redis.set(`otp:${data.email}`, otp, 'EX', 300);
+    await redis.set(`REGISTER_${data.email}`, JSON.stringify(data), 'EX', 600);
+
+    const emailContent = createEmailOtpContent(otp);
+
+    sendEmail({
+      from: { name: 'GiaSuVLU' },
+      to: { emailAddress: [data.email] },
+      subject: 'Mã OTP đăng ký tài khoản',
+      text: emailContent
+    });
+  }
+
+  async resendOtp(email: string): Promise<void> {
+    const storedData = await redis.get(`REGISTER_${email}`);
+    if (!storedData) {
+      throw new Error('Session expired. Please register again.');
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await redis.set(`otp:${email}`, otp, 'EX', 300);
+    await redis.set(`REGISTER_${email}`, storedData, 'EX', 600);
+
+    const emailContent = createEmailOtpContent(otp);
+    sendEmail({
+      from: { name: 'GiaSuVLU' },
+      to: { emailAddress: [email] },
+      subject: 'Mã OTP đăng ký tài khoản',
+      text: emailContent
+    });
+  }
+
+  async register(email: string, otp: string): Promise<RegisterUserRes> {
+    // const emailExist = await this.exists({
+    //   filter: { email: data.email }
+    // });
+    // if (emailExist) {
+    //   throw new Error('Email has exist');
+    // }
+
+    const storedOtp = await redis.get(`otp:${email}`);
+    const storedData = await redis.get(`REGISTER_${email}`);
+
+    if (!storedOtp || storedOtp !== otp) {
+      throw new Error('Invalid or expired OTP');
+    }
+
+    if (!storedData) {
+      throw new Error('Session expired. Please try again.');
+    }
+
+    const data: RegisterUserReq = JSON.parse(storedData);
+    data.password = await bcrypt.hash(data.password, 10);
 
     const userProfile = new UserProfile();
     userProfile.userDisplayName = data.fullname;
@@ -170,6 +218,9 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       subject: 'Chúc mừng đăng ký tài khoản thành công',
       text: emailContent
     });
+
+    // Xóa OTP khỏi Redis sau khi xác thực thành công
+    await redis.del(`otp:${data.email}`);
 
     return convertToDto(RegisterUserRes, result);
   }

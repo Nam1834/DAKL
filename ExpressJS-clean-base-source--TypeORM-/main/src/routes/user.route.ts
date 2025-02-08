@@ -12,7 +12,9 @@ import { classValidate } from '@/middleware/class-validate.middleware';
 import express from 'express';
 const userRouter = express.Router();
 userRouter
-  .post('/register', classValidate(RegisterUserReq), userController.register.bind(userController))
+  .post('/send-otp', classValidate(RegisterUserReq), userController.sendOtp.bind(userController))
+  .post('/resend-otp', userController.resendOtp.bind(userController))
+  .post('/register', userController.register.bind(userController))
   .post('/logout', authenticateJWT, userController.logout.bind(userController))
   .post('/login', classValidate(LoginUserReq), userController.login.bind(userController))
   .get(
