@@ -57,10 +57,45 @@ export class UserController {
     }
   }
 
-  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async sendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestBody: RegisterUserReq = req.body;
-      const result = await this.userService.register(requestBody);
+
+      if (!requestBody.email) {
+        throw new Error('Email is required');
+      }
+
+      await this.userService.sendOtp(requestBody);
+      res.send_ok('OTP has been sent successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        throw new Error('Email is required');
+      }
+
+      await this.userService.resendOtp(email);
+      res.send_ok('OTP has been resent successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email, otp } = req.body;
+
+      if (!email || !otp) {
+        throw new Error('Email and OTP are required');
+      }
+
+      const result = await this.userService.register(email, otp);
       res.send_ok('Register Borrower successful', result);
     } catch (error) {
       next(error);

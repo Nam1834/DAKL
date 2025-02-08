@@ -21,7 +21,9 @@ import { User } from '@/models/user.model';
 export interface IUserService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<User>>;
   logout(userId: string): Promise<void>;
-  register(data: RegisterUserReq): Promise<RegisterUserRes>;
+  resendOtp(email: string): Promise<void>;
+  sendOtp(data: RegisterUserReq): Promise<void>;
+  register(email: string, otp: string): Promise<RegisterUserRes>;
   login(data: LoginUserReq): Promise<LoginUserRes>;
   getMicrosoftAuthUrl(): Promise<{ authUrl: string }>;
   exchangeCodeForToken(code: string): Promise<any>;
