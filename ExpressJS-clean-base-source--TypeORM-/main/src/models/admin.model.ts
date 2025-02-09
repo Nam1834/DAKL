@@ -22,7 +22,6 @@ export class Admin extends BaseModel {
   @Column('varchar', { length: 100 })
   email!: string;
 
-  @Index({ unique: true })
   @Column('varchar', { length: 15, name: 'phone_number' })
   phoneNumber!: string;
 
