@@ -54,4 +54,10 @@ export class TutorProfile extends BaseModel {
 
   @Column({ nullable: true, name: 'teaching_method' })
   teachingMethod!: string;
+
+  @Column({ nullable: true, name: 'work_address' })
+  workAddress!: string;
+
+  @Column({ name: 'is_use_curriculumn', type: 'boolean', default: false })
+  isUseCurriculumn!: boolean;
 }

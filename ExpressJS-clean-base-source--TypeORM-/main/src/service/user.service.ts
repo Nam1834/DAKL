@@ -526,6 +526,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     tutorProfile.description = data.description;
     tutorProfile.videoUrl = data.videoUrl;
     tutorProfile.teachingMethod = data.teachingMethod;
+    tutorProfile.isUseCurriculumn = data.isUseCurriculumn;
 
     existingUser.tutorProfile = tutorProfile;
 

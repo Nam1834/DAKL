@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -14,6 +15,7 @@ import {
   ValidateNested
 } from 'class-validator';
 import { CreateCurriculumnReq } from '../curriculumn/create-curriculumn.req';
+import { optional } from 'inversify';
 export enum DegreeEnum {
   STUDENT = 'STUDENT',
   MASTER = 'MASTER',
@@ -97,8 +99,16 @@ export class RegisToTutorReq {
   @IsEnum(TeachingMethod, { message: 'teachingMethod must be one of: ONLINE, OFFLINE, BOTH.' })
   teachingMethod!: string;
 
-  @IsNotEmpty({ message: 'Curriculumn is required.' })
+  @IsNotEmpty()
+  @IsString()
+  workAddress!: string;
+
+  @optional()
   @ValidateNested()
   @Type(() => CreateCurriculumnReq)
   curriculumn!: CreateCurriculumnReq;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  isUseCurriculumn!: boolean;
 }
