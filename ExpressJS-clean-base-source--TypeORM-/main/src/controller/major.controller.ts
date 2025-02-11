@@ -47,14 +47,6 @@ export class MajorController {
       const id = req.params.id;
       const data: CreateMajorReq = req.body;
 
-      const existingMajor = await this.majorService.findOne({
-        filter: { majorId: data.majorId }
-      });
-
-      if (existingMajor) {
-        throw new BaseError(ErrorCode.ALREADY_EXISTS, 'Major already exist');
-      }
-
       await this.majorService.updateMajor(id, data);
 
       res.send_ok('Update major successfully', data);

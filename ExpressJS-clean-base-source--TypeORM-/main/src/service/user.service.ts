@@ -51,6 +51,7 @@ import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculum
 import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.repository';
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
+import { sendSms } from '@/utils/sms/sms-sender.util';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -427,9 +428,12 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
   async forgotPassword(data: ForgotPasswordUserReq): Promise<void> {
     let user: User | null = null;
+    let isPhoneNumber = false;
 
+    // Kiểm tra nếu input là số điện thoại
     if (/^\d{10,11}$/.test(data.emailOrPhoneNumber)) {
       user = await this.userRepository.findOne({ filter: { phoneNumber: data.emailOrPhoneNumber } });
+      isPhoneNumber = true;
     } else {
       user = await this.userRepository.findOne({ filter: { email: data.emailOrPhoneNumber } });
     }
@@ -438,16 +442,25 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new Error('User not found');
     }
 
+    // Tạo mã OTP ngẫu nhiên
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Lưu OTP vào Redis với key `otp:<email>`
     await redis.set(`otp:${user.email}`, otp, 'EX', 300);
 
-    const emailContent = createEmailOtpContent(otp);
-    sendEmail({
-      from: { name: 'Công ty Alpha' },
-      to: { emailAddress: [user.email] },
-      subject: 'OTP for Password Reset',
-      text: emailContent
-    });
+    if (isPhoneNumber) {
+      // Nếu input là số điện thoại, gửi OTP qua SMS
+      sendSms(`Mã OTP của bạn là ${otp}`, [user.phoneNumber]);
+    } else {
+      // Nếu input là email, gửi OTP qua email
+      const emailContent = createEmailOtpContent(otp);
+      sendEmail({
+        from: { name: 'Công ty Alpha' },
+        to: { emailAddress: [user.email] },
+        subject: 'OTP for Password Reset',
+        text: emailContent
+      });
+    }
   }
 
   async verifyOtp(data: VerifyOtpReq): Promise<VerifyOtpRes> {
