@@ -15,10 +15,10 @@ export class User extends BaseModel {
   @Column('varchar', { length: 100 })
   email!: string;
 
-  @Column('varchar', { length: 15, name: 'phone_number' })
+  @Column('varchar', { length: 15, name: 'phone_number', nullable: true })
   phoneNumber!: string;
 
-  @Column('varchar', { length: 100 })
+  @Column('varchar', { length: 100, nullable: true })
   password!: string;
 
   @Column({ name: 'microsoft_id', nullable: true })
