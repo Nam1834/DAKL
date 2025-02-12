@@ -5,6 +5,9 @@ import { IMyCurriculumnService } from '@/service/interface/i.my_curriculumn.serv
 import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
 import { BaseContainer } from '@/container/base.container';
 import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
+import { MyCurriculumnItemRepository } from '@/repository/my_curriculumn_item.repository';
+import { myCurriculumnItemRepository } from './my_curriculumn_item.container';
 
 class MyCurriculumnContainer extends BaseContainer {
   constructor() {
@@ -12,6 +15,11 @@ class MyCurriculumnContainer extends BaseContainer {
     this.container.bind<IMyCurriculumnService<MyCurriculumn>>('MyCurriculumnService').to(MyCurriculumnService);
     this.container.bind<IMyCurriculumnRepository<MyCurriculumn>>('MyCurriculumnRepository').to(MyCurriculumnRepository);
     this.container.bind<MyCurriculumnController>(MyCurriculumnController).toSelf();
+
+    //Import
+    this.container
+      .bind<IMyCurriculumnItemRepository<any>>('MyCurriculumnItemRepository')
+      .toConstantValue(myCurriculumnItemRepository);
   }
 
   export() {
