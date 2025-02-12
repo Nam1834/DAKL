@@ -426,6 +426,10 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     return updatedProfile;
   }
 
+  async convertVNPhone(phone: string): Promise<string> {
+    return phone.replace(/^0/, '+84');
+  }
+
   async forgotPassword(data: ForgotPasswordUserReq): Promise<void> {
     let user: User | null = null;
     let isPhoneNumber = false;
@@ -450,7 +454,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     if (isPhoneNumber) {
       // Nếu input là số điện thoại, gửi OTP qua SMS
-      sendSms(`Mã OTP của bạn là ${otp}`, [user.phoneNumber]);
+      const internationalPhone = await this.convertVNPhone(user.phoneNumber);
+      sendSms(`Mã OTP của bạn là ${otp}`, [internationalPhone]);
     } else {
       // Nếu input là email, gửi OTP qua email
       const emailContent = createEmailOtpContent(otp);
