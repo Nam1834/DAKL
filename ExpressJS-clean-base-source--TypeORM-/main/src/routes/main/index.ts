@@ -13,6 +13,7 @@ import orderRouter from '../order.route';
 import paymentRouter from '../payment.route';
 import curriculumnRouter from '../curriculumn.route';
 import staticDataRouter from '../static_data.route';
+import myCurriculumnRouter from '../my_curriculumn.route';
 
 export function route(app: any, root_api: string) {
   app.use(`/role`, roleRouter);
@@ -28,6 +29,7 @@ export function route(app: any, root_api: string) {
   app.use(`/payment`, paymentRouter);
   app.use(`/curriculumn`, curriculumnRouter);
   app.use(`/static-data`, staticDataRouter);
+  app.use(`/my-curriculumn`, myCurriculumnRouter);
   app.all('*', (req: any, res: any, next: any) => {
     const err = new BaseError(ErrorCode.API_NOT_EXISTS, 'API Not Exists');
     next(err);

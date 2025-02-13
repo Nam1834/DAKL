@@ -1,4 +1,6 @@
 import { AddToMyCurriculumnReq } from '@/dto/my-curriculumn/add-to-my-curriculumn.req';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { PagingDto } from '@/dto/paging.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
 import { MyCurriculumn } from '@/models/my-curriculumn.model';
@@ -26,7 +28,7 @@ export class MyCurriculumnService
     this.myCurriculumnItemRepository = myCurriculumnItemRepository;
   }
 
-  async getMyCurriculumn(userId: string): Promise<MyCurriculumn> {
+  async getMyCurriculumn(userId: string, paging: PagingDto): Promise<PagingResponseDto<MyCurriculumn>> {
     const myCurriculumn = await this.myCurriculumnRepository.findOne({
       filter: { userId: userId }
     });
@@ -35,25 +37,24 @@ export class MyCurriculumnService
       throw new BaseError(ErrorCode.BAD_REQUEST, 'My Currriculumn does not exist');
     }
 
-    const myCurriculumnItem = await this.myCurriculumnItemRepository.findMany({
+    const myCurriculumnItems = await this.myCurriculumnItemRepository.findMany({
       filter: {
         myCurriculumnId: myCurriculumn.myCurriculumnId
       },
       relations: ['curriculumn'],
-      select: {
-        curriculumn: {
-          curriculumnId: true,
-          curriculumnMajor: true,
-          curriculumnName: true,
-          curriculumnUrl: true,
-          description: true
-        }
-      }
+      paging: paging
     });
 
-    myCurriculumn.items = myCurriculumnItem;
+    (myCurriculumn as any).items = myCurriculumnItems;
 
-    return myCurriculumn;
+    const total = await this.myCurriculumnItemRepository.count({
+      filter: { myCurriculumnId: myCurriculumn.myCurriculumnId }
+    });
+
+    return {
+      total: total,
+      items: [myCurriculumn]
+    };
   }
 
   async addToMyCurrriculumn(userId: string, data: AddToMyCurriculumnReq): Promise<void> {
@@ -76,5 +77,22 @@ export class MyCurriculumnService
     });
   }
 
-  async removeFromMyCurriculumn() {}
+  async removeFromMyCurriculumn(userId: string, curriculumnId: string): Promise<void> {
+    const myCurriculumn = await this.myCurriculumnRepository.findOne({
+      filter: {
+        userId: userId
+      }
+    });
+
+    if (!myCurriculumn) {
+      throw new BaseError(ErrorCode.BAD_REQUEST, 'My Currriculumn does not exist');
+    }
+
+    await this.myCurriculumnItemRepository.findOneAndHardDelete({
+      filter: {
+        curriculumnId: curriculumnId,
+        myCurriculumnId: myCurriculumn.myCurriculumnId
+      }
+    });
+  }
 }
