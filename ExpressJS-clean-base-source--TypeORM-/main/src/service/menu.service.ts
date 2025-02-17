@@ -32,6 +32,13 @@ export class MenuService implements IMenuService {
       icon: 'fa-solid fa-users'
     },
     {
+      name: 'QUẢN LÝ NGƯỜI HỌC',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_NGUOI_HOC],
+      children: null,
+      icon: 'fa-solid fa-users'
+    },
+    {
       name: 'QUẢN LÝ YÊU CẦU',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_YEU_CAU],
