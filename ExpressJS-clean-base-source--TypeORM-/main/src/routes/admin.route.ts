@@ -2,6 +2,7 @@ import { Permissions } from '@/constants/permission.constants';
 import { adminController } from '@/container/admin.container';
 import { CreateAdminReq } from '@/dto/admin/create-admin.req';
 import { LoginAdminReq } from '@/dto/admin/login-admin.req';
+import { UpdateManageAdminReq } from '@/dto/admin/update-admin-for-manage.req';
 import { UpdateAdminReq } from '@/dto/admin/update-admin.req';
 import { authenticateJWT } from '@/middleware/authenticate.middleware';
 import { checkPermission } from '@/middleware/check-permission.middleware';
@@ -16,6 +17,13 @@ adminRouter
     authenticateJWT,
     classValidate(UpdateAdminReq),
     adminController.updateAdmin.bind(adminController)
+  )
+  .put(
+    '/update-admin-by-id/:id',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_ADMIN]),
+    classValidate(UpdateManageAdminReq),
+    adminController.updateAdminById.bind(adminController)
   )
   .get(
     '/search',
@@ -32,6 +40,12 @@ adminRouter
     authenticateJWT,
     checkPermission([Permissions.QUAN_LY_ADMIN]),
     adminController.getDetail.bind(adminController)
+  )
+  .delete(
+    '/delete-admin-by-id/:id',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_ADMIN]),
+    adminController.deleteById.bind(adminController)
   );
 
 export default adminRouter;

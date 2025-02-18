@@ -37,6 +37,7 @@ import { UpdateAdminReq } from '@/dto/admin/update-admin.req';
 import { MicrosoftTokenRes } from '@/dto/user/microsoft-token.res';
 import { AdminTypeEnum } from '@/enums/admin-type.enum';
 import axios from 'axios';
+import { UpdateManageAdminReq } from '@/dto/admin/update-admin-for-manage.req';
 
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -331,6 +332,30 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     return admin;
   }
 
+  async convertUpdateManageAdmin(data: UpdateManageAdminReq, id: string): Promise<Admin> {
+    await this.adminRepository.checkEmail(data.email, id);
+
+    await this.adminRepository.checkPhoneNumber(data.phoneNumber, id);
+
+    const admin = new Admin();
+    admin.status = data.status;
+    admin.roleId = data.roleId;
+    admin.email = data.email;
+    admin.phoneNumber = data.phoneNumber;
+
+    const adminProfile = new AdminProfile();
+    adminProfile.personalEmail = data.email;
+    adminProfile.phoneNumber = data.phoneNumber;
+    adminProfile.fullname = data.fullname;
+    adminProfile.birthday = new Date(data.birthday);
+    adminProfile.homeAddress = data.homeAddress;
+    adminProfile.gender = data.gender;
+
+    admin.adminProfile = adminProfile;
+
+    return admin;
+  }
+
   async updateAdmin(id: string, data: any): Promise<void> {
     const existingAdmin = await this.adminRepository.findOne({
       filter: {
@@ -344,6 +369,23 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
 
     //Merge data to admin
     const adminUpdate = await this.convertUpdateAdminReqToAdmin(data);
+    const updatedData: Admin = { ...existingAdmin, ...adminUpdate }; // Gộp dữ liệu cũ với dữ liệu mới
+
+    await this.adminRepository.save(updatedData);
+  }
+
+  async updateAdminById(id: string, data: any): Promise<void> {
+    const existingAdmin = await this.adminRepository.findOne({
+      filter: {
+        adminId: id
+      }
+    });
+
+    if (!existingAdmin) {
+      throw new BaseError(ErrorCode.NF_01, 'Admin not found');
+    }
+
+    const adminUpdate = await this.convertUpdateManageAdmin(data, id);
     const updatedData: Admin = { ...existingAdmin, ...adminUpdate }; // Gộp dữ liệu cũ với dữ liệu mới
 
     await this.adminRepository.save(updatedData);

@@ -18,4 +18,5 @@ export interface IAdminService<T extends BaseModelType> extends IBaseCrudService
   login(data: LoginAdminReq): Promise<LoginAdminRes>;
   getProfile(adminId: string): Promise<GetProfileAdminRes>;
   updateAdmin(id: string, data: any): Promise<void>;
+  updateAdminById(id: string, data: any): Promise<void>;
 }

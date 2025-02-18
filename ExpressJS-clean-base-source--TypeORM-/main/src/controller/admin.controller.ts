@@ -2,6 +2,7 @@ import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.control
 import { CreateAdminReq } from '@/dto/admin/create-admin.req';
 import { GetProfileAdminRes } from '@/dto/admin/get-profile-admin.res';
 import { LoginAdminReq } from '@/dto/admin/login-admin.req';
+import { UpdateManageAdminReq } from '@/dto/admin/update-admin-for-manage.req';
 import { UpdateAdminReq } from '@/dto/admin/update-admin.req';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { Admin } from '@/models/admin.model';
@@ -130,10 +131,40 @@ export class AdminController {
 
   async updateAdmin(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = req.params.id;
+      const admin = req.user;
+      if (!admin) {
+        throw new Error('You must login');
+      }
+
+      const id = admin.id;
       const data: UpdateAdminReq = req.body;
       const result = await this.adminService.updateAdmin(id, data);
       res.send_ok('Admin updated successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateAdminById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.id;
+      const data: UpdateManageAdminReq = req.body;
+      const result = await this.adminService.updateAdminById(id, data);
+      res.send_ok('Admin updated successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.id;
+      await this.adminService.findOneAndDelete({
+        filter: {
+          adminId: id
+        }
+      });
+      res.send_ok('Admin deleted successfully');
     } catch (error) {
       next(error);
     }
