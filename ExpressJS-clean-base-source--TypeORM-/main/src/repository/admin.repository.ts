@@ -3,15 +3,36 @@ import { AdminProfile } from '@/models/admin_profile.model';
 import { BaseRepository } from '@/repository/base/base.repository';
 import { IAdminRepository } from '@/repository/interface/i.admin.repository';
 import { ITYPES } from '@/types/interface.types';
+import e from 'express';
 import { inject } from 'inversify';
+import { emit } from 'process';
 import 'reflect-metadata';
-import { DataSource, MoreThanOrEqual, Repository } from 'typeorm';
+import { DataSource, MoreThanOrEqual, Not, Repository } from 'typeorm';
 
 export class AdminRepository extends BaseRepository<Admin> implements IAdminRepository<Admin> {
   private adminProfileRepository: Repository<AdminProfile>;
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Admin));
     this.adminProfileRepository = dataSource.getRepository(AdminProfile);
+  }
+
+  async checkEmail(email: string, id: string): Promise<void> {
+    const checkEmail = await this.ormRepository.findOne({ where: { email: email, adminId: Not(id) } });
+    if (checkEmail) {
+      throw new Error('Email has been exist!');
+    }
+  }
+
+  async checkPhoneNumber(phoneNumber: string, id: string): Promise<void> {
+    if (!phoneNumber) {
+      return; // Nếu phoneNumber không được truyền vào, bỏ qua kiểm tra
+    }
+    const checkPhoneNumber = await this.ormRepository.findOne({
+      where: { phoneNumber: phoneNumber, adminId: Not(id) }
+    });
+    if (checkPhoneNumber) {
+      throw new Error('PhoneNumber has been exist!');
+    }
   }
 
   async createNewAdmin(admin: Admin): Promise<void> {
