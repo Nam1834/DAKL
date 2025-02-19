@@ -48,6 +48,12 @@ userRouter
     authenticateJWT,
     checkPermission([Permissions.QUAN_LY_YEU_CAU]),
     userController.solveRequest.bind(userController)
+  )
+  .delete(
+    '/delete-user-by-id/:id',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_ADMIN]),
+    userController.deleteById.bind(userController)
   );
 
 export default userRouter;

@@ -11,54 +11,57 @@ import { get } from 'lodash';
 export class MenuService implements IMenuService {
   public MENU_MAP: MenuMapDto[] = [
     {
-      name: 'QUẢN LÝ ADMIN',
+      name: 'TÀI KHOẢN',
       isCollapsed: false,
-      permissions: [Permissions.QUAN_LY_ADMIN],
-      children: null,
+      permissions: [Permissions.QUAN_LY_ADMIN, Permissions.QUAN_LY_NGUOI_HOC, Permissions.QUAN_LY_GIA_SU],
+      children: [
+        {
+          name: 'NHÂN VIÊN',
+          isCollapsed: false,
+          permissions: [Permissions.QUAN_LY_ADMIN],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'NGƯỜI HỌC',
+          isCollapsed: false,
+          permissions: [Permissions.QUAN_LY_NGUOI_HOC],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.QUAN_LY_GIA_SU],
+          children: null,
+          icon: null
+        }
+      ],
       icon: 'fa-solid fa-user-tie'
     },
+
     {
-      name: 'QUẢN LÝ BÀI ĐĂNG',
+      name: 'BÀI ĐĂNG',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_BAI_DANG],
       children: null,
       icon: 'fa-regular fa-newspaper'
     },
+
     {
-      name: 'QUẢN LÝ NGƯỜI DÙNG',
-      isCollapsed: false,
-      permissions: [Permissions.QUAN_LY_NGUOI_DUNG],
-      children: null,
-      icon: 'fa-solid fa-users'
-    },
-    {
-      name: 'QUẢN LÝ NGƯỜI HỌC',
-      isCollapsed: false,
-      permissions: [Permissions.QUAN_LY_NGUOI_HOC],
-      children: null,
-      icon: 'fa-solid fa-users'
-    },
-    {
-      name: 'QUẢN LÝ GIA SƯ',
-      isCollapsed: false,
-      permissions: [Permissions.QUAN_LY_GIA_SU],
-      children: null,
-      icon: 'fa-solid fa-users'
-    },
-    {
-      name: 'QUẢN LÝ YÊU CẦU',
+      name: 'YÊU CẦU',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_YEU_CAU],
       children: null,
       icon: 'fa-regular fa-paper-plane'
     },
     {
-      name: 'QUẢN LÝ DANH MỤC',
+      name: 'DANH MỤC',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_NGANH],
       children: [
         {
-          name: 'QUẢN LÝ NGÀNH',
+          name: 'NGÀNH',
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_NGANH],
           children: null,
@@ -68,7 +71,7 @@ export class MenuService implements IMenuService {
       icon: null
     },
     {
-      name: 'QUẢN LÝ GÓI THANH TOÁN',
+      name: 'GÓI THANH TOÁN',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_GOI_THANH_TOAN],
       children: null,
