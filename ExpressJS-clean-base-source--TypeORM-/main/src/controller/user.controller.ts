@@ -278,4 +278,18 @@ export class UserController {
       next(error);
     }
   }
+
+  async deleteById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.id;
+      await this.userService.findOneAndDelete({
+        filter: {
+          userId: id
+        }
+      });
+      res.send_ok('User deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -95,4 +95,6 @@ export class MyCurriculumnService
       }
     });
   }
+
+  async updateById(): Promise<void> {}
 }
