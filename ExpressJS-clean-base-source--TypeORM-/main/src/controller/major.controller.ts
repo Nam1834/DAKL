@@ -1,12 +1,14 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { CreateMajorReq } from '@/dto/major/create-major.req';
 import { PagingDto } from '@/dto/paging.dto';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Major } from '@/models/major.model';
 import { IMajorService } from '@/service/interface/i.major.service';
 import { ITYPES } from '@/types/interface.types';
 import { convertToDto } from '@/utils/dto-convert/convert-to-dto.util';
 import BaseError from '@/utils/error/base.error';
+import { getSearchData } from '@/utils/get-search-data.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 
@@ -20,6 +22,16 @@ export class MajorController {
   ) {
     this.majorService = majorService;
     this.common = common;
+  }
+
+  async searchMajor(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.majorService.search(searchData);
+      res.send_ok('Major fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
