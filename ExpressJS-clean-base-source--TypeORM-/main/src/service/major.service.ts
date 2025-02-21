@@ -1,12 +1,14 @@
 import { GetListMajorRes } from '@/dto/major/get-list-major.res';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { PagingDto } from '@/dto/paging.dto';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Major } from '@/models/major.model';
 import { IMajorRepository } from '@/repository/interface/i.major.repository';
 import { BaseCrudService } from '@/service/base/base.service';
 import { IMajorService } from '@/service/interface/i.major.service';
 import BaseError from '@/utils/error/base.error';
+import { SearchUtil } from '@/utils/search.util';
 import { inject, injectable } from 'inversify';
 
 @injectable()
@@ -16,6 +18,22 @@ export class MajorService extends BaseCrudService<Major> implements IMajorServic
   constructor(@inject('MajorRepository') majorRepository: IMajorRepository<Major>) {
     super(majorRepository);
     this.majorRepository = majorRepository;
+  }
+
+  async search(searchData: SearchDataDto): Promise<PagingResponseDto<Major>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const majors = await this.majorRepository.findMany({
+      filter: where,
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.majorRepository.count({
+      filter: where
+    });
+
+    return new PagingResponseDto(total, majors);
   }
 
   async updateMajor(id: string, data: any): Promise<void> {
