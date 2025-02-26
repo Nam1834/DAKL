@@ -5,6 +5,7 @@ import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
 import { LoginUserReq } from '@/dto/user/login-user.req';
 import { RegisterUserReq } from '@/dto/user/register-user.req';
 import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
+import { UpdateManageUserReq } from '@/dto/user/update-manage-user.req';
 import { VerifyOtpReq } from '@/dto/user/verify-otp.req';
 import { authenticateJWT } from '@/middleware/authenticate.middleware';
 import { checkPermission } from '@/middleware/check-permission.middleware';
@@ -48,6 +49,13 @@ userRouter
     authenticateJWT,
     checkPermission([Permissions.QUAN_LY_YEU_CAU]),
     userController.solveRequest.bind(userController)
+  )
+  .put(
+    '/update-user-by-id/:id',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_NGUOI_HOC]),
+    classValidate(UpdateManageUserReq),
+    userController.updateUserById.bind(userController)
   )
   .delete(
     '/delete-user-by-id/:id',

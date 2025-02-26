@@ -9,6 +9,7 @@ import { LoginUserRes } from '@/dto/user/login-user.res';
 import { RegisterUserReq } from '@/dto/user/register-user.req';
 import { ResetPasswordReq } from '@/dto/user/reset-password-user.req';
 import { ResetPasswordRes } from '@/dto/user/reset-password-user.res';
+import { UpdateManageUserReq } from '@/dto/user/update-manage-user.req';
 import { UpdateProfileUserReq } from '@/dto/user/update-profile-user.req';
 import { UpdateProfileUserRes } from '@/dto/user/update-profile-user.res';
 import { VerifyOtpReq } from '@/dto/user/verify-otp.req';
@@ -274,6 +275,17 @@ export class UserController {
       const result = await this.userService.solveRequest(userId, click);
 
       res.send_ok('Request solve successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateUserById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.id;
+      const data: UpdateManageUserReq = req.body;
+      const result = await this.userService.updateUserById(id, data);
+      res.send_ok('User updated successfully', result);
     } catch (error) {
       next(error);
     }

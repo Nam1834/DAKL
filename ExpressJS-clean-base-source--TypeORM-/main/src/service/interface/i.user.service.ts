@@ -36,4 +36,5 @@ export interface IUserService<T extends BaseModelType> extends IBaseCrudService<
   regisToTutor(id: string, data: RegisToTutorReq): Promise<void>;
   getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes>;
   solveRequest(userId: string, click: string): Promise<void>;
+  updateUserById(id: string, data: any): Promise<void>;
 }

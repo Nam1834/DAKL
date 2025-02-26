@@ -5,6 +5,7 @@ import { Role } from './role.model';
 import { UserTypeEnum } from '@/enums/user-type.enum';
 import { UserStatus } from '@/enums/user-status.enum';
 import { TutorProfile } from './tutor_profile.model';
+import { UserCheckActiveEnum } from '@/enums/user-check-active.enum';
 
 @Entity('users')
 export class User extends BaseModel {
@@ -39,6 +40,9 @@ export class User extends BaseModel {
 
   @Column({ nullable: true, default: UserStatus.PENDING })
   status?: string;
+
+  @Column({ nullable: true, default: UserCheckActiveEnum.ACTIVE })
+  checkActive?: string;
 
   @Column({ name: 'coin', default: 0 })
   coin!: number;

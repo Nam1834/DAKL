@@ -52,6 +52,7 @@ import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.rep
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 import { sendSms } from '@/utils/sms/sms-sender.util';
+import { UpdateManageUserReq } from '@/dto/user/update-manage-user.req';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -672,5 +673,31 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
         }
       });
     }
+  }
+
+  async convertUpdateManageUser(data: UpdateManageUserReq): Promise<User> {
+    const user = new User();
+    user.status = data.status;
+    user.roleId = data.roleId;
+    user.checkActive = data.checkActive;
+
+    return user;
+  }
+
+  async updateUserById(id: string, data: any): Promise<void> {
+    const existingUser = await this.userRepository.findOne({
+      filter: {
+        userId: id
+      }
+    });
+
+    if (!existingUser) {
+      throw new BaseError(ErrorCode.NF_01, 'User not found');
+    }
+
+    const userUpdate = await this.convertUpdateManageUser(data);
+    const updatedData: User = { ...existingUser, ...userUpdate };
+
+    await this.userRepository.save(updatedData);
   }
 }
