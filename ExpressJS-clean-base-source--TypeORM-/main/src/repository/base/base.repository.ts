@@ -23,6 +23,25 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     return this.ormRepository.metadata.columns.some((column) => column.propertyName === 'deletedAt');
   }
 
+  createOrderCondition(key: string, direction: 'ASC' | 'DESC'): any {
+    const orderCondition: any = {};
+    const keys = key.split('.');
+
+    if (keys.length === 1) {
+      return { [key]: direction };
+    }
+
+    let temp = orderCondition;
+    for (let i = 0; i < keys.length - 1; i++) {
+      temp[keys[i]] = {};
+      temp = temp[keys[i]];
+    }
+
+    temp[keys[keys.length - 1]] = direction;
+
+    return orderCondition;
+  }
+
   async save(data: T): Promise<T> {
     return await this.ormRepository.save(data);
   }
@@ -130,9 +149,12 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
     }
 
     const orderObject: Record<string, 'ASC' | 'DESC'> = {};
+
     if (order) {
       order.forEach((o) => {
-        orderObject[o.column] = o.direction;
+        //orderObject[o.column] = o.direction;
+        const orderCondition = this.createOrderCondition(o.column, o.direction);
+        Object.assign(orderObject, orderCondition);
       });
     }
     const result = await this.ormRepository.find({
