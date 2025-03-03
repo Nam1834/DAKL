@@ -275,13 +275,16 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
       throw new Error('Admin not found');
     }
 
+    // bi block khong cho dang nhap ...
+    if (admin.status === AdminStatus.BLOCKED) {
+      throw new BaseError(ErrorCode.AUTH_01, 'Admin is blocked from logging in');
+    }
+
     const isPasswordValid = await bcrypt.compare(data.password, admin!.password);
 
     if (!isPasswordValid) {
       throw new BaseError(ErrorCode.AUTH_01, 'Password is incorrect');
     }
-
-    // bi block khong cho dang nhap ...
 
     const rolePermission = await this.rolePermissionRepository.findMany({
       filter: {
