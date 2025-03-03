@@ -68,7 +68,7 @@ export class MenuService implements IMenuService {
           icon: null
         }
       ],
-      icon: null
+      icon: 'fa-solid fa-list'
     },
     {
       name: 'GÓI THANH TOÁN',
