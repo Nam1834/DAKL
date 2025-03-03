@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mã OTP Xác Thực</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+      .container {
+        max-width: 500px;
+        background: #ffffff;
+        padding: 20px;
+        margin: 20px auto;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .otp {
+        font-size: 24px;
+        font-weight: bold;
+        color: #e63946;
+        margin: 20px 0;
+      }
+      .footer {
+        font-size: 12px;
+        color: #777;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Xin chào <%= name %>,</h2>
+      <p>Mã OTP của bạn để xác thực tài khoản là:</p>
+      <p class="otp"><%= otp %></p>
+      <p>Mã này có hiệu lực trong <%= expiry %> phút. Vui lòng không chia sẻ mã này với bất kỳ ai.</p>
+      <p>Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.</p>
+      <div class="footer">&copy; 2025 Công ty GiaSuVLU. Mọi quyền được bảo lưu.</div>
+    </div>
+  </body>
+</html>
