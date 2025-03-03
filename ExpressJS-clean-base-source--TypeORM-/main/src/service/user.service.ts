@@ -53,6 +53,7 @@ import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curric
 import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 import { sendSms } from '@/utils/sms/sms-sender.util';
 import { UpdateManageUserReq } from '@/dto/user/update-manage-user.req';
+import { UserCheckActiveEnum } from '@/enums/user-check-active.enum';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -244,13 +245,15 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new Error('User not found');
     }
 
+    if (user.checkActive === UserCheckActiveEnum.BLOCKED) {
+      throw new BaseError(ErrorCode.AUTH_01, 'User is blocked from logging in');
+    }
+
     const isPasswordValid = await bcrypt.compare(data.password, user!.password);
 
     if (!isPasswordValid) {
       throw new BaseError(ErrorCode.AUTH_01, 'Password is incorrect');
     }
-
-    // bi block khong cho dang nhap ...
 
     // Luu vao JWt
     const claim = new JwtClaimDto(user.userId, '', [], '');
