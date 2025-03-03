@@ -281,6 +281,8 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
       throw new BaseError(ErrorCode.AUTH_01, 'Password is incorrect');
     }
 
+    // bi block khong cho dang nhap ...
+
     const rolePermission = await this.rolePermissionRepository.findMany({
       filter: {
         roleId: admin.roleId

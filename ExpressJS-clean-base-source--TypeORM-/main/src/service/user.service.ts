@@ -250,6 +250,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new BaseError(ErrorCode.AUTH_01, 'Password is incorrect');
     }
 
+    // bi block khong cho dang nhap ...
+
     // Luu vao JWt
     const claim = new JwtClaimDto(user.userId, '', [], '');
 
@@ -647,24 +649,24 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
         }
       });
 
-      const myCurriculumn = await this.myCurriculumnRepository.findOne({
-        filter: { userId: userId },
-        relations: ['items', 'items.curriculumn'] // Lấy các liên kết
-      });
+      // const myCurriculumn = await this.myCurriculumnRepository.findOne({
+      //   filter: { userId: userId },
+      //   relations: ['items', 'items.curriculumn'] // Lấy các liên kết
+      // });
 
-      if (!myCurriculumn || myCurriculumn.items.length === 0) {
-        throw new BaseError(ErrorCode.NOT_FOUND, 'My Curriculumn or My Curriculumn Items does not exist');
-      }
+      // if (!myCurriculumn || myCurriculumn.items.length === 0) {
+      //   throw new BaseError(ErrorCode.NOT_FOUND, 'My Curriculumn or My Curriculumn Items does not exist');
+      // }
 
       // Cập nhật trạng thái của curriculumn thành ACTIVE
-      for (const item of myCurriculumn.items) {
-        await this.curriculumnRepository.findOneAndUpdate({
-          filter: { curriculumnId: item.curriculumn.curriculumnId },
-          updateData: {
-            status: CurriculumnStatus.ACTIVE
-          }
-        });
-      }
+      // for (const item of myCurriculumn.items) {
+      //   await this.curriculumnRepository.findOneAndUpdate({
+      //     filter: { curriculumnId: item.curriculumn.curriculumnId },
+      //     updateData: {
+      //       status: CurriculumnStatus.ACTIVE
+      //     }
+      //   });
+      // }
     } else if (click === UserStatus.REFUSE) {
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },
