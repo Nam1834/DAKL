@@ -4,7 +4,7 @@ export class CreateMajorReq {
   @IsNotEmpty()
   @IsString()
   @MaxLength(30)
-  majorId!: string;
+  sumName!: string;
 
   @IsNotEmpty()
   @IsString()

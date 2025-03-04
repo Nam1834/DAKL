@@ -38,15 +38,7 @@ export class MajorController {
     try {
       const requestBody: CreateMajorReq = req.body;
 
-      const existingMajor = await this.majorService.findOne({
-        filter: { majorId: requestBody.majorId }
-      });
-
-      if (existingMajor) {
-        throw new BaseError(ErrorCode.ALREADY_EXISTS, 'Major already exist');
-      }
-
-      const result = await this.majorService.create({ data: requestBody });
+      const result = await this.majorService.createMajor(requestBody);
 
       res.send_ok('Create major successfully', result);
     } catch (error) {

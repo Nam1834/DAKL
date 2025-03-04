@@ -1,3 +1,4 @@
+import { CreateMajorReq } from '@/dto/major/create-major.req';
 import { GetListMajorRes } from '@/dto/major/get-list-major.res';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { PagingDto } from '@/dto/paging.dto';
@@ -34,6 +35,18 @@ export class MajorService extends BaseCrudService<Major> implements IMajorServic
     });
 
     return new PagingResponseDto(total, majors);
+  }
+
+  async createMajor(data: CreateMajorReq): Promise<void> {
+    const newMajor = new Major();
+    newMajor.sumName = data.sumName;
+    newMajor.majorName = data.majorName;
+
+    // Gọi repository để tạo majorId
+    await this.majorRepository.createNewMajor(newMajor);
+
+    // Lưu vào database
+    await this.majorRepository.save(newMajor);
   }
 
   async updateMajor(id: string, data: any): Promise<void> {
