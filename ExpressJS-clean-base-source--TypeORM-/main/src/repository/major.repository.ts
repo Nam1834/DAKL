@@ -10,4 +10,17 @@ export class MajorRepository extends BaseRepository<Major> implements IMajorRepo
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Major));
   }
+
+  async createNewMajor(major: Major): Promise<void> {
+    const maxMajorId = await this.ormRepository
+      .createQueryBuilder('major')
+      .select("MAX(CAST(NULLIF(SUBSTRING(major.majorId, 2), '') AS INTEGER))", 'maxMajorId')
+      .where("major.majorId ~ '^M[0-9]+$'") // Chỉ lấy những ID hợp lệ
+      .getRawOne();
+
+    const newMajorIdNumber = (maxMajorId?.maxMajorId || 0) + 1;
+    const newMajorId = 'M' + newMajorIdNumber.toString().padStart(4, '0');
+
+    major.majorId = newMajorId;
+  }
 }
