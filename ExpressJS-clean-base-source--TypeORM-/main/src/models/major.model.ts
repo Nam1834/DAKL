@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { BaseModel } from './base.model';
+import { Subject } from './subject.model';
 
 @Entity('majors')
 export class Major extends BaseModel {
@@ -11,4 +12,7 @@ export class Major extends BaseModel {
 
   @Column({ name: 'major_name' })
   majorName!: string;
+
+  @OneToMany(() => Subject, (subject) => subject.major)
+  subjects!: Subject[];
 }
