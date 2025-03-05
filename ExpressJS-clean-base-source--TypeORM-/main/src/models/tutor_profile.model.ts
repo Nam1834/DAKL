@@ -1,6 +1,8 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { BaseModel } from './base.model';
 import { User } from './user.model';
+import { TutorSubject } from './tutor_subject.model';
+import { TutorLevel } from './tutor_level.model';
 
 @Entity('tutor_profiles')
 export class TutorProfile extends BaseModel {
@@ -60,4 +62,10 @@ export class TutorProfile extends BaseModel {
 
   @Column({ name: 'is_use_curriculumn', type: 'boolean', default: false })
   isUseCurriculumn!: boolean;
+
+  // @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.tutor)
+  // tutorSubjects!: TutorSubject[];
+
+  @ManyToOne(() => TutorLevel, (tutorLevel) => tutorLevel.tutors, { onDelete: 'SET NULL' })
+  tutorLevel!: TutorLevel;
 }

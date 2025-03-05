@@ -66,6 +66,20 @@ export class MenuService implements IMenuService {
           permissions: [Permissions.QUAN_LY_NGANH],
           children: null,
           icon: null
+        },
+        {
+          name: 'MÔN HỌC',
+          isCollapsed: false,
+          permissions: [Permissions.QUAN_LY_MON_HOC],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'HẠNG GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.QUAN_LY_HANG_GIA_SU],
+          children: null,
+          icon: null
         }
       ],
       icon: 'fa-solid fa-list'

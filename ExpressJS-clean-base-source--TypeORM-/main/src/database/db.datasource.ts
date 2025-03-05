@@ -20,6 +20,9 @@ import { OrderItem } from '@/models/order_item.model';
 import { Curriculumn } from '@/models/curriculumn.model';
 import { MyCurriculumn } from '@/models/my-curriculumn.model';
 import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
+import { Subject } from '@/models/subject.model';
+import { TutorLevel } from '@/models/tutor_level.model';
+import { TutorSubject } from '@/models/tutor_subject.model';
 
 const models = [
   Role,
@@ -39,7 +42,10 @@ const models = [
   OrderItem,
   Curriculumn,
   MyCurriculumn,
-  MyCurriculumnItem
+  MyCurriculumnItem,
+  Subject,
+  TutorLevel
+  //TutorSubject
 ];
 
 export class AppDataSourceSingleton {
