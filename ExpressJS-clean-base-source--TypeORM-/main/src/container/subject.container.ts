@@ -2,9 +2,9 @@ import { SubjectController } from '@/controller/subject.controller';
 import { SubjectService } from '@/service/subject.service';
 import { Subject } from '@/models/subject.model';
 import { SubjectRepository } from '@/repository/subject.repository';
-import { ISubjectService } from '@/service/interface/i.subject.service';
 import { ISubjectRepository } from '@/repository/interface/i.subject.repository';
 import { BaseContainer } from '@/container/base.container';
+import { ISubjectService } from '@/service/interface/i.subject.service';
 
 class SubjectContainer extends BaseContainer {
   constructor() {
