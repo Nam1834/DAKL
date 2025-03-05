@@ -6,12 +6,7 @@ import express from 'express';
 const majorRouter = express.Router();
 
 majorRouter
-  .get(
-    '/search',
-    authenticateJWT,
-    checkPermission([Permissions.QUAN_LY_NGANH]),
-    majorController.searchMajor.bind(majorController)
-  )
+  .get('/search', majorController.searchMajor.bind(majorController))
   .post(
     '/create',
     authenticateJWT,

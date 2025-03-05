@@ -27,6 +27,7 @@ export class MajorService extends BaseCrudService<Major> implements IMajorServic
     const majors = await this.majorRepository.findMany({
       filter: where,
       order: order,
+      relations: ['subjects'],
       paging: paging
     });
 

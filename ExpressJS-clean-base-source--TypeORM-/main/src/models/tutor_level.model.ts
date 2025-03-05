@@ -5,7 +5,7 @@ import { TutorProfile } from './tutor_profile.model';
 @Entity('tutor_levels')
 export class TutorLevel extends BaseModel {
   @PrimaryGeneratedColumn('uuid', { name: 'tutor_level_id' })
-  tutorLevelId!: number;
+  tutorLevelId!: string;
 
   @Column({ name: 'level_name' })
   levelName!: string;
