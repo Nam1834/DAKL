@@ -6,9 +6,7 @@ import { TutorLevel } from './tutor_level.model';
 
 @Entity('tutor_profiles')
 export class TutorProfile extends BaseModel {
-  @PrimaryColumn({
-    name: 'user_id'
-  })
+  @PrimaryColumn({ type: 'uuid', name: 'user_id' })
   userId!: string;
 
   @OneToOne(() => User, { onDelete: 'CASCADE' })
@@ -63,8 +61,8 @@ export class TutorProfile extends BaseModel {
   @Column({ name: 'is_use_curriculumn', type: 'boolean', default: false })
   isUseCurriculumn!: boolean;
 
-  // @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.tutor)
-  // tutorSubjects!: TutorSubject[];
+  @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.tutor)
+  tutorSubjects!: TutorSubject[];
 
   @ManyToOne(() => TutorLevel, (tutorLevel) => tutorLevel.tutors, { onDelete: 'SET NULL' })
   tutorLevel!: TutorLevel;

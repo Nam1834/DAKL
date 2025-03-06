@@ -18,6 +18,6 @@ export class Subject extends BaseModel {
   @JoinColumn({ name: 'major_id' })
   major!: Major;
 
-  // @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.subject)
-  // tutorSubjects!: TutorSubject[];
+  @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.subject)
+  tutorSubjects!: TutorSubject[];
 }
