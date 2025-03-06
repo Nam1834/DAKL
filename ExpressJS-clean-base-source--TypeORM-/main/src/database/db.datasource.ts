@@ -44,8 +44,8 @@ const models = [
   MyCurriculumn,
   MyCurriculumnItem,
   Subject,
-  TutorLevel
-  //TutorSubject
+  TutorLevel,
+  TutorSubject
 ];
 
 export class AppDataSourceSingleton {

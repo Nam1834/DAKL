@@ -46,4 +46,6 @@ export class User extends BaseModel {
 
   @Column({ name: 'coin', default: 0 })
   coin!: number;
+
+  //diem so cua user
 }
