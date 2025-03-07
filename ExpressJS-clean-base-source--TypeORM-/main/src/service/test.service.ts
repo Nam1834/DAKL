@@ -23,6 +23,17 @@ export class TestService extends BaseCrudService<Test> implements ITestService<T
       filter: where,
       order: order,
       relations: ['questions'],
+      select: {
+        questions: {
+          testQuestionId: true,
+          questionNumber: true,
+          questionText: true,
+          optionA: true,
+          optionB: true,
+          optionC: true,
+          optionD: true
+        }
+      },
       paging: paging
     });
 
