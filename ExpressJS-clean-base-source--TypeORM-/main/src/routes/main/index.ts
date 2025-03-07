@@ -16,6 +16,7 @@ import staticDataRouter from '../static_data.route';
 import myCurriculumnRouter from '../my_curriculumn.route';
 import subjectRouter from '../subject.route';
 import tutorLevelRouter from '../tutor_level.route';
+import testRouter from '../test.route';
 
 export function route(app: any, root_api: string) {
   app.use(`/role`, roleRouter);
@@ -34,6 +35,7 @@ export function route(app: any, root_api: string) {
   app.use(`/my-curriculumn`, myCurriculumnRouter);
   app.use(`/subject`, subjectRouter);
   app.use(`/tutor-level`, tutorLevelRouter);
+  app.use(`/test`, testRouter);
   app.all('*', (req: any, res: any, next: any) => {
     const err = new BaseError(ErrorCode.API_NOT_EXISTS, 'API Not Exists');
     next(err);
