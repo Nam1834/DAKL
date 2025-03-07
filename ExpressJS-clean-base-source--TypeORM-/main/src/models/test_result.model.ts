@@ -20,6 +20,7 @@ export class TestResult extends BaseModel {
 
   @Column('timestamp', { name: 'test_date', default: () => 'CURRENT_TIMESTAMP' })
   testDate!: Date;
+
   @Column('varchar', { length: 255, name: 'title' })
   title!: string;
 
