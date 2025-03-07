@@ -6,6 +6,7 @@ import { UserTypeEnum } from '@/enums/user-type.enum';
 import { UserStatus } from '@/enums/user-status.enum';
 import { TutorProfile } from './tutor_profile.model';
 import { UserCheckActiveEnum } from '@/enums/user-check-active.enum';
+import { TestResult } from './test_result.model';
 
 @Entity('users')
 export class User extends BaseModel {
@@ -47,5 +48,9 @@ export class User extends BaseModel {
   @Column({ name: 'coin', default: 0 })
   coin!: number;
 
-  //diem so cua user
+  @OneToOne(() => TestResult, (testResult) => testResult.user)
+  testResults!: TestResult;
+
+  @Column({ name: 'total_test_points', type: 'int', default: 0 })
+  totalTestPoints!: number;
 }

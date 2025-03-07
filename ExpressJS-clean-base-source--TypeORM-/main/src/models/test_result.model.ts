@@ -1,17 +1,25 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseModel } from './base.model';
 import { TestQuestion } from './test_question.model';
+import { User } from './user.model';
 
-@Entity('tests')
+@Entity('test_results')
 export class TestResult extends BaseModel {
   @PrimaryGeneratedColumn('uuid', { name: 'test_result_id' })
   testResultId!: string;
 
-  //userId
-  //points
-  //date
-  //
+  @Column({ type: 'uuid', name: 'user_id' })
+  userId!: string;
 
+  @OneToOne(() => User, (user) => user.testResults, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user!: User;
+
+  @Column('int', { name: 'points' })
+  points!: number;
+
+  @Column('timestamp', { name: 'test_date', default: () => 'CURRENT_TIMESTAMP' })
+  testDate!: Date;
   @Column('varchar', { length: 255, name: 'title' })
   title!: string;
 

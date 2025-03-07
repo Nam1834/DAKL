@@ -7,11 +7,15 @@ export class TestQuestion extends BaseModel {
   @PrimaryGeneratedColumn('uuid', { name: 'test_question_id' })
   testQuestionId!: string;
 
+  @Column({ type: 'uuid', name: 'test_id' })
+  testId!: string;
+
   @ManyToOne(() => Test, (test) => test.questions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'test_id' })
   test!: Test;
 
-  //question number
+  @Column('int', { name: 'question_number' })
+  questionNumber!: number;
 
   @Column('varchar', { length: 255, name: 'question_text' })
   questionText!: string;
@@ -29,5 +33,5 @@ export class TestQuestion extends BaseModel {
   optionD!: string;
 
   @Column('varchar', { length: 1, name: 'correct_answer' })
-  correctAnswer!: string; //ko dc tra
+  correctAnswer!: string;
 }
