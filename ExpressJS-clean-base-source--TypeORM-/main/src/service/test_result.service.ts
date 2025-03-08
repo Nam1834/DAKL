@@ -65,4 +65,12 @@ export class TestResultService extends BaseCrudService<TestResult> implements IT
       updateData: { totalTestPoints: score }
     });
   }
+
+  async checkPassTest(userId: string): Promise<boolean> {
+    const testResult = await this.testResultRepository.findOne({
+      filter: { userId }
+    });
+
+    return !!testResult;
+  }
 }

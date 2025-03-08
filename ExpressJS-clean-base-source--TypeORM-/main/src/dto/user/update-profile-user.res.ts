@@ -24,4 +24,7 @@ export class UpdateProfileUserRes {
 
   @Expose()
   gender!: 'MALE' | 'FEMALE';
+
+  @Expose()
+  majorId!: string;
 }

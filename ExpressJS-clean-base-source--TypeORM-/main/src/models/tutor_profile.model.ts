@@ -61,9 +61,13 @@ export class TutorProfile extends BaseModel {
   @Column({ name: 'is_use_curriculumn', type: 'boolean', default: false })
   isUseCurriculumn!: boolean;
 
+  @Column({ nullable: true, name: 'tutor_level_id' })
+  tutorLevelId!: string;
+
   @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.tutor)
   tutorSubjects!: TutorSubject[];
 
-  @ManyToOne(() => TutorLevel, (tutorLevel) => tutorLevel.tutors, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TutorLevel, { onDelete: 'CASCADE', eager: true })
+  @JoinColumn({ name: 'tutor_level_id' })
   tutorLevel!: TutorLevel;
 }

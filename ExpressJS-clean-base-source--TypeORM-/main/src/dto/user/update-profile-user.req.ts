@@ -28,4 +28,7 @@ export class UpdateProfileUserReq {
   @IsString()
   @Matches(/^(MALE|FEMALE)$/, { message: 'Gender must be either MALE or FEMALE' })
   gender?: 'MALE' | 'FEMALE';
+
+  @IsOptional()
+  majorId!: string;
 }

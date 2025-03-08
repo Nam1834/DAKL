@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
 import { BaseModel } from './base.model';
 import { User } from './user.model';
+import { Major } from './major.model';
 
 @Entity('user_profiles')
 export class UserProfile extends BaseModel {
@@ -39,4 +40,11 @@ export class UserProfile extends BaseModel {
 
   @Column({ type: 'enum', enum: ['MALE', 'FEMALE'], nullable: true })
   gender!: 'MALE' | 'FEMALE';
+
+  @Column({ nullable: true, name: 'major_id' })
+  majorId!: string;
+
+  @ManyToOne(() => Major, { onDelete: 'CASCADE', eager: true })
+  @JoinColumn({ name: 'major_id' })
+  major!: Major;
 }
