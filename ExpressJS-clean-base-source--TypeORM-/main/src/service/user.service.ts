@@ -54,6 +54,7 @@ import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 import { sendSms } from '@/utils/sms/sms-sender.util';
 import { UpdateManageUserReq } from '@/dto/user/update-manage-user.req';
 import { UserCheckActiveEnum } from '@/enums/user-check-active.enum';
+import { TutorLevelEnum } from '@/enums/tutor_level.enum';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -517,73 +518,41 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     return response;
   }
 
-  async convertUserReqToTutor(
-    existingUser: User,
-    data: RegisToTutorReq
-  ): Promise<{ user: User; myCurriculumn: MyCurriculumn; curriculumn: Curriculumn }> {
+  async getTutorLevelId(totalTestPoints: number): Promise<string> {
+    if (totalTestPoints >= 17) return TutorLevelEnum.DIAMOND;
+    if (totalTestPoints >= 13) return TutorLevelEnum.PLATINUM;
+    if (totalTestPoints >= 9) return TutorLevelEnum.GOLD;
+    if (totalTestPoints >= 5) return TutorLevelEnum.SILVER;
+    return TutorLevelEnum.BRONZE;
+  }
+
+  async convertUserReqToTutor(existingUser: User, data: RegisToTutorReq): Promise<void> {
     existingUser.status = UserStatus.REQUEST;
 
     const tutorProfile = new TutorProfile();
     tutorProfile.avatar = data.avatar;
-    tutorProfile.majorName = data.majorName;
-    tutorProfile.teachingCetification = data.teachingCetification;
-    tutorProfile.degree = data.degree;
-    tutorProfile.univercity = data.univercity;
+    tutorProfile.fullname = data.fullname;
+    tutorProfile.majorId = data.majorId;
+    tutorProfile.birthday = new Date(data.birthday);
+    tutorProfile.gender = data.gender;
+    tutorProfile.bankNumber = data.bankNumber;
+    tutorProfile.bankName = data.bankName;
     tutorProfile.GPA = data.GPA;
-    tutorProfile.educationalCertification = data.educationalCertification;
     tutorProfile.dateTimeLearn = data.dateTimeLearn.map((item) => JSON.stringify(item));
     tutorProfile.teachingTime = data.teachingTime;
-    tutorProfile.amount = data.amount;
-    tutorProfile.teachingRoadMap = data.teachingRoadMap;
     tutorProfile.description = data.description;
+    tutorProfile.subjectId = data.subjectId;
+    tutorProfile.univercity = data.univercity;
+    tutorProfile.GPAOrNameDegree = data.GPAOrNameDegree;
+    tutorProfile.educationalCertification = data.educationalCertification;
     tutorProfile.videoUrl = data.videoUrl;
-    tutorProfile.teachingMethod = data.teachingMethod;
+    tutorProfile.teachingTime = data.teachingTime;
+    tutorProfile.descriptionOfSubject = data.descriptionOfSubject;
     tutorProfile.isUseCurriculumn = data.isUseCurriculumn;
 
+    tutorProfile.tutorLevelId = await this.getTutorLevelId(existingUser.totalTestPoints);
+
     existingUser.tutorProfile = tutorProfile;
-
-    let myCurriculumn = await this.myCurriculumnRepository.findOne({
-      filter: { userId: existingUser.userId }
-    });
-
-    if (myCurriculumn) {
-      // Xóa toàn bộ MyCurriculumnItem cũ
-      await this.myCurriculumnItemRepository.findOneAndHardDelete({
-        filter: { myCurriculumnId: myCurriculumn.myCurriculumnId }
-      });
-
-      // Reset danh sách items
-      myCurriculumn.items = [];
-    } else {
-      // Nếu chưa có, tạo mới MyCurriculumn
-      myCurriculumn = new MyCurriculumn();
-      myCurriculumn.user = existingUser;
-      myCurriculumn.items = [];
-    }
-
-    // Tạo mới Curriculumn
-    const curriculumn = new Curriculumn();
-    curriculumn.curriculumnName = data.curriculumn.curriculumnName;
-    curriculumn.curriculumnMajor = data.curriculumn.curriculumnMajor;
-    curriculumn.curriculumnUrl = data.curriculumn.curriculumnUrl;
-    curriculumn.description = data.curriculumn.description;
-    curriculumn.roleUserCreated = existingUser.roleId;
-
-    await this.curriculumnRepository.save(curriculumn);
-
-    // Tạo mới MyCurriculumnItem
-    const myCurriculumnItem = new MyCurriculumnItem();
-    myCurriculumnItem.curriculumn = curriculumn;
-    myCurriculumnItem.curriculumnId = curriculumn.curriculumnId;
-
-    // Gán MyCurriculumnItem mới vào MyCurriculumn
-    myCurriculumn.items.push(myCurriculumnItem);
-
-    if (!existingUser.userId) {
-      throw new Error('User ID is not set');
-    }
-
-    return { user: existingUser, myCurriculumn, curriculumn };
   }
 
   async regisToTutor(id: string, data: RegisToTutorReq): Promise<void> {
@@ -597,8 +566,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new BaseError(ErrorCode.NF_01, 'User not found');
     }
 
-    const { user, myCurriculumn, curriculumn } = await this.convertUserReqToTutor(existingUser, data);
-    await this.userRepository.updateUserWithTransaction(user, myCurriculumn, curriculumn);
+    await this.convertUserReqToTutor(existingUser, data);
+    await this.userRepository.save(existingUser);
   }
 
   async getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes> {
@@ -652,25 +621,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
           status: UserStatus.ACCEPT
         }
       });
-
-      // const myCurriculumn = await this.myCurriculumnRepository.findOne({
-      //   filter: { userId: userId },
-      //   relations: ['items', 'items.curriculumn'] // Lấy các liên kết
-      // });
-
-      // if (!myCurriculumn || myCurriculumn.items.length === 0) {
-      //   throw new BaseError(ErrorCode.NOT_FOUND, 'My Curriculumn or My Curriculumn Items does not exist');
-      // }
-
-      // Cập nhật trạng thái của curriculumn thành ACTIVE
-      // for (const item of myCurriculumn.items) {
-      //   await this.curriculumnRepository.findOneAndUpdate({
-      //     filter: { curriculumnId: item.curriculumn.curriculumnId },
-      //     updateData: {
-      //       status: CurriculumnStatus.ACTIVE
-      //     }
-      //   });
-      // }
     } else if (click === UserStatus.REFUSE) {
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },

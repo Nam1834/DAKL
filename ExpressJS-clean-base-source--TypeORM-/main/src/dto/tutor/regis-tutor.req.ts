@@ -4,6 +4,7 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -43,17 +44,42 @@ export class RegisToTutorReq {
   @IsString({ message: 'Avatar must be a string' })
   avatar!: string;
 
-  @IsNotEmpty({ message: 'Major Name is required' })
-  @IsString({ message: 'Major Name must be a string' })
-  majorName!: string;
+  @IsNotEmpty({ message: 'fullname is required' })
+  @IsString({ message: 'fullname must be a string' })
+  fullname!: string;
 
-  @IsNotEmpty({ message: 'Teaching Certification is required' })
-  @IsString({ message: 'Teaching Certification must be a string or file type' })
-  teachingCetification!: string;
+  @IsNotEmpty({ message: 'MajorId is required' })
+  @IsString({ message: 'MajorId must be a string' })
+  majorId!: string;
 
-  @IsNotEmpty({ message: 'Degree is required.' })
-  @IsEnum(DegreeEnum, { message: 'Degree must be one of: STUDENT, MASTER, DOCTOR, FREELANCE.' })
-  degree!: DegreeEnum;
+  @IsNotEmpty()
+  @IsDateString()
+  birthday!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Matches(/^(MALE|FEMALE)$/, { message: 'Gender must be either MALE or FEMALE' })
+  gender!: 'MALE' | 'FEMALE';
+
+  @IsNotEmpty()
+  @IsString()
+  bankNumber!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  bankName!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  subjectId!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  GPAOrNameDegree!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  descriptionOfSubject!: string;
 
   @IsNotEmpty({ message: 'University is required' })
   @IsString({ message: 'University must be a string' })
@@ -75,17 +101,9 @@ export class RegisToTutorReq {
   @Type(() => DateTimeLearnDto)
   dateTimeLearn!: DateTimeLearnDto[];
 
-  @IsNotEmpty()
-  @IsNumber()
-  amount!: number;
-
   @IsNotEmpty({ message: 'Educational Certification is required' })
   @IsNumber()
   teachingTime!: number;
-
-  @IsNotEmpty()
-  @IsString()
-  teachingRoadMap!: string;
 
   @IsNotEmpty()
   @IsString()
@@ -94,19 +112,6 @@ export class RegisToTutorReq {
   @IsNotEmpty()
   @IsString()
   videoUrl!: string;
-
-  @IsNotEmpty()
-  @IsEnum(TeachingMethod, { message: 'teachingMethod must be one of: ONLINE, OFFLINE, BOTH.' })
-  teachingMethod!: string;
-
-  @IsNotEmpty()
-  @IsString()
-  workAddress!: string;
-
-  @optional()
-  @ValidateNested()
-  @Type(() => CreateCurriculumnReq)
-  curriculumn!: CreateCurriculumnReq;
 
   @IsNotEmpty()
   @IsBoolean()
