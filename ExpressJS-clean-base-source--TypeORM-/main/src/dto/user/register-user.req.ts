@@ -70,4 +70,7 @@ export class RegisterUserReq {
   @ValidateIf((o) => o.password !== undefined)
   @Validate(IsPasswordMatch)
   confirmPassword!: string;
+
+  @IsNotEmpty()
+  majorId!: string;
 }

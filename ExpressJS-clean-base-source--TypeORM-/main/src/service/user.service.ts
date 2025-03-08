@@ -197,6 +197,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     userProfile.personalEmail = data.email;
     userProfile.phoneNumber = data.phoneNumber;
     userProfile.gender = data.gender;
+    userProfile.majorId = data.majorId;
 
     (data as unknown as User).userProfile = userProfile;
 

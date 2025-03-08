@@ -34,4 +34,21 @@ export class TestResultController {
       next(error);
     }
   }
+
+  async checkPassTest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        throw new Error('You must login');
+      }
+      const userId = user.id;
+
+      const result = await this.testResultService.checkPassTest(userId);
+      console.log('Final Result:', result);
+      res.send_ok(result ? 'You pass this test!' : 'You must passed this test!', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
