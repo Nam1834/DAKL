@@ -71,6 +71,6 @@ export class TestResultService extends BaseCrudService<TestResult> implements IT
       filter: { userId }
     });
 
-    return !!testResult;
+    return Boolean(testResult);
   }
 }
