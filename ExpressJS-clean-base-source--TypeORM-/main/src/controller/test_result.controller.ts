@@ -45,8 +45,7 @@ export class TestResultController {
       const userId = user.id;
 
       const result = await this.testResultService.checkPassTest(userId);
-      console.log('Final Result:', result);
-      res.send_ok(result ? 'You pass this test!' : 'You must passed this test!', result);
+      res.send_ok(result.toString());
     } catch (error) {
       next(error);
     }
