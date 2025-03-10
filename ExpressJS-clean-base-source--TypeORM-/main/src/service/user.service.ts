@@ -58,6 +58,7 @@ import { TutorLevelEnum } from '@/enums/tutor_level.enum';
 import { TutorSubject } from '@/models/tutor_subject.model';
 import { ITutorSubjectRepository } from '@/repository/interface/i.tutor_subject.repository';
 import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
+import { UpdateTutorProfileRes } from '@/dto/tutor/update-tutor-profile.res';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -573,77 +574,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     existingUser.tutorProfile = tutorProfile;
   }
 
-  async convertTutorUpdateProfile(existingUser: User, data: UpdateTutorProfileReq): Promise<void> {
-    const tutorProfile = await this.tutorProfileRepository.findOne({ filter: { userId: existingUser.userId } });
-
-    if (!tutorProfile) {
-      // Nếu chưa có profile, tạo mới
-      const newTutorProfile = new TutorProfile();
-      newTutorProfile.userId = existingUser.userId;
-      newTutorProfile.avatar = data.avatar;
-      newTutorProfile.fullname = data.fullname;
-      newTutorProfile.majorId = data.majorId;
-      newTutorProfile.birthday = new Date(data.birthday);
-      newTutorProfile.gender = data.gender;
-      newTutorProfile.bankNumber = data.bankNumber;
-      newTutorProfile.bankName = data.bankName;
-      newTutorProfile.GPA = data.GPA;
-      newTutorProfile.dateTimeLearn = data.dateTimeLearn.map((item) => JSON.stringify(item));
-      newTutorProfile.teachingTime = data.teachingTime;
-      newTutorProfile.description = data.description;
-      newTutorProfile.subjectId = data.subjectId;
-      newTutorProfile.univercity = data.univercity;
-      newTutorProfile.GPAOrNameDegree = data.GPAOrNameDegree;
-      newTutorProfile.educationalCertification = data.educationalCertification;
-      newTutorProfile.videoUrl = data.videoUrl;
-      newTutorProfile.teachingTime = data.teachingTime;
-      newTutorProfile.descriptionOfSubject = data.descriptionOfSubject;
-      newTutorProfile.isPublicProfile = data.isPublicProfile;
-
-      await this.tutorProfileRepository.save(newTutorProfile);
-      existingUser.tutorProfile = newTutorProfile;
-    } else {
-      // Nếu đã có profile, chỉ cập nhật thông tin
-      Object.assign(tutorProfile, {
-        avatar: data.avatar,
-        fullname: data.fullname,
-        majorId: data.majorId,
-        birthday: new Date(data.birthday),
-        gender: data.gender,
-        bankNumber: data.bankNumber,
-        bankName: data.bankName,
-        GPA: data.GPA,
-        dateTimeLearn: data.dateTimeLearn.map((item) => JSON.stringify(item)),
-        teachingTime: data.teachingTime,
-        description: data.description,
-        subjectId: data.subjectId,
-        univercity: data.univercity,
-        GPAOrNameDegree: data.GPAOrNameDegree,
-        educationalCertification: data.educationalCertification,
-        videoUrl: data.videoUrl,
-        descriptionOfSubject: data.descriptionOfSubject,
-        isPublicProfile: data.isPublicProfile
-      });
-
-      await this.tutorProfileRepository.save(tutorProfile);
-    }
-
-    // Kiểm tra xem TutorSubject đã tồn tại hay chưa
-    const tutorSubject = await this.tutorSubjectRepository.findOne({ filter: { tutorId: existingUser.userId } });
-
-    if (tutorSubject) {
-      // Nếu tồn tại, cập nhật subjectId
-      tutorSubject.subjectId = data.subjectId;
-      await this.tutorSubjectRepository.save(tutorSubject);
-    } else {
-      // Nếu chưa có, tạo mới
-      const newTutorSubject = new TutorSubject();
-      newTutorSubject.tutorId = existingUser.userId;
-      newTutorSubject.subjectId = data.subjectId;
-      await this.tutorSubjectRepository.save(newTutorSubject);
-    }
-  }
-
   async regisToTutor(id: string, data: RegisToTutorReq): Promise<void> {
     const existingUser = await this.userRepository.findOne({
       filter: {
@@ -660,18 +590,50 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   }
 
   async updateTutorProfile(id: string, data: UpdateTutorProfileReq): Promise<void> {
-    const existingUser = await this.userRepository.findOne({
-      filter: {
-        userId: id
-      }
+    const updatedUser = await this.userRepository.findOne({
+      filter: { userId: id },
+      relations: ['tutorProfile']
     });
 
-    if (!existingUser) {
-      throw new BaseError(ErrorCode.NF_01, 'Tutor not found');
+    if (!updatedUser || !updatedUser.tutorProfile) {
+      throw new Error('Tutor profile not found');
     }
 
-    await this.convertTutorUpdateProfile(existingUser, data);
-    await this.userRepository.save(existingUser);
+    const tutorProfileUpdatePayload: Partial<TutorProfile> = {
+      avatar: data.avatar,
+      fullname: data.fullname,
+      majorId: data.majorId,
+      birthday: data.birthday ? new Date(data.birthday) : undefined,
+      gender: data.gender,
+      bankNumber: data.bankNumber,
+      bankName: data.bankName,
+      GPA: data.GPA,
+      dateTimeLearn: data.dateTimeLearn?.map((item) => JSON.stringify(item)),
+      teachingTime: data.teachingTime,
+      description: data.description,
+      subjectId: data.subjectId,
+      univercity: data.univercity,
+      GPAOrNameDegree: data.GPAOrNameDegree,
+      educationalCertification: data.educationalCertification,
+      videoUrl: data.videoUrl,
+      descriptionOfSubject: data.descriptionOfSubject,
+      isPublicProfile: data.isPublicProfile
+    };
+    Object.keys(tutorProfileUpdatePayload).forEach(
+      (key) =>
+        tutorProfileUpdatePayload[key as keyof TutorProfile] === undefined &&
+        delete tutorProfileUpdatePayload[key as keyof TutorProfile]
+    );
+
+    await this.tutorProfileRepository.findOneAndUpdate({
+      filter: { userId: id },
+      updateData: tutorProfileUpdatePayload
+    });
+
+    await this.tutorSubjectRepository.findOneAndUpdate({
+      filter: { tutorId: id },
+      updateData: { subjectId: data.subjectId }
+    });
   }
 
   async getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes> {
