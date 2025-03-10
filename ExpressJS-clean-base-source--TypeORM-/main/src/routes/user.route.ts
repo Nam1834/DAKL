@@ -1,6 +1,7 @@
 import { Permissions } from '@/constants/permission.constants';
 import { userController } from '@/container/user.container';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
+import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
 import { LoginUserReq } from '@/dto/user/login-user.req';
 import { RegisterUserReq } from '@/dto/user/register-user.req';
@@ -37,6 +38,12 @@ userRouter
     authenticateJWT,
     classValidate(RegisToTutorReq),
     userController.regisUserToTutor.bind(userController)
+  )
+  .put(
+    '/update-tutor-profile',
+    authenticateJWT,
+    classValidate(UpdateTutorProfileReq),
+    userController.updateTutorProfile.bind(userController)
   )
   .get(
     '/get-list/:status',

@@ -1,6 +1,7 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
+import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
 import { GetProfileRes } from '@/dto/user/get-profile-user.res';
 import { LoginMicrosoftRes } from '@/dto/user/login-microsoft.res';
@@ -249,6 +250,23 @@ export class UserController {
       const requestBody: RegisToTutorReq = req.body;
       const result = await this.userService.regisToTutor(userId, requestBody);
       res.send_ok('Register Tutor successful', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateTutorProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const requestBody: UpdateTutorProfileReq = req.body;
+      const result = await this.userService.updateTutorProfile(userId, requestBody);
+      res.send_ok('update Tutor successful', result);
     } catch (error) {
       next(error);
     }
