@@ -34,7 +34,7 @@ export class ValueConfigController {
         throw new BaseError(ErrorCode.ALREADY_EXISTS, 'Value already exist');
       }
 
-      const result = await this.valueConfigService.create({ data: requestBody });
+      const result = await this.valueConfigService.createValueConfig(requestBody);
 
       res.send_ok('Create value config successfully', result);
     } catch (error) {
