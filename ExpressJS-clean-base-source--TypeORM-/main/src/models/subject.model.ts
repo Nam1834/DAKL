@@ -5,7 +5,7 @@ import { TutorSubject } from './tutor_subject.model';
 
 @Entity('subjects')
 export class Subject extends BaseModel {
-  @PrimaryGeneratedColumn('uuid', { name: 'subject_id' })
+  @PrimaryColumn({ name: 'subject_id' })
   subjectId!: string;
 
   @Column({ name: 'subject_name' })
@@ -14,7 +14,7 @@ export class Subject extends BaseModel {
   @Column({ name: 'major_id' })
   majorId!: string;
 
-  @ManyToOne(() => Major, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Major, { eager: true })
   @JoinColumn({ name: 'major_id' })
   major!: Major;
 

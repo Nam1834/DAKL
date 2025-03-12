@@ -44,7 +44,7 @@ export class UserProfile extends BaseModel {
   @Column({ nullable: true, name: 'major_id' })
   majorId!: string;
 
-  @ManyToOne(() => Major, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Major, { eager: true })
   @JoinColumn({ name: 'major_id' })
   major!: Major;
 }

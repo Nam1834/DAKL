@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, PrimaryColumn } from 'typeorm';
 import { BaseModel } from './base.model';
 import { TutorProfile } from './tutor_profile.model';
 
 @Entity('tutor_levels')
 export class TutorLevel extends BaseModel {
-  @PrimaryGeneratedColumn('uuid', { name: 'tutor_level_id' })
+  @PrimaryColumn({ name: 'tutor_level_id' })
   tutorLevelId!: string;
 
   @Column({ name: 'level_name' })

@@ -37,7 +37,7 @@ export class TutorLevelController {
     try {
       const requestBody: CreateTutorLevelReq = req.body;
 
-      const result = await this.tutorLevelService.create({ data: requestBody });
+      const result = await this.tutorLevelService.createTutorLevel(requestBody);
 
       res.send_ok('Create Tutor level successfully', result);
     } catch (error) {

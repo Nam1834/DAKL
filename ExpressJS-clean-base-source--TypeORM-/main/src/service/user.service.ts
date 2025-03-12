@@ -419,7 +419,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       workEmail: data.workEmail,
       homeAddress: data.homeAddress,
       birthday: data.birthday ? new Date(data.birthday) : undefined,
-      gender: data.gender
+      gender: data.gender,
+      majorId: data.majorId
     };
 
     Object.keys(userProfileUpdatePayload).forEach(

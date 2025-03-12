@@ -10,4 +10,17 @@ export class TutorLevelRepository extends BaseRepository<TutorLevel> implements 
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(TutorLevel));
   }
+
+  async createNewTutorLevel(tutorLevel: TutorLevel): Promise<void> {
+    const maxTutorLevelId = await this.ormRepository
+      .createQueryBuilder('tutorLevel')
+      .select("MAX(CAST(NULLIF(SUBSTRING(tutorLevel.tutorLevelId, 3), '') AS INTEGER))", 'maxTutorLevelId')
+      .where("tutorLevel.tutorLevelId ~ '^TL[0-9]+$'") // Chỉ lấy những ID hợp lệ
+      .getRawOne();
+
+    const newTutorLevelIdNumber = (maxTutorLevelId?.maxTutorLevelId || 0) + 1;
+    const newTutorLevelId = 'TL' + newTutorLevelIdNumber.toString().padStart(4, '0');
+
+    tutorLevel.tutorLevelId = newTutorLevelId;
+  }
 }

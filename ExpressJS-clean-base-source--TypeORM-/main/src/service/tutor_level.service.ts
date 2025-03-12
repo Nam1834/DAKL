@@ -1,5 +1,6 @@
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
+import { CreateTutorLevelReq } from '@/dto/tutor-level/create-tutor-level.req';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { TutorLevel } from '@/models/tutor_level.model';
 import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repository';
@@ -32,6 +33,19 @@ export class TutorLevelService extends BaseCrudService<TutorLevel> implements IT
     });
 
     return new PagingResponseDto(total, majors);
+  }
+
+  async createTutorLevel(data: CreateTutorLevelReq): Promise<void> {
+    const newTutorLevel = new TutorLevel();
+    newTutorLevel.levelName = data.levelName;
+    newTutorLevel.salary = data.salary;
+    newTutorLevel.description = data.description;
+
+    // Gọi repository
+    await this.tutorLevelRepository.createNewTutorLevel(newTutorLevel);
+
+    // Lưu vào database
+    await this.tutorLevelRepository.save(newTutorLevel);
   }
 
   async updateTutorLevel(id: string, data: any): Promise<void> {

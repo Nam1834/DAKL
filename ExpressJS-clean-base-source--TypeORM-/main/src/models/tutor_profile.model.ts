@@ -24,7 +24,7 @@ export class TutorProfile extends BaseModel {
   @Column({ nullable: true, name: 'major_id' })
   majorId!: string;
 
-  @ManyToOne(() => Major, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Major, { eager: true })
   @JoinColumn({ name: 'major_id' })
   major!: Major;
 
@@ -49,7 +49,7 @@ export class TutorProfile extends BaseModel {
   @Column({ name: 'subject_id', nullable: true })
   subjectId!: string;
 
-  @ManyToOne(() => Subject, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Subject, { eager: true })
   @JoinColumn({ name: 'subject_id' })
   subject!: Subject;
 
@@ -86,7 +86,7 @@ export class TutorProfile extends BaseModel {
   @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.tutor)
   tutorSubjects!: TutorSubject[];
 
-  @ManyToOne(() => TutorLevel, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => TutorLevel, { eager: true })
   @JoinColumn({ name: 'tutor_level_id' })
   tutorLevel!: TutorLevel;
 }
