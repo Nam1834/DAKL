@@ -1,5 +1,6 @@
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { PagingDto } from '@/dto/paging.dto';
+import { CreateValueConfigReq } from '@/dto/value-config/create-value-config.req';
 import { GetListValueConfigRes } from '@/dto/value-config/get-list-value-config.res';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { ValueConfig } from '@/models/value_config.model';
@@ -16,6 +17,20 @@ export class ValueConfigService extends BaseCrudService<ValueConfig> implements 
   constructor(@inject('ValueConfigRepository') valueConfigRepository: IValueConfigRepository<ValueConfig>) {
     super(valueConfigRepository);
     this.valueConfigRepository = valueConfigRepository;
+  }
+
+  async createValueConfig(data: CreateValueConfigReq): Promise<void> {
+    const newValueConfig = new ValueConfig();
+    newValueConfig.price = data.price;
+    newValueConfig.coinConfig = data.coinConfig;
+    newValueConfig.urlConfig = data.urlConfig;
+    newValueConfig.description = data.description;
+
+    // Gọi repository để tạo majorId
+    await this.valueConfigRepository.createNewValueConfig(newValueConfig);
+
+    // Lưu vào database
+    await this.valueConfigRepository.save(newValueConfig);
   }
 
   async updateValueConfig(id: string, data: any): Promise<void> {

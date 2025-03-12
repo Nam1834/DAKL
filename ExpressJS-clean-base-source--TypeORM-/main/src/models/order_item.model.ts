@@ -13,7 +13,7 @@ export class OrderItem {
   @Column({ name: 'value_config_id' })
   valueConfigId!: string;
 
-  @ManyToOne(() => ValueConfig, { onDelete: 'SET NULL', eager: true })
+  @ManyToOne(() => ValueConfig, { eager: true })
   @JoinColumn({ name: 'value_config_id' })
   valueConfig!: ValueConfig;
 

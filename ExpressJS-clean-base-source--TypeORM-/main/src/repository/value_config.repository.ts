@@ -10,4 +10,17 @@ export class ValueConfigRepository extends BaseRepository<ValueConfig> implement
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(ValueConfig));
   }
+
+  async createNewValueConfig(valueConfig: ValueConfig): Promise<void> {
+    const maxValueConfigId = await this.ormRepository
+      .createQueryBuilder('valueConfig')
+      .select("MAX(CAST(NULLIF(SUBSTRING(valueConfig.valueConfigId, 3), '') AS INTEGER))", 'maxValueConfigId')
+      .where("valueConfig.valueConfigId ~ '^VC[0-9]+$'") // Chỉ lấy những ID hợp lệ
+      .getRawOne();
+
+    const newValueConfigIdNumber = (maxValueConfigId?.maxValueConfigId || 0) + 1;
+    const newValueConfigId = 'VC' + newValueConfigIdNumber.toString().padStart(4, '0');
+
+    valueConfig.valueConfigId = newValueConfigId;
+  }
 }

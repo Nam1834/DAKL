@@ -1,9 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseModel } from './base.model';
 
 @Entity('value_configs')
 export class ValueConfig extends BaseModel {
-  @PrimaryGeneratedColumn('uuid', { name: 'value-config_id' })
+  @PrimaryColumn({ name: 'value-config_id' })
   valueConfigId!: string;
 
   @Column({ type: 'decimal' })

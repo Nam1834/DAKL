@@ -1,25 +1,19 @@
-import { IsNotEmpty, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { optional } from 'inversify';
 
 export class UpdateValueConfigReq {
-  @optional()
-  @IsString()
-  @MaxLength(30)
-  valueConfigId!: string;
-
-  @optional()
+  @IsOptional()
   @IsNumber()
   price!: number;
 
-  @optional()
+  @IsOptional()
   @IsNumber()
   coinConfig!: number;
 
-  @optional()
-  @IsNumber()
+  @IsOptional()
   urlConfig!: string;
 
-  @optional()
+  @IsOptional()
   @IsString()
   description!: string;
 }
