@@ -1,5 +1,6 @@
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
+import { CreateSubjectReq } from '@/dto/subject/create-subject.req';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Subject } from '@/models/subject.model';
 import { ISubjectRepository } from '@/repository/interface/i.subject.repository';
@@ -32,6 +33,18 @@ export class SubjectService extends BaseCrudService<Subject> implements ISubject
     });
 
     return new PagingResponseDto(total, majors);
+  }
+
+  async createSubject(data: CreateSubjectReq): Promise<void> {
+    const newSubject = new Subject();
+    newSubject.subjectName = data.subjectName;
+    newSubject.majorId = data.majorId;
+
+    // Gọi repository để tạo majorId
+    await this.subjectRepository.createNewSubject(newSubject);
+
+    // Lưu vào database
+    await this.subjectRepository.save(newSubject);
   }
 
   async updateSubject(id: string, data: any): Promise<void> {

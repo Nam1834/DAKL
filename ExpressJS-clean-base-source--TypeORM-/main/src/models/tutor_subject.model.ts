@@ -15,11 +15,11 @@ export class TutorSubject extends BaseModel {
   @Column({ name: 'subject_id' })
   subjectId!: string;
 
-  @ManyToOne(() => TutorProfile, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => TutorProfile, { eager: true })
   @JoinColumn({ name: 'tutor_id' })
   tutor!: TutorProfile;
 
-  @ManyToOne(() => Subject, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Subject, { eager: true })
   @JoinColumn({ name: 'subject_id' })
   subject!: Subject;
 }

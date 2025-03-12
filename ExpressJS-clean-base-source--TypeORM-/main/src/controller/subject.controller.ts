@@ -37,7 +37,7 @@ export class SubjectController {
     try {
       const requestBody: CreateSubjectReq = req.body;
 
-      const result = await this.subjectService.create({ data: requestBody });
+      const result = await this.subjectService.createSubject(requestBody);
 
       res.send_ok('Create subject successfully', result);
     } catch (error) {
