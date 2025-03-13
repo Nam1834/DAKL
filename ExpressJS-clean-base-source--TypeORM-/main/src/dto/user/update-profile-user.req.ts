@@ -13,6 +13,12 @@ export class UpdateProfileUserReq {
   avatar?: string;
 
   @IsOptional()
+  @Matches(/^0(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7,8}$/, {
+    message: 'Phone number must be a valid Vietnamese number'
+  })
+  phoneNumber!: string;
+
+  @IsOptional()
   @IsEmail()
   workEmail!: string;
 

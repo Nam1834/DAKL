@@ -398,6 +398,11 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   }
 
   async updateProfile(userId: string, data: UpdateProfileUserReq): Promise<UpdateProfileUserRes> {
+    const phoneNumberExist = await this.exists({ filter: { phoneNumber: data.phoneNumber } });
+    if (phoneNumberExist) {
+      throw new Error('Phone number already exists');
+    }
+
     const updatedUser = await this.userRepository.findOne({
       filter: { userId },
       relations: ['userProfile']
@@ -409,6 +414,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     const userProfileUpdatePayload: Partial<UserProfile> = {
       fullname: data.fullname,
+      phoneNumber: data.phoneNumber,
       avatar: data.avatar,
       workEmail: data.workEmail,
       homeAddress: data.homeAddress,
