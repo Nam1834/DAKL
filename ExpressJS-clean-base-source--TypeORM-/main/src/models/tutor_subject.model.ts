@@ -9,7 +9,7 @@ export class TutorSubject extends BaseModel {
   @PrimaryGeneratedColumn('uuid', { name: 'tutor_subject_id' })
   tutorSubjectId!: string;
 
-  @Column({ type: 'uuid', name: 'tutor_id' })
+  @Column({ name: 'tutor_id' })
   tutorId!: string;
 
   @Column({ name: 'subject_id' })

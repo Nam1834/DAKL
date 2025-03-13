@@ -8,7 +8,7 @@ export class TestResult extends BaseModel {
   @PrimaryGeneratedColumn('uuid', { name: 'test_result_id' })
   testResultId!: string;
 
-  @Column({ type: 'uuid', name: 'user_id' })
+  @Column({ name: 'user_id' })
   userId!: string;
 
   @OneToOne(() => User, (user) => user.testResults, { onDelete: 'CASCADE' })

@@ -175,13 +175,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   }
 
   async register(email: string, otp: string): Promise<RegisterUserRes> {
-    // const emailExist = await this.exists({
-    //   filter: { email: data.email }
-    // });
-    // if (emailExist) {
-    //   throw new Error('Email has exist');
-    // }
-
     const storedOtp = await redis.get(`otp:${email}`);
     const storedData = await redis.get(`REGISTER_${email}`);
 
@@ -196,6 +189,9 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     const data: RegisterUserReq = JSON.parse(storedData);
     data.password = await bcrypt.hash(data.password, 10);
 
+    const user = new User();
+    Object.assign(user, data);
+
     const userProfile = new UserProfile();
     userProfile.userDisplayName = data.fullname;
     userProfile.personalEmail = data.email;
@@ -207,11 +203,9 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     userProfile.gender = data.gender;
     userProfile.majorId = data.majorId;
 
-    (data as unknown as User).userProfile = userProfile;
+    user.userProfile = userProfile;
 
-    const user = await this.userRepository.create({
-      data: data
-    });
+    await this.userRepository.createNewUser(user);
 
     const result = await this.userRepository.findOne({
       filter: { userId: user.userId },
@@ -357,26 +351,26 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     });
 
     if (!user) {
-      user = await this.userRepository.create({
-        data: {
-          email: microsoftUser.mail || microsoftUser.userPrincipalName || `${microsoftUser.id}@microsoft.com`,
-          phoneNumber: '',
-          password: '',
-          microsoftId: microsoftUser.id,
-          userProfile: {
-            userDisplayName: microsoftUser.displayName || '',
-            fullname: microsoftUser.displayName || '',
-            personalEmail: microsoftUser.mail || '',
-            workEmail: microsoftUser.userPrincipalName || '',
-            homeAddress: '',
-            birthday: undefined,
-            gender: microsoftUser.gender ? (microsoftUser.gender === 'male' ? 'MALE' : 'FEMALE') : undefined
-          }
-        }
-      });
+      user = new User();
+      user.email = microsoftUser.mail || microsoftUser.userPrincipalName || `${microsoftUser.id}@microsoft.com`;
+      user.phoneNumber = ''; // Cập nhật nếu có
+      user.password = ''; // Nếu là login từ Microsoft, bạn có thể để trống hoặc bỏ qua
+      user.microsoftId = microsoftUser.id;
 
-      // Lưu User và UserProfile vào database trong một thao tác
-      await this.userRepository.save(user);
+      const userProfile = new UserProfile();
+      userProfile.userDisplayName = microsoftUser.displayName || '';
+      userProfile.fullname = microsoftUser.displayName || '';
+      userProfile.personalEmail = microsoftUser.mail || '';
+      userProfile.workEmail = microsoftUser.userPrincipalName || '';
+      userProfile.homeAddress = '';
+      userProfile.birthday = microsoftUser.birthdate ? new Date(microsoftUser.birthdate) : new Date();
+      userProfile.gender =
+        microsoftUser.gender === 'male' ? 'MALE' : microsoftUser.gender === 'female' ? 'FEMALE' : 'MALE';
+
+      user.userProfile = userProfile;
+
+      // Gọi createNewUser để tạo user với userId tự động
+      await this.userRepository.createNewUser(user);
     }
 
     // Bước 4: Tạo JWT Token

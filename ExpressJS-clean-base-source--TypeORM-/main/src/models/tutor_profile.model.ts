@@ -8,7 +8,7 @@ import { Subject } from './subject.model';
 
 @Entity('tutor_profiles')
 export class TutorProfile extends BaseModel {
-  @PrimaryColumn({ type: 'uuid', name: 'user_id' })
+  @PrimaryColumn({ name: 'user_id' })
   userId!: string;
 
   @OneToOne(() => User, { onDelete: 'CASCADE' })
