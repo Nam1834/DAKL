@@ -1,4 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Index, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  Index,
+  OneToOne,
+  ManyToOne,
+  JoinColumn,
+  PrimaryColumn
+} from 'typeorm';
 import { BaseModel } from './base.model';
 import { UserProfile } from './user_profile.model';
 import { Role } from './role.model';
@@ -10,7 +20,7 @@ import { TestResult } from './test_result.model';
 
 @Entity('users')
 export class User extends BaseModel {
-  @PrimaryGeneratedColumn('uuid', { name: 'user_id' })
+  @PrimaryColumn({ name: 'user_id' })
   userId!: string;
 
   @Index({ unique: true })

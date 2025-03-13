@@ -3,18 +3,51 @@ import { Curriculumn } from '@/models/curriculumn.model';
 import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
 import { MyCurriculumn } from '@/models/my-curriculumn.model';
 import { User } from '@/models/user.model';
+import { UserProfile } from '@/models/user_profile.model';
 import { BaseRepository } from '@/repository/base/base.repository';
 import { IUserRepository } from '@/repository/interface/i.user.repository';
 import { ITYPES } from '@/types/interface.types';
 import { inject } from 'inversify';
 import 'reflect-metadata';
-import { DataSource, MoreThanOrEqual } from 'typeorm';
+import { DataSource, MoreThanOrEqual, Repository } from 'typeorm';
 
 export class UserRepository extends BaseRepository<User> implements IUserRepository<User> {
   private datasource: DataSource;
+  private userProfileRepository: Repository<UserProfile>;
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(User));
     this.datasource = dataSource;
+    this.userProfileRepository = dataSource.getRepository(UserProfile);
+  }
+
+  async createNewUser(user: User): Promise<void> {
+    const maxUserId = await this.ormRepository
+      .createQueryBuilder('user')
+      .select('MAX(CAST(SUBSTRING(user.userId, 3) AS INTEGER))', 'maxUserId') // Thay UNSIGNED bằng INTEGER
+      .getRawOne();
+
+    const newUserIdNumber = (maxUserId?.maxUserId || 0) + 1; // Lấy số tiếp theo từ giá trị lớn nhất
+    const newUserId = 'US' + newUserIdNumber.toString().padStart(5, '0'); // Tạo adminId theo định dạng NV0001
+
+    // Gán adminId mới vào admin
+    user.userId = newUserId;
+
+    const createdUser = await this.ormRepository
+      .createQueryBuilder()
+      .insert()
+      .values(user)
+      .returning('user_id')
+      .execute();
+
+    const createdUserId = createdUser.identifiers[0].userId;
+
+    // Gán adminId vào adminProfile
+    let userrofile = new UserProfile();
+    userrofile = user.userProfile;
+    userrofile.userId = createdUserId; // Gán adminId cho adminProfile
+
+    // Lưu adminProfile vào bảng admin_profiles
+    await this.userProfileRepository.save(userrofile);
   }
 
   async updateUserWithTransaction(user: User, myCurriculumn: MyCurriculumn, curriculumn: Curriculumn): Promise<void> {
