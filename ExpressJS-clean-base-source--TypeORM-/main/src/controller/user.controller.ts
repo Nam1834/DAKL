@@ -322,4 +322,15 @@ export class UserController {
       next(error);
     }
   }
+
+  async getListTutorPublic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.userService.getListTutorPublic(searchData);
+
+      res.send_ok('Tutor Public fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

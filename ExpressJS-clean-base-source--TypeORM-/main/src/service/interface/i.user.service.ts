@@ -18,6 +18,7 @@ import { GetListRequestRes } from '@/dto/tutor/get-list-request.res';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { User } from '@/models/user.model';
 import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
+import { GetListPublicTutorProfileRes } from '@/dto/tutor/get-list-public-tutor-profile.res';
 
 export interface IUserService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<User>>;
@@ -39,4 +40,5 @@ export interface IUserService<T extends BaseModelType> extends IBaseCrudService<
   getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes>;
   solveRequest(userId: string, click: string): Promise<void>;
   updateUserById(id: string, data: any): Promise<void>;
+  getListTutorPublic(searchData: SearchDataDto): Promise<GetListPublicTutorProfileRes>;
 }
