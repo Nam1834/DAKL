@@ -59,6 +59,7 @@ import { TutorSubject } from '@/models/tutor_subject.model';
 import { ITutorSubjectRepository } from '@/repository/interface/i.tutor_subject.repository';
 import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { UpdateTutorProfileRes } from '@/dto/tutor/update-tutor-profile.res';
+import { GetListPublicTutorProfileRes } from '@/dto/tutor/get-list-public-tutor-profile.res';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -722,5 +723,35 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     const updatedData: User = { ...existingUser, ...userUpdate };
 
     await this.userRepository.save(updatedData);
+  }
+
+  async getListTutorPublic(searchData: SearchDataDto): Promise<GetListPublicTutorProfileRes> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    where.tutorProfile = {
+      ...(where.tutorProfile || {}),
+      isPublicProfile: true
+    };
+
+    const publics = await this.userRepository.findMany({
+      filter: where,
+      paging: paging,
+      relations: ['tutorProfile'],
+      order: order
+    });
+
+    publics.forEach((publicUser) => {
+      delete (publicUser as any).password;
+    });
+
+    const total = await this.userRepository.count({ filter: where });
+
+    return {
+      total,
+      items: publics,
+      counts: {
+        totalPublic: total
+      }
+    };
   }
 }
