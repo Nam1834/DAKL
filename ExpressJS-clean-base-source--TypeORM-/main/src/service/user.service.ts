@@ -60,6 +60,8 @@ import { ITutorSubjectRepository } from '@/repository/interface/i.tutor_subject.
 import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { UpdateTutorProfileRes } from '@/dto/tutor/update-tutor-profile.res';
 import { GetListPublicTutorProfileRes } from '@/dto/tutor/get-list-public-tutor-profile.res';
+import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repository';
+import { TutorLevel } from '@/models/tutor_level.model';
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -75,6 +77,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   private curriculumnRepository: ICurriculumnRepository<Curriculumn>;
   private myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>;
   private tutorSubjectRepository: ITutorSubjectRepository<TutorSubject>;
+  private tutorLevelRepository: ITutorLevelRepository<TutorLevel>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
@@ -85,7 +88,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     @inject('MyCurriculumnRepository') myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>,
     @inject('CurriculumnRepository') curriculumnRepository: ICurriculumnRepository<Curriculumn>,
     @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>,
-    @inject('TutorSubjectRepository') tutorSubjectRepository: ITutorSubjectRepository<TutorSubject>
+    @inject('TutorSubjectRepository') tutorSubjectRepository: ITutorSubjectRepository<TutorSubject>,
+    @inject('TutorLevelRepository') tutorLevelRepository: ITutorLevelRepository<TutorLevel>
   ) {
     super(userRepository);
     this.userRepository = userRepository;
@@ -95,6 +99,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.curriculumnRepository = curriculumnRepository;
     this.myCurriculumnItemRepository = myCurriculumnItemRepository;
     this.tutorSubjectRepository = tutorSubjectRepository;
+    this.tutorLevelRepository = tutorLevelRepository;
   }
 
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<User>> {
@@ -562,6 +567,14 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     tutorProfile.tutorLevelId = await this.getTutorLevelId(existingUser.totalTestPoints);
 
+    const tutorLevel = await this.tutorLevelRepository.findOne({ filter: { tutorLevelId: tutorProfile.tutorLevelId } });
+
+    if (!tutorLevel) {
+      throw new Error('Tutor Level not found');
+    }
+
+    tutorProfile.coinPerHours = tutorLevel.salary / 1000 - (tutorLevel.salary / 1000) * 0.1;
+
     await this.tutorProfileRepository.save(tutorProfile);
 
     // Tạo dữ liệu cho bảng TutorSubject
@@ -705,6 +718,24 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     user.roleId = data.roleId;
     user.checkActive = data.checkActive;
 
+    if (data.tutorLevelId) {
+      const tutorLevel = await this.tutorLevelRepository.findOne({
+        filter: { tutorLevelId: data.tutorLevelId }
+      });
+
+      if (!tutorLevel) {
+        throw new BaseError(ErrorCode.NF_01, 'Tutor Level not found');
+      }
+
+      // Tạo mới TutorProfile nếu chưa có
+      if (!user.tutorProfile) {
+        user.tutorProfile = new TutorProfile();
+      }
+
+      user.tutorProfile.tutorLevelId = data.tutorLevelId;
+      user.tutorProfile.coinPerHours = tutorLevel.salary / 1000 - (tutorLevel.salary / 1000) * 0.1; // Công thức tính coinPerHours
+    }
+
     return user;
   }
 
@@ -712,7 +743,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     const existingUser = await this.userRepository.findOne({
       filter: {
         userId: id
-      }
+      },
+      relations: ['tutorProfile']
     });
 
     if (!existingUser) {

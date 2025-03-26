@@ -15,4 +15,7 @@ export class UpdateManageUserReq {
   @IsOptional()
   @IsEnum(UserStatus, { message: 'Check Status must be either PENDING, REQUEST, ACCEPT or REFUSE' })
   status!: UserStatus;
+
+  @IsOptional()
+  tutorLevelId!: string;
 }
