@@ -89,4 +89,7 @@ export class TutorProfile extends BaseModel {
   @ManyToOne(() => TutorLevel, { eager: true })
   @JoinColumn({ name: 'tutor_level_id' })
   tutorLevel!: TutorLevel;
+
+  @Column({ nullable: true, name: 'coin_per_hours' })
+  coinPerHours!: number;
 }
