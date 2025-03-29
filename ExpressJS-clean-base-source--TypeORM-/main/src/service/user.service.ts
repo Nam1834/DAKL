@@ -62,6 +62,9 @@ import { UpdateTutorProfileRes } from '@/dto/tutor/update-tutor-profile.res';
 import { GetListPublicTutorProfileRes } from '@/dto/tutor/get-list-public-tutor-profile.res';
 import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repository';
 import { TutorLevel } from '@/models/tutor_level.model';
+import ejs from 'ejs';
+import path from 'path';
+
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
@@ -151,13 +154,19 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await redis.set(`otp:${data.email}`, otp, 'EX', 300);
     await redis.set(`REGISTER_${data.email}`, JSON.stringify(data), 'EX', 600);
 
-    const emailContent = createEmailOtpContent(otp);
+    const emailTemplatePath = path.join(__dirname, '../utils/email/otp-template.util.ejs');
 
-    sendEmail({
+    const emailContent = await ejs.renderFile(emailTemplatePath, {
+      fullname: data.fullname,
+      email: data.email,
+      otp: otp
+    });
+
+    await sendEmail({
       from: { name: 'GiaSuVLU' },
       to: { emailAddress: [data.email] },
-      subject: 'Mã OTP đăng ký tài khoản',
-      text: emailContent
+      subject: 'Xác nhận đăng ký tài khoản',
+      html: emailContent
     });
   }
 
@@ -171,12 +180,21 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await redis.set(`otp:${email}`, otp, 'EX', 300);
     await redis.set(`REGISTER_${email}`, storedData, 'EX', 600);
 
-    const emailContent = createEmailOtpContent(otp);
-    sendEmail({
+    const data: RegisterUserReq = JSON.parse(storedData);
+
+    const emailTemplatePath = path.join(__dirname, '../utils/email/otp-template.util.ejs');
+
+    const emailContent = await ejs.renderFile(emailTemplatePath, {
+      fullname: data.fullname,
+      email: email,
+      otp: otp
+    });
+
+    await sendEmail({
       from: { name: 'GiaSuVLU' },
       to: { emailAddress: [email] },
-      subject: 'Mã OTP đăng ký tài khoản',
-      text: emailContent
+      subject: 'Xác nhận đăng ký tài khoản',
+      html: emailContent
     });
   }
 
@@ -222,13 +240,19 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new Error('Failed to find the registered user');
     }
 
-    const emailContent = createEmailContent(data.fullname);
+    const emailTemplatePath = path.join(__dirname, '../utils/email/success-email-template.util.ejs');
 
-    sendEmail({
+    const emailContent = await ejs.renderFile(emailTemplatePath, {
+      fullname: data.fullname,
+      email: email,
+      otp: otp
+    });
+
+    await sendEmail({
       from: { name: 'GiaSuVLU' },
-      to: { emailAddress: [result.email] },
+      to: { emailAddress: [email] },
       subject: 'Chúc mừng đăng ký tài khoản thành công',
-      text: emailContent
+      html: emailContent
     });
 
     // Xóa OTP khỏi Redis sau khi xác thực thành công
@@ -480,12 +504,18 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       sendSms(`Mã OTP của bạn là ${otp}`, [internationalPhone]);
     } else {
       // Nếu input là email, gửi OTP qua email
-      const emailContent = createEmailOtpContent(otp);
-      sendEmail({
-        from: { name: 'Công ty Alpha' },
+      const emailTemplatePath = path.join(__dirname, '../utils/email/otp-forgot-template.util.ejs');
+
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        email: user.email,
+        otp: otp
+      });
+
+      await sendEmail({
+        from: { name: 'GiaSuVLU' },
         to: { emailAddress: [user.email] },
-        subject: 'OTP for Password Reset',
-        text: emailContent
+        subject: 'Tìm lại mật khẩu',
+        html: emailContent
       });
     }
   }

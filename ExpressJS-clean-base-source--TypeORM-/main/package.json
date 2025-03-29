@@ -32,6 +32,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/config": "^3.3.5",
     "@types/cors": "^2.8.17",
+    "@types/ejs": "^3.1.5",
     "@types/i18n": "^0.13.12",
     "@types/ioredis": "^4.28.10",
     "@types/minio": "^7.1.0",

@@ -128,7 +128,7 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
         },
         to: { emailAddress: [userEmail] },
         subject: 'Thanh toán thành công',
-        text: content
+        html: content
       });
     }
 

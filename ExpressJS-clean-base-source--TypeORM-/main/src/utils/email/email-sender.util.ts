@@ -8,7 +8,7 @@ export async function sendEmail(data: {
     emailAddress: string[];
   };
   subject: string;
-  text: string;
+  html: string;
 }): Promise<void> {
   const mailOptions = {
     from: {
@@ -17,7 +17,7 @@ export async function sendEmail(data: {
     },
     to: data.to.emailAddress,
     subject: data.subject,
-    text: data.text
+    html: data.html
   };
 
   const result = await transporter.sendMail(mailOptions);
