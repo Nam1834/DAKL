@@ -18,6 +18,7 @@ import subjectRouter from '../subject.route';
 import tutorLevelRouter from '../tutor_level.route';
 import testRouter from '../test.route';
 import testResultRouter from '../test_result.route';
+import bookingRequestRouter from '../booking_request.route';
 
 export function route(app: any, root_api: string) {
   app.use(`/role`, roleRouter);
@@ -38,6 +39,7 @@ export function route(app: any, root_api: string) {
   app.use(`/tutor-level`, tutorLevelRouter);
   app.use(`/test`, testRouter);
   app.use(`/test-result`, testResultRouter);
+  app.use(`/booking-request`, bookingRequestRouter);
   app.all('*', (req: any, res: any, next: any) => {
     const err = new BaseError(ErrorCode.API_NOT_EXISTS, 'API Not Exists');
     next(err);
