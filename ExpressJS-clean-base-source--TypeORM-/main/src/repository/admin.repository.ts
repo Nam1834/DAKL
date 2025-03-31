@@ -17,6 +17,10 @@ export class AdminRepository extends BaseRepository<Admin> implements IAdminRepo
   }
 
   async checkEmail(email: string, id: string): Promise<void> {
+    if (!email) {
+      return; // Nếu không được truyền vào, bỏ qua kiểm tra
+    }
+
     const checkEmail = await this.ormRepository.findOne({ where: { email: email, adminId: Not(id) } });
     if (checkEmail) {
       throw new Error('Email has been exist!');

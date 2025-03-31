@@ -2,6 +2,7 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   Matches,
@@ -27,26 +28,25 @@ export class IsPasswordMatch implements ValidatorConstraintInterface {
 }
 
 export class UpdateAdminReq {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(30, { message: 'Fullname must not exceed 30 characters' })
   @Matches(/^[a-zA-ZÀ-ỹ\s]*$/, { message: 'Fullname must not contain special characters' })
   @Matches(/^\S.*\S$|^[\S]$/, { message: 'Fullname must not have leading or trailing spaces' })
   fullname!: string;
 
-  @IsNotEmpty()
-  @IsDateString()
+  @IsOptional()
   birthday!: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   workEmail!: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   homeAddress!: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @Matches(/^(MALE|FEMALE)$/, { message: 'Gender must be either MALE or FEMALE' })
   gender!: 'MALE' | 'FEMALE';

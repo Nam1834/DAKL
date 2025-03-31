@@ -320,7 +320,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     return admin.adminProfile;
   }
 
-  async convertUpdateAdminReqToAdmin(data: UpdateAdminReq): Promise<Admin> {
+  async convertUpdateAdminReqToAdmin(existingAdmin: Admin, data: UpdateAdminReq): Promise<Admin> {
     const admin = new Admin();
     admin.status = AdminStatus.ACTIVE;
 
@@ -328,7 +328,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     adminProfile.adminDisplayName = data.fullname;
     adminProfile.workEmail = data.workEmail;
     adminProfile.fullname = data.fullname;
-    adminProfile.birthday = new Date(data.birthday);
+    adminProfile.birthday = data.birthday ? new Date(data.birthday) : existingAdmin.adminProfile?.birthday;
     adminProfile.homeAddress = data.homeAddress;
     adminProfile.gender = data.gender;
 
@@ -337,7 +337,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     return admin;
   }
 
-  async convertUpdateManageAdmin(data: UpdateManageAdminReq, id: string): Promise<Admin> {
+  async convertUpdateManageAdmin(existingAdmin: Admin, data: UpdateManageAdminReq, id: string): Promise<Admin> {
     await this.adminRepository.checkEmail(data.email, id);
 
     await this.adminRepository.checkPhoneNumber(data.phoneNumber, id);
@@ -352,7 +352,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     adminProfile.personalEmail = data.email;
     adminProfile.phoneNumber = data.phoneNumber;
     adminProfile.fullname = data.fullname;
-    adminProfile.birthday = new Date(data.birthday);
+    adminProfile.birthday = data.birthday ? new Date(data.birthday) : existingAdmin.adminProfile?.birthday;
     adminProfile.homeAddress = data.homeAddress;
     adminProfile.gender = data.gender;
 
@@ -373,7 +373,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
     }
 
     //Merge data to admin
-    const adminUpdate = await this.convertUpdateAdminReqToAdmin(data);
+    const adminUpdate = await this.convertUpdateAdminReqToAdmin(existingAdmin, data);
     const updatedData: Admin = { ...existingAdmin, ...adminUpdate }; // Gộp dữ liệu cũ với dữ liệu mới
 
     await this.adminRepository.save(updatedData);
@@ -390,7 +390,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
       throw new BaseError(ErrorCode.NF_01, 'Admin not found');
     }
 
-    const adminUpdate = await this.convertUpdateManageAdmin(data, id);
+    const adminUpdate = await this.convertUpdateManageAdmin(existingAdmin, data, id);
     const updatedData: Admin = { ...existingAdmin, ...adminUpdate }; // Gộp dữ liệu cũ với dữ liệu mới
 
     await this.adminRepository.save(updatedData);
