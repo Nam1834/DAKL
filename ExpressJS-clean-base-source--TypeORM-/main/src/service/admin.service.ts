@@ -216,9 +216,11 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
       birthdate?: string;
     };
 
+    const email = microsoftUser.mail || microsoftUser.userPrincipalName || `${microsoftUser.id}@microsoft.com`;
+
     // Bước 3: Kiểm tra User tồn tại
     let admin = await this.adminRepository.findOne({
-      filter: { microsoftId: microsoftUser.id },
+      filter: { email: email },
       relations: ['adminProfile']
     });
 

@@ -374,9 +374,11 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       birthdate?: string;
     };
 
+    const email = microsoftUser.mail || microsoftUser.userPrincipalName || `${microsoftUser.id}@microsoft.com`;
+
     // Bước 3: Kiểm tra User tồn tại
     let user = await this.userRepository.findOne({
-      filter: { microsoftId: microsoftUser.id },
+      filter: { email: email },
       relations: ['userProfile']
     });
 
