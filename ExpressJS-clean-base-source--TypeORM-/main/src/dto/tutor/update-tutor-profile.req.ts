@@ -76,10 +76,6 @@ export class UpdateTutorProfileReq {
 
   @IsOptional()
   @IsString()
-  GPAOrNameDegree!: string;
-
-  @IsOptional()
-  @IsString()
   descriptionOfSubject!: string;
 
   @IsOptional()

@@ -585,38 +585,30 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     tutorProfile.bankNumber = data.bankNumber;
     tutorProfile.bankName = data.bankName;
     tutorProfile.GPA = data.GPA;
+    tutorProfile.evidenceOfGPA = data.evidenceOfGPA;
     tutorProfile.dateTimeLearn = data.dateTimeLearn.map((item) => JSON.stringify(item));
     tutorProfile.teachingTime = data.teachingTime;
     tutorProfile.description = data.description;
     tutorProfile.subjectId = data.subjectId;
+    tutorProfile.evidenceOfSubject = data.evidenceOfSubject;
     tutorProfile.univercity = data.univercity;
-    tutorProfile.GPAOrNameDegree = data.GPAOrNameDegree;
-    tutorProfile.educationalCertification = data.educationalCertification;
     tutorProfile.videoUrl = data.videoUrl;
     tutorProfile.teachingTime = data.teachingTime;
     tutorProfile.descriptionOfSubject = data.descriptionOfSubject;
     tutorProfile.isUseCurriculumn = data.isUseCurriculumn;
 
-    tutorProfile.tutorLevelId = await this.getTutorLevelId(existingUser.totalTestPoints);
+    tutorProfile.subjectId2 = data.subjectId2;
+    tutorProfile.evidenceOfSubject2 = data.evidenceOfSubject2;
+    tutorProfile.descriptionOfSubject2 = data.descriptionOfSubject2;
 
-    const tutorLevel = await this.tutorLevelRepository.findOne({ filter: { tutorLevelId: tutorProfile.tutorLevelId } });
+    tutorProfile.subjectId3 = data.subjectId3;
+    tutorProfile.evidenceOfSubject3 = data.evidenceOfSubject3;
+    tutorProfile.descriptionOfSubject3 = data.descriptionOfSubject3;
 
-    if (!tutorLevel) {
-      throw new Error('Tutor Level not found');
-    }
-
-    tutorProfile.coinPerHours = tutorLevel.salary / 1000 - (tutorLevel.salary / 1000) * 0.1;
+    tutorProfile.teachingMethod = data.teachingMethod;
+    tutorProfile.teachingPlace = data.teachingPlace;
 
     await this.tutorProfileRepository.save(tutorProfile);
-
-    // Tạo dữ liệu cho bảng TutorSubject
-
-    const tutorSubject = new TutorSubject();
-    tutorSubject.tutorId = existingUser.userId;
-    tutorSubject.subjectId = data.subjectId;
-
-    // Lưu vào database
-    await this.tutorSubjectRepository.save(tutorSubject);
 
     existingUser.tutorProfile = tutorProfile;
   }
@@ -660,8 +652,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       description: data.description,
       subjectId: data.subjectId,
       univercity: data.univercity,
-      GPAOrNameDegree: data.GPAOrNameDegree,
-      educationalCertification: data.educationalCertification,
       videoUrl: data.videoUrl,
       descriptionOfSubject: data.descriptionOfSubject,
       isPublicProfile: data.isPublicProfile
