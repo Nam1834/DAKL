@@ -95,7 +95,7 @@ export class TutorProfile extends BaseModel {
   @Column({ nullable: true, name: 'date_time_learn', type: 'json' })
   dateTimeLearn!: string[];
 
-  @Column({ nullable: true, name: 'teaching_time' })
+  @Column({ nullable: true, name: 'teaching_time', type: 'decimal', precision: 4, scale: 2 })
   teachingTime!: number;
 
   @Column({ name: 'teaching_method', nullable: true, default: TeachingMethod.ONLINE })

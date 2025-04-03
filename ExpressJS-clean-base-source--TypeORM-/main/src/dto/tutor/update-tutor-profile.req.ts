@@ -113,4 +113,12 @@ export class UpdateTutorProfileReq {
   @IsOptional()
   @IsBoolean()
   isPublicProfile!: boolean;
+
+  @IsOptional()
+  @IsEnum(TeachingMethod, { message: 'Teaching Method must be either ONLINE, OFFLINE or BOTH' })
+  teachingMethod!: TeachingMethod;
+
+  @IsOptional()
+  @IsString()
+  teachingPlace!: string;
 }
