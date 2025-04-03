@@ -703,7 +703,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     };
   }
 
-  async solveRequest(userId: string, click: string): Promise<void> {
+  async solveRequest(userId: string, click: string, tutorLevelId?: string): Promise<void> {
     const checkStatus = await this.userRepository.findOne({
       filter: { status: UserStatus.REQUEST, userId: userId }
     });
@@ -717,6 +717,20 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     }
 
     if (click === UserStatus.ACCEPT) {
+      if (!tutorLevelId) {
+        throw new Error('You must Input Tutor Level Id');
+      }
+      const tutorLevel = await this.tutorLevelRepository.findOne({
+        filter: { tutorLevelId }
+      });
+
+      if (!tutorLevel) {
+        throw new Error('Invalid tutorLevelId');
+      }
+
+      // Tính toán coinPerHours
+      const coinPerHours = tutorLevel.salary / 1000;
+
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },
         updateData: {
@@ -724,6 +738,20 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
           status: UserStatus.ACCEPT
         }
       });
+
+      const tutorProfile = await this.tutorProfileRepository.findOne({
+        filter: { userId: userId }
+      });
+
+      if (tutorProfile) {
+        await this.tutorProfileRepository.findOneAndUpdate({
+          filter: { userId: userId },
+          updateData: {
+            tutorLevelId: tutorLevelId,
+            coinPerHours: coinPerHours
+          }
+        });
+      }
     } else if (click === UserStatus.REFUSE) {
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },
