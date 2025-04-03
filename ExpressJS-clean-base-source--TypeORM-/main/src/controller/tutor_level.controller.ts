@@ -4,6 +4,8 @@ import { CreateTutorLevelReq } from '@/dto/tutor-level/create-tutor-level.req';
 import { UpdateTutorLevelReq } from '@/dto/tutor-level/update-tutor-level.req';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { TutorLevel } from '@/models/tutor_level.model';
+import { TutorProfile } from '@/models/tutor_profile.model';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
 import { ITutorLevelService } from '@/service/interface/i.tutor_level.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
@@ -15,11 +17,14 @@ import { inject, injectable } from 'inversify';
 export class TutorLevelController {
   public common: IBaseCrudController<TutorLevel>;
   private tutorLevelService: ITutorLevelService<TutorLevel>;
+  private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
   constructor(
     @inject('TutorLevelService') tutorLevelService: ITutorLevelService<TutorLevel>,
+    @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
     @inject(ITYPES.Controller) common: IBaseCrudController<TutorLevel>
   ) {
     this.tutorLevelService = tutorLevelService;
+    this.tutorProfileRepository = tutorProfileRepository;
     this.common = common;
   }
 
@@ -59,17 +64,14 @@ export class TutorLevelController {
   }
 
   async deleteTutorLevelById(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const id = req.params.id;
+    try {
+      const id = req.params.id;
 
-    const existingTutorLevel = await this.tutorLevelService.findOne({
-      filter: { tutorLevelId: id }
-    });
-    if (!existingTutorLevel) {
-      throw new BaseError(ErrorCode.DOES_NOT_EXISTS, 'Tutor Level does not exist');
+      await this.tutorLevelService.deleteTutorLevelById(id);
+
+      res.send_ok('Delete tutor level successfully');
+    } catch (error) {
+      next(error);
     }
-
-    await this.tutorLevelService.findOneAndDelete({ filter: { tutorLevelId: id } });
-
-    res.send_ok('Delete tutor level successfully');
   }
 }

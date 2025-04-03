@@ -5,6 +5,8 @@ import { TutorLevelRepository } from '@/repository/tutor_level.repository';
 import { ITutorLevelService } from '@/service/interface/i.tutor_level.service';
 import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repository';
 import { BaseContainer } from '@/container/base.container';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
+import { tutorProfileRepository } from './tutor_profile.container';
 
 class TutorLevelContainer extends BaseContainer {
   constructor() {
@@ -12,6 +14,9 @@ class TutorLevelContainer extends BaseContainer {
     this.container.bind<ITutorLevelService<TutorLevel>>('TutorLevelService').to(TutorLevelService);
     this.container.bind<ITutorLevelRepository<TutorLevel>>('TutorLevelRepository').to(TutorLevelRepository);
     this.container.bind<TutorLevelController>(TutorLevelController).toSelf();
+
+    //Import
+    this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
   export() {

@@ -9,4 +9,5 @@ export interface ITutorLevelService<T extends BaseModelType> extends IBaseCrudSe
   search(searchData: SearchDataDto): Promise<PagingResponseDto<TutorLevel>>;
   createTutorLevel(data: CreateTutorLevelReq): Promise<void>;
   updateTutorLevel(id: string, data: any): Promise<void>;
+  deleteTutorLevelById(id: string): Promise<void>;
 }
