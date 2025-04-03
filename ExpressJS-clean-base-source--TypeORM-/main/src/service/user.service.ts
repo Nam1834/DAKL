@@ -641,19 +641,16 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     const tutorProfileUpdatePayload: Partial<TutorProfile> = {
       avatar: data.avatar,
       fullname: data.fullname,
-      majorId: data.majorId,
       birthday: data.birthday ? new Date(data.birthday) : undefined,
       gender: data.gender,
       bankNumber: data.bankNumber,
       bankName: data.bankName,
-      GPA: data.GPA,
       dateTimeLearn: data.dateTimeLearn?.map((item) => JSON.stringify(item)),
       teachingTime: data.teachingTime,
       description: data.description,
-      subjectId: data.subjectId,
-      univercity: data.univercity,
       videoUrl: data.videoUrl,
-      descriptionOfSubject: data.descriptionOfSubject,
+      teachingMethod: data.teachingMethod,
+      teachingPlace: data.teachingPlace,
       isPublicProfile: data.isPublicProfile
     };
     Object.keys(tutorProfileUpdatePayload).forEach(
@@ -665,11 +662,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await this.tutorProfileRepository.findOneAndUpdate({
       filter: { userId: id },
       updateData: tutorProfileUpdatePayload
-    });
-
-    await this.tutorSubjectRepository.findOneAndUpdate({
-      filter: { tutorId: id },
-      updateData: { subjectId: data.subjectId }
     });
   }
 
