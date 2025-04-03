@@ -8,6 +8,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Matches,
   Max,
@@ -75,10 +76,6 @@ export class RegisToTutorReq {
 
   @IsNotEmpty()
   @IsString()
-  GPAOrNameDegree!: string;
-
-  @IsNotEmpty()
-  @IsString()
   descriptionOfSubject!: string;
 
   @IsNotEmpty({ message: 'University is required' })
@@ -90,10 +87,6 @@ export class RegisToTutorReq {
   @Min(0, { message: 'GPA must be at least 0' })
   @Max(4, { message: 'GPA must not exceed 4' })
   GPA!: number;
-
-  @IsNotEmpty({ message: 'Educational Certification is required' })
-  @IsString()
-  educationalCertification!: string;
 
   @IsArray({ message: 'DateTimeLearn must be an array' })
   @ArrayNotEmpty({ message: 'DateTimeLearn must not be empty' })
@@ -116,4 +109,44 @@ export class RegisToTutorReq {
   @IsNotEmpty()
   @IsBoolean()
   isUseCurriculumn!: boolean;
+
+  @IsNotEmpty()
+  @IsString()
+  evidenceOfGPA!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  evidenceOfSubject!: string;
+
+  @IsOptional()
+  @IsString()
+  subjectId2!: string;
+
+  @IsOptional()
+  @IsString()
+  evidenceOfSubject2!: string;
+
+  @IsOptional()
+  @IsString()
+  descriptionOfSubject2!: string;
+
+  @IsOptional()
+  @IsString()
+  subjectId3!: string;
+
+  @IsOptional()
+  @IsString()
+  evidenceOfSubject3!: string;
+
+  @IsOptional()
+  @IsString()
+  descriptionOfSubject3!: string;
+
+  @IsNotEmpty()
+  @IsEnum(TeachingMethod, { message: 'Teaching Method must be either ONLINE, OFFLINE or BOTH' })
+  teachingMethod!: TeachingMethod;
+
+  @IsNotEmpty()
+  @IsString()
+  teachingPlace!: string;
 }
