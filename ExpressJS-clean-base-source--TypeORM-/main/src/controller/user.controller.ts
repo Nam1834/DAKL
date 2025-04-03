@@ -290,7 +290,8 @@ export class UserController {
       const userId = req.params.userId;
 
       const click: string = req.body.click;
-      const result = await this.userService.solveRequest(userId, click);
+      const tutorLevelId: string = req.body.tutorLevelId;
+      const result = await this.userService.solveRequest(userId, click, tutorLevelId);
 
       res.send_ok('Request solve successfully', result);
     } catch (error) {
