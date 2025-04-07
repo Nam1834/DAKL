@@ -1,7 +1,7 @@
 import { AddToMyCurriculumnReq } from '@/dto/my-curriculumn/add-to-my-curriculumn.req';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { PagingDto } from '@/dto/paging.dto';
-import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumn } from '@/models/my_curriculumn.model';
 import { IBaseCrudService } from '@/service/interface/i.base.service';
 import { BaseModelType } from '@/types/base-model.types';
 

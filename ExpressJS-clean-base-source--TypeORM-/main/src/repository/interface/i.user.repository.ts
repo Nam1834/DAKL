@@ -1,5 +1,5 @@
 import { Curriculumn } from '@/models/curriculumn.model';
-import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumn } from '@/models/my_curriculumn.model';
 import { User } from '@/models/user.model';
 import { IBaseRepository } from '@/repository/interface/i.base.repository';
 

@@ -1,12 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, OneToOne, Column } from 'typeorm';
 import { User } from './user.model';
-import { MyCurriculumnItem } from './my-curriculumn-item.model';
 import { BaseModel } from './base.model';
+import { MyTutorItem } from './my_tutor_item.model';
 
-@Entity('my_curriculumns')
-export class MyCurriculumn extends BaseModel {
-  @PrimaryGeneratedColumn('uuid', { name: 'my_curriculumn_id' })
-  myCurriculumnId!: string;
+@Entity('my_tutors')
+export class MyTutor extends BaseModel {
+  @PrimaryGeneratedColumn('uuid', { name: 'my_tutor_id' })
+  myTutorId!: string;
 
   @Column({ name: 'user_id' })
   userId!: string;
@@ -15,9 +15,9 @@ export class MyCurriculumn extends BaseModel {
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @OneToMany(() => MyCurriculumnItem, (myCurriculumnItem) => myCurriculumnItem.myCurriculumn, {
+  @OneToMany(() => MyTutorItem, (myTutorItem) => myTutorItem.myTutor, {
     cascade: true,
     eager: true
   })
-  items!: MyCurriculumnItem[];
+  items!: MyTutorItem[];
 }

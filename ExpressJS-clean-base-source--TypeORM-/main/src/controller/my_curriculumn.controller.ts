@@ -2,7 +2,7 @@ import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.control
 import { AddToMyCurriculumnReq } from '@/dto/my-curriculumn/add-to-my-curriculumn.req';
 import { PagingDto } from '@/dto/paging.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
-import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumn } from '@/models/my_curriculumn.model';
 import { IMyCurriculumnService } from '@/service/interface/i.my_curriculumn.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';

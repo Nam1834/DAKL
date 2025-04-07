@@ -4,7 +4,7 @@ import { MyCurriculumnItemRepository } from '@/repository/my_curriculumn_item.re
 import { IMyCurriculumnItemService } from '@/service/interface/i.my_curriculumn_item.service';
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { BaseContainer } from '@/container/base.container';
-import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
 
 class MyCurriculumnItemContainer extends BaseContainer {
   constructor() {

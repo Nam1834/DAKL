@@ -1,4 +1,4 @@
-import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { BaseCrudService } from '@/service/base/base.service';
 import { IMyCurriculumnItemService } from '@/service/interface/i.my_curriculumn_item.service';
