@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, ManyToOne, Column, JoinColumn } from 'typeorm';
-import { MyCurriculumn } from './my-curriculumn.model';
+import { MyCurriculumn } from './my_curriculumn.model';
 import { Curriculumn } from './curriculumn.model';
 import { BaseModel } from './base.model';
 

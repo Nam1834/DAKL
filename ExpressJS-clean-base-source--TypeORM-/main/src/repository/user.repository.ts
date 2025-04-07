@@ -1,7 +1,7 @@
 import { UserStatus } from '@/enums/user-status.enum';
 import { Curriculumn } from '@/models/curriculumn.model';
-import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
-import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
+import { MyCurriculumn } from '@/models/my_curriculumn.model';
 import { User } from '@/models/user.model';
 import { UserProfile } from '@/models/user_profile.model';
 import { BaseRepository } from '@/repository/base/base.repository';

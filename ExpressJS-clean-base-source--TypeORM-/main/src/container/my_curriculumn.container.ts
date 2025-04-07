@@ -4,7 +4,7 @@ import { MyCurriculumnRepository } from '@/repository/my_curriculumn.repository'
 import { IMyCurriculumnService } from '@/service/interface/i.my_curriculumn.service';
 import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
 import { BaseContainer } from '@/container/base.container';
-import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumn } from '@/models/my_curriculumn.model';
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { MyCurriculumnItemRepository } from '@/repository/my_curriculumn_item.repository';
 import { myCurriculumnItemRepository } from './my_curriculumn_item.container';

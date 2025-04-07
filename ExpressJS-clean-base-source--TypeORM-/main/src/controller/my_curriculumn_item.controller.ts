@@ -1,5 +1,5 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
-import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
 import { IMyCurriculumnItemService } from '@/service/interface/i.my_curriculumn_item.service';
 import { ITYPES } from '@/types/interface.types';
 import { NextFunction, Request, Response } from 'express';

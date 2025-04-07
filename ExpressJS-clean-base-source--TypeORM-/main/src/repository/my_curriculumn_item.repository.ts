@@ -1,4 +1,4 @@
-import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
 import { BaseRepository } from '@/repository/base/base.repository';
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { ITYPES } from '@/types/interface.types';

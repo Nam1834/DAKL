@@ -2,8 +2,8 @@ import { AddToMyCurriculumnReq } from '@/dto/my-curriculumn/add-to-my-curriculum
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { PagingDto } from '@/dto/paging.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
-import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
-import { MyCurriculumn } from '@/models/my-curriculumn.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
+import { MyCurriculumn } from '@/models/my_curriculumn.model';
 import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
 import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { BaseCrudService } from '@/service/base/base.service';

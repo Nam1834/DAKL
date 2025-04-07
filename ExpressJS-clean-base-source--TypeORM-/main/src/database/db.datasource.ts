@@ -18,8 +18,8 @@ import { Payment } from '@/models/payment.model';
 import { Order } from '@/models/order.model';
 import { OrderItem } from '@/models/order_item.model';
 import { Curriculumn } from '@/models/curriculumn.model';
-import { MyCurriculumn } from '@/models/my-curriculumn.model';
-import { MyCurriculumnItem } from '@/models/my-curriculumn-item.model';
+import { MyCurriculumn } from '@/models/my_curriculumn.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
 import { Subject } from '@/models/subject.model';
 import { TutorLevel } from '@/models/tutor_level.model';
 import { TutorSubject } from '@/models/tutor_subject.model';
@@ -27,6 +27,8 @@ import { Test } from '@/models/test.model';
 import { TestQuestion } from '@/models/test_question.model';
 import { TestResult } from '@/models/test_result.model';
 import { BookingRequest } from '@/models/booking_request.model';
+import { MyTutor } from '@/models/my_tutor.model';
+import { MyTutorItem } from '@/models/my_tutor_item.model';
 
 const models = [
   Role,
@@ -53,7 +55,8 @@ const models = [
   Test,
   TestQuestion,
   TestResult,
-  BookingRequest
+  MyTutor,
+  MyTutorItem
 ];
 
 export class AppDataSourceSingleton {
