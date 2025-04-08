@@ -154,7 +154,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await redis.set(`otp:${data.email}`, otp, 'EX', 300);
     await redis.set(`REGISTER_${data.email}`, JSON.stringify(data), 'EX', 600);
 
-    const emailTemplatePath = path.join(__dirname, '../utils/email/otp-template.util.ejs');
+    const rootDir = process.cwd();
+    const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-template.util.ejs');
 
     const emailContent = await ejs.renderFile(emailTemplatePath, {
       fullname: data.fullname,
