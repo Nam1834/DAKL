@@ -14,7 +14,9 @@ import { IPaymentService } from '@/service/interface/i.payment.service';
 import { sendEmail } from '@/utils/email/email-sender.util';
 import BaseError from '@/utils/error/base.error';
 import { createVNPayUrl } from '@/utils/vnpay/create-pay-url.util';
+import ejs from 'ejs';
 import { inject, injectable } from 'inversify';
+import path from 'path';
 
 @injectable()
 export class PaymentService extends BaseCrudService<Payment> implements IPaymentService<Payment> {
@@ -120,15 +122,19 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     //Send success email
     const userEmail = order.customerEmail;
     if (userEmail) {
-      const content = `Đơn hàng của bạn đã được thanh toán thành công với tổng giá trị là ${order.totalPrice}`;
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-payment.util.ejs');
 
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        amount: payment.amount
+      });
       sendEmail({
         from: {
           name: 'GiaSuVLU'
         },
         to: { emailAddress: [userEmail] },
         subject: 'Thanh toán thành công',
-        html: content
+        html: emailContent
       });
     }
 

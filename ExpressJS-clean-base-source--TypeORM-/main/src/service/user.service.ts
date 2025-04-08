@@ -183,7 +183,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     const data: RegisterUserReq = JSON.parse(storedData);
 
-    const emailTemplatePath = path.join(__dirname, '../utils/email/otp-template.util.ejs');
+    const rootDir = process.cwd();
+    const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-template.util.ejs');
 
     const emailContent = await ejs.renderFile(emailTemplatePath, {
       fullname: data.fullname,
@@ -241,7 +242,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new Error('Failed to find the registered user');
     }
 
-    const emailTemplatePath = path.join(__dirname, '../utils/email/success-email-template.util.ejs');
+    const rootDir = process.cwd();
+    const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-template.util.ejs');
 
     const emailContent = await ejs.renderFile(emailTemplatePath, {
       fullname: data.fullname,
@@ -507,7 +509,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       sendSms(`Mã OTP của bạn là ${otp}`, [internationalPhone]);
     } else {
       // Nếu input là email, gửi OTP qua email
-      const emailTemplatePath = path.join(__dirname, '../utils/email/otp-forgot-template.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-forgot-template.util.ejs');
 
       const emailContent = await ejs.renderFile(emailTemplatePath, {
         email: user.email,
