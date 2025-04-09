@@ -64,6 +64,8 @@ import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repo
 import { TutorLevel } from '@/models/tutor_level.model';
 import ejs from 'ejs';
 import path from 'path';
+import { IMyTutorRepository } from '@/repository/interface/i.my_tutor.repository';
+import { MyTutor } from '@/models/my_tutor.model';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
@@ -81,6 +83,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   private myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>;
   private tutorSubjectRepository: ITutorSubjectRepository<TutorSubject>;
   private tutorLevelRepository: ITutorLevelRepository<TutorLevel>;
+  private myTutorRepository: IMyTutorRepository<MyTutor>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
@@ -92,7 +95,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     @inject('CurriculumnRepository') curriculumnRepository: ICurriculumnRepository<Curriculumn>,
     @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>,
     @inject('TutorSubjectRepository') tutorSubjectRepository: ITutorSubjectRepository<TutorSubject>,
-    @inject('TutorLevelRepository') tutorLevelRepository: ITutorLevelRepository<TutorLevel>
+    @inject('TutorLevelRepository') tutorLevelRepository: ITutorLevelRepository<TutorLevel>,
+    @inject('MyTutorRepository') myTutorRepository: IMyTutorRepository<MyTutor>
   ) {
     super(userRepository);
     this.userRepository = userRepository;
@@ -103,6 +107,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.myCurriculumnItemRepository = myCurriculumnItemRepository;
     this.tutorSubjectRepository = tutorSubjectRepository;
     this.tutorLevelRepository = tutorLevelRepository;
+    this.myTutorRepository = myTutorRepository;
   }
 
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<User>> {
@@ -241,6 +246,13 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     if (!result) {
       throw new Error('Failed to find the registered user');
     }
+
+    const myTutor = new MyTutor();
+    myTutor.userId = user.userId;
+
+    await this.myTutorRepository.create({
+      data: myTutor
+    });
 
     const rootDir = process.cwd();
     const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-template.util.ejs');
@@ -406,6 +418,13 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
       // Gọi createNewUser để tạo user với userId tự động
       await this.userRepository.createNewUser(user);
+
+      const myTutor = new MyTutor();
+      myTutor.userId = user.userId;
+
+      await this.myTutorRepository.create({
+        data: myTutor
+      });
     }
 
     // Bước 4: Tạo JWT Token
@@ -433,10 +452,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   }
 
   async updateProfile(userId: string, data: UpdateProfileUserReq): Promise<UpdateProfileUserRes> {
-    const phoneNumberExist = await this.exists({ filter: { phoneNumber: data.phoneNumber } });
-    if (phoneNumberExist) {
-      throw new Error('Phone number already exists');
-    }
+    await this.userRepository.checkPhoneNumber(data.phoneNumber, data.phoneNumber);
+    await this.userRepository.checkEmail(data.workEmail, data.workEmail);
 
     const updatedUser = await this.userRepository.findOne({
       filter: { userId },
