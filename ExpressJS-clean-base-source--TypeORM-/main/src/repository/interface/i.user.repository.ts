@@ -7,4 +7,6 @@ export interface IUserRepository<T> extends IBaseRepository<T> {
   createNewUser(user: User): Promise<void>;
   updateUserWithTransaction(user: User, myCurriculumn: MyCurriculumn, curriculumn: Curriculumn): Promise<void>;
   totalNewRequest(): Promise<number>;
+  checkEmail(email: string, id: string): Promise<void>;
+  checkPhoneNumber(phoneNumber: string, id: string): Promise<void>;
 }

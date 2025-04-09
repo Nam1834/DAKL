@@ -9,7 +9,7 @@ import { IUserRepository } from '@/repository/interface/i.user.repository';
 import { ITYPES } from '@/types/interface.types';
 import { inject } from 'inversify';
 import 'reflect-metadata';
-import { DataSource, MoreThanOrEqual, Repository } from 'typeorm';
+import { DataSource, MoreThanOrEqual, Not, Repository } from 'typeorm';
 
 export class UserRepository extends BaseRepository<User> implements IUserRepository<User> {
   private datasource: DataSource;
@@ -81,5 +81,28 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
         updatedAt: MoreThanOrEqual(new Date(new Date().setDate(new Date().getDate() - 3)))
       }
     });
+  }
+
+  async checkEmail(email: string, id: string): Promise<void> {
+    if (!email) {
+      return; // Nếu không được truyền vào, bỏ qua kiểm tra
+    }
+
+    const checkEmail = await this.ormRepository.findOne({ where: { email: email, userId: Not(id) } });
+    if (checkEmail) {
+      throw new Error('Email has been exist!');
+    }
+  }
+
+  async checkPhoneNumber(phoneNumber: string, id: string): Promise<void> {
+    if (!phoneNumber) {
+      return; // Nếu phoneNumber không được truyền vào, bỏ qua kiểm tra
+    }
+    const checkPhoneNumber = await this.ormRepository.findOne({
+      where: { phoneNumber: phoneNumber, userId: Not(id) }
+    });
+    if (checkPhoneNumber) {
+      throw new Error('PhoneNumber has been exist!');
+    }
   }
 }

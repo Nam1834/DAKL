@@ -75,17 +75,14 @@ export class MyTutorService extends BaseCrudService<MyTutor> implements IMyTutor
    * @param data
    */
   async addToMyTutor(userId: string, data: AddToMyTutorReq): Promise<void> {
-    let myTutor = await this.myTutorRepository.findOne({
-      filter: { userId: userId }
+    const myTutor = await this.myTutorRepository.findOne({
+      filter: {
+        userId: userId
+      }
     });
 
-    // Nếu chưa có danh sách thì tạo mới
     if (!myTutor) {
-      myTutor = await this.myTutorRepository.create({
-        data: {
-          userId: userId
-        }
-      });
+      throw new BaseError(ErrorCode.BAD_REQUEST, 'Không tồn tại danh sách gia sư yêu thích');
     }
 
     const myTutorItem = new MyTutorItem();

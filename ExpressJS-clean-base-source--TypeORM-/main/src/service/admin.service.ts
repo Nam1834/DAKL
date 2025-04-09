@@ -323,6 +323,9 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
   }
 
   async convertUpdateAdminReqToAdmin(existingAdmin: Admin, data: UpdateAdminReq): Promise<Admin> {
+    await this.adminRepository.checkPhoneNumber(data.phoneNumber, existingAdmin.adminId);
+    await this.adminRepository.checkEmail(data.workEmail, existingAdmin.adminId);
+
     const admin = new Admin();
     admin.status = AdminStatus.ACTIVE;
 
