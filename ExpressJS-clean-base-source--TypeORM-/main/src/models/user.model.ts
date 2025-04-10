@@ -49,11 +49,8 @@ export class User extends BaseModel {
   @JoinColumn({ name: 'role_id' })
   role!: Role;
 
-  @Column({ nullable: true, default: UserStatus.PENDING })
-  status?: string;
-
   @Column({ nullable: true, default: UserCheckActiveEnum.ACTIVE })
-  checkActive?: string;
+  checkActive!: string;
 
   @Column({ name: 'coin', default: 0 })
   coin!: number;

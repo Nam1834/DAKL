@@ -27,7 +27,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
       .getRawOne();
 
     const newUserIdNumber = (maxUserId?.maxUserId || 0) + 1; // Lấy số tiếp theo từ giá trị lớn nhất
-    const newUserId = 'US' + newUserIdNumber.toString().padStart(5, '0'); // Tạo adminId theo định dạng NV0001
+    const newUserId = 'US' + newUserIdNumber.toString().padStart(5, '0');
 
     // Gán adminId mới vào admin
     user.userId = newUserId;
@@ -77,7 +77,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
     //Total request that have been created from 3 days ago
     return await this.ormRepository.count({
       where: {
-        status: UserStatus.REQUEST,
+        //status: UserStatus.REQUEST,
         updatedAt: MoreThanOrEqual(new Date(new Date().setDate(new Date().getDate() - 3)))
       }
     });

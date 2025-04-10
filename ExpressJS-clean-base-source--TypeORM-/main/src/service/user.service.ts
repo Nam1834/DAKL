@@ -594,8 +594,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   }
 
   async convertUserReqToTutor(existingUser: User, data: RegisToTutorReq): Promise<void> {
-    existingUser.status = UserStatus.REQUEST;
-
     const tutorProfile = new TutorProfile();
     tutorProfile.userId = existingUser.userId;
     tutorProfile.avatar = data.avatar;
@@ -718,7 +716,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
   async solveRequest(userId: string, click: string, tutorLevelId?: string): Promise<void> {
     const checkStatus = await this.userRepository.findOne({
-      filter: { status: UserStatus.REQUEST, userId: userId }
+      filter: { userId: userId }
     });
 
     if (!checkStatus) {
@@ -747,8 +745,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },
         updateData: {
-          roleId: UserTypeEnum.TUTOR,
-          status: UserStatus.ACCEPT
+          roleId: UserTypeEnum.TUTOR
         }
       });
 
@@ -768,16 +765,13 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     } else if (click === UserStatus.REFUSE) {
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },
-        updateData: {
-          status: UserStatus.REFUSE
-        }
+        updateData: {}
       });
     }
   }
 
   async convertUpdateManageUser(data: UpdateManageUserReq): Promise<User> {
     const user = new User();
-    user.status = data.status;
     user.roleId = data.roleId;
     user.checkActive = data.checkActive;
 

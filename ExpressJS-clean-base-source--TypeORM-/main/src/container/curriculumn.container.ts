@@ -5,6 +5,9 @@ import { CurriculumnRepository } from '@/repository/curriculumn.repository';
 import { ICurriculumnService } from '@/service/interface/i.curriculumn.service';
 import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.repository';
 import { BaseContainer } from '@/container/base.container';
+import { IAdminRepository } from '@/repository/interface/i.admin.repository';
+import { Admin } from 'typeorm';
+import { adminRepository } from './admin.container';
 
 class CurriculumnContainer extends BaseContainer {
   constructor() {
@@ -12,6 +15,9 @@ class CurriculumnContainer extends BaseContainer {
     this.container.bind<ICurriculumnService<Curriculumn>>('CurriculumnService').to(CurriculumnService);
     this.container.bind<ICurriculumnRepository<Curriculumn>>('CurriculumnRepository').to(CurriculumnRepository);
     this.container.bind<CurriculumnController>(CurriculumnController).toSelf();
+
+    //Import
+    this.container.bind<IAdminRepository<Admin>>('AdminRepository').toConstantValue(adminRepository);
   }
 
   export() {

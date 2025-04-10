@@ -1,25 +1,29 @@
 import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
-import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { optional } from 'inversify';
 
 export class UpdateCurriculumnReq {
-  @optional()
+  @IsOptional()
   @IsString()
   curriculumnName!: string;
 
-  @optional()
+  @IsOptional()
   @IsString()
-  curriculumnMajor!: string;
+  majorId!: string;
 
-  @optional()
+  @IsOptional()
+  @IsString()
+  subjectId!: string;
+
+  @IsOptional()
   @IsString()
   curriculumnUrl!: string;
 
-  @optional()
+  @IsOptional()
   @IsString()
-  desciption!: string;
+  description!: string;
 
-  @optional()
+  @IsOptional()
   @IsEnum(CurriculumnStatus, { message: 'Status must be either ACTIVE or UNACTIVE' })
   status!: CurriculumnStatus;
 }

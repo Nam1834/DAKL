@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
+import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateCurriculumnReq {
   @IsNotEmpty()
@@ -7,7 +8,11 @@ export class CreateCurriculumnReq {
 
   @IsNotEmpty()
   @IsString()
-  curriculumnMajor!: string;
+  majorId!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  subjectId!: string;
 
   @IsNotEmpty()
   @IsString()
@@ -16,4 +21,8 @@ export class CreateCurriculumnReq {
   @IsNotEmpty()
   @IsString()
   description!: string;
+
+  @IsNotEmpty()
+  @IsEnum(CurriculumnStatus, { message: 'Status must be either ACTIVE or UNACTIVE' })
+  status!: CurriculumnStatus;
 }

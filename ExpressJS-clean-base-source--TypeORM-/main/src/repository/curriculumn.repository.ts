@@ -10,4 +10,17 @@ export class CurriculumnRepository extends BaseRepository<Curriculumn> implement
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Curriculumn));
   }
+
+  async createNewCurriculumn(curriculumn: Curriculumn): Promise<void> {
+    const maxCurriculumnId = await this.ormRepository
+      .createQueryBuilder('curriculumn')
+      .select("MAX(CAST(NULLIF(SUBSTRING(curriculumn.curriculumnId, 2), '') AS INTEGER))", 'maxCurriculumnId')
+      .where("curriculumn.curriculumnId ~ '^C[0-9]+$'") // Chỉ lấy những ID hợp lệ
+      .getRawOne();
+
+    const newCurriculumnIdNumber = (maxCurriculumnId?.maxCurriculumnId || 0) + 1;
+    const newCurriculumnId = 'C' + newCurriculumnIdNumber.toString().padStart(5, '0');
+
+    curriculumn.curriculumnId = newCurriculumnId;
+  }
 }
