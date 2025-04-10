@@ -3,6 +3,7 @@ import { CreateCurriculumnReq } from '@/dto/curriculumn/create-curriculumn.req';
 import { UpdateCurriculumnReq } from '@/dto/curriculumn/update-curriculumn.req';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { PagingDto } from '@/dto/paging.dto';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { AdminTypeEnum } from '@/enums/admin-type.enum';
 import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 import { ErrorCode } from '@/enums/error-code.enums';
@@ -10,6 +11,7 @@ import { Curriculumn } from '@/models/curriculumn.model';
 import { ICurriculumnService } from '@/service/interface/i.curriculumn.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
+import { getSearchData } from '@/utils/get-search-data.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { filter } from 'lodash';
@@ -26,17 +28,28 @@ export class CurriculumnController {
     this.common = common;
   }
 
+  async searchCurriculumn(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.curriculumnService.search(searchData);
+      res.send_ok('Curriculumn fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createByAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const requestBody: CreateCurriculumnReq = req.body;
+      const admin = req.user;
+      const adminId = admin?.id;
 
-      const curriculumnData = {
-        ...requestBody,
-        status: CurriculumnStatus.ACTIVE,
-        roleUserCreated: AdminTypeEnum.ADMIN
-      };
+      if (!adminId) {
+        throw new Error('You must login');
+      }
 
-      const result = await this.curriculumnService.create({ data: curriculumnData });
+      const data: CreateCurriculumnReq = req.body;
+
+      const result = await this.curriculumnService.createByAdmin(data, adminId);
 
       res.send_ok('Create curriculumn successfully', result);
     } catch (error) {
@@ -58,6 +71,14 @@ export class CurriculumnController {
         throw new BaseError(ErrorCode.NF_01, 'Curriculumn not found');
       }
       const data: UpdateCurriculumnReq = req.body;
+
+      const existingCurriculumnName = await this.curriculumnService.findOne({
+        filter: { curriculumnName: data.curriculumnName }
+      });
+
+      if (existingCurriculumnName) {
+        throw new Error(`Curriculumn name "${data.curriculumnName}" already exists!`);
+      }
 
       await this.curriculumnService.findOneAndUpdate({ filter: { curriculumnId: id }, updateData: data });
 

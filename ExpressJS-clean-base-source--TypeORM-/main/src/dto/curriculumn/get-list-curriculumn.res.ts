@@ -8,7 +8,10 @@ export class GetListCurriculumnRes {
   curriculumnName!: string;
 
   @Expose()
-  curriculumnMajor!: string;
+  majorId!: string;
+
+  @Expose()
+  subjectId!: string;
 
   @Expose()
   status!: string;

@@ -29,6 +29,7 @@ import { TestResult } from '@/models/test_result.model';
 import { BookingRequest } from '@/models/booking_request.model';
 import { MyTutor } from '@/models/my_tutor.model';
 import { MyTutorItem } from '@/models/my_tutor_item.model';
+import { TutorRequest } from '@/models/tutor_request.model';
 
 const models = [
   Role,
@@ -56,7 +57,8 @@ const models = [
   TestQuestion,
   TestResult,
   MyTutor,
-  MyTutorItem
+  MyTutorItem,
+  TutorRequest
 ];
 
 export class AppDataSourceSingleton {

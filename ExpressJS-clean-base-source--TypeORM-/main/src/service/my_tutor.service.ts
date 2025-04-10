@@ -37,8 +37,7 @@ export class MyTutorService extends BaseCrudService<MyTutor> implements IMyTutor
     const myTutorItems = await this.myTutorItemRepository.findMany({
       filter: {
         myTutorId: myTutor.myTutorId
-      },
-      relations: ['tutorProfile']
+      }
     });
 
     myTutorItems.forEach((tutor) => {
