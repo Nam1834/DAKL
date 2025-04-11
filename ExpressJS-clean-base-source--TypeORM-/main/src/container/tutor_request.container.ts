@@ -7,6 +7,14 @@ import { ITutorRequestRepository } from '@/repository/interface/i.tutor_request.
 import { BaseContainer } from '@/container/base.container';
 import { IUserRepository } from '@/repository/interface/i.user.repository';
 import { userRepository } from './user.container';
+import { ITestResultRepository } from '@/repository/interface/i.test_result.repository';
+import { testResultRepository } from './test_result.container';
+import { tutorLevelRepository } from './tutor_level.container';
+import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repository';
+import { IMyCurriculumnRepository } from '@/repository/interface/i.my_curriculumn.repository';
+import { myCurriculumnRepository } from './my_curriculumn.container';
+import { tutorProfileRepository } from './tutor_profile.container';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
 
 class TutorRequestContainer extends BaseContainer {
   constructor() {
@@ -17,6 +25,12 @@ class TutorRequestContainer extends BaseContainer {
 
     //Import
     this.container.bind<IUserRepository<any>>('UserRepository').toConstantValue(userRepository);
+    this.container.bind<ITestResultRepository<any>>('TestResultRepository').toConstantValue(testResultRepository);
+    this.container.bind<ITutorLevelRepository<any>>('TutorLevelRepository').toConstantValue(tutorLevelRepository);
+    this.container
+      .bind<IMyCurriculumnRepository<any>>('MyCurriculumnRepository')
+      .toConstantValue(myCurriculumnRepository);
+    this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
   export() {

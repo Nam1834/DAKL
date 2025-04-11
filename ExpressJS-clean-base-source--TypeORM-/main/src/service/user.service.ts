@@ -57,7 +57,6 @@ import { UserCheckActiveEnum } from '@/enums/user-check-active.enum';
 import { TutorLevelEnum } from '@/enums/tutor_level.enum';
 import { TutorSubject } from '@/models/tutor_subject.model';
 import { ITutorSubjectRepository } from '@/repository/interface/i.tutor_subject.repository';
-import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { UpdateTutorProfileRes } from '@/dto/tutor/update-tutor-profile.res';
 import { GetListPublicTutorProfileRes } from '@/dto/tutor/get-list-public-tutor-profile.res';
 import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repository';
@@ -66,6 +65,7 @@ import ejs from 'ejs';
 import path from 'path';
 import { IMyTutorRepository } from '@/repository/interface/i.my_tutor.repository';
 import { MyTutor } from '@/models/my_tutor.model';
+import { UpdatePublicProfileReq } from '@/dto/tutor/public-profile.req';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
@@ -647,7 +647,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await this.userRepository.save(existingUser);
   }
 
-  async updateTutorProfile(id: string, data: UpdateTutorProfileReq): Promise<void> {
+  async updatePublicTutorProfile(id: string, data: UpdatePublicProfileReq): Promise<void> {
     const updatedUser = await this.userRepository.findOne({
       filter: { userId: id },
       relations: ['tutorProfile']
@@ -658,18 +658,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     }
 
     const tutorProfileUpdatePayload: Partial<TutorProfile> = {
-      avatar: data.avatar,
-      fullname: data.fullname,
-      birthday: data.birthday ? new Date(data.birthday) : undefined,
-      gender: data.gender,
-      bankNumber: data.bankNumber,
-      bankName: data.bankName,
-      dateTimeLearn: data.dateTimeLearn?.map((item) => JSON.stringify(item)),
-      teachingTime: data.teachingTime,
-      description: data.description,
-      videoUrl: data.videoUrl,
-      teachingMethod: data.teachingMethod,
-      teachingPlace: data.teachingPlace,
       isPublicProfile: data.isPublicProfile
     };
     Object.keys(tutorProfileUpdatePayload).forEach(
