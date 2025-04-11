@@ -1,5 +1,6 @@
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
+import { CancelRequestReq } from '@/dto/tutor/cancel-request.req';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
 import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { ErrorCode } from '@/enums/error-code.enums';
@@ -64,6 +65,22 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
     });
 
     return new PagingResponseDto(total, tutorRequests);
+  }
+
+  async getMyListRequest(userId: string, searchData: SearchDataDto): Promise<PagingResponseDto<TutorRequest>> {
+    const { order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const myRequests = await this.tutorRequestRepository.findMany({
+      filter: { userId: userId },
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.tutorRequestRepository.count({
+      filter: { userId: userId }
+    });
+
+    return new PagingResponseDto(total, myRequests);
   }
 
   async convertUserReqToTutor(existingUser: User, data: RegisToTutorReq): Promise<TutorRequest> {
@@ -348,7 +365,17 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
 
   async getMyNewRequest(): Promise<void> {}
 
-  async getMyListRequest(): Promise<void> {}
+  async cancelRequest(tutorRequestId: string, data: CancelRequestReq): Promise<void> {
+    const tutorRequest = await this.tutorRequestRepository.findOne({
+      filter: { tutorRequestId: tutorRequestId, status: TutorRequestStatus.REQUEST }
+    });
+    if (!tutorRequest) {
+      throw new Error('Can not find request!');
+    }
 
-  async cancelRequest(): Promise<void> {}
+    await this.tutorRequestRepository.findOneAndUpdate({
+      filter: { tutorRequestId: tutorRequestId },
+      updateData: { status: data.status }
+    });
+  }
 }
