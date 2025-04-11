@@ -1,5 +1,6 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { SearchDataDto } from '@/dto/search-data.dto';
+import { CancelRequestReq } from '@/dto/tutor/cancel-request.req';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
 import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { TutorRequest } from '@/models/tutor_request.model';
@@ -25,6 +26,23 @@ export class TutorRequestController {
     try {
       const searchData: SearchDataDto = getSearchData(req);
       const result = await this.tutorRequestService.search(searchData);
+      res.send_ok('Tutor Request fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMyListRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.tutorRequestService.getMyListRequest(userId, searchData);
       res.send_ok('Tutor Request fetched successfully', result);
     } catch (error) {
       next(error);
@@ -74,6 +92,19 @@ export class TutorRequestController {
       const result = await this.tutorRequestService.solveRequest(tutorRequestId, click, tutorLevelId);
 
       res.send_ok('Request solve successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async cancelRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tutorRequestId = req.params.tutorRequestId;
+
+      const data: CancelRequestReq = req.body;
+      const result = await this.tutorRequestService.cancelRequest(tutorRequestId, data);
+
+      res.send_ok('Cancel Request successfully', result);
     } catch (error) {
       next(error);
     }
