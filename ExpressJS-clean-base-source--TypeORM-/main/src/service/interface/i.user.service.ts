@@ -17,8 +17,8 @@ import { SearchDataDto } from '@/dto/search-data.dto';
 import { GetListRequestRes } from '@/dto/tutor/get-list-request.res';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { User } from '@/models/user.model';
-import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { GetListPublicTutorProfileRes } from '@/dto/tutor/get-list-public-tutor-profile.res';
+import { UpdatePublicProfileReq } from '@/dto/tutor/public-profile.req';
 
 export interface IUserService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<User>>;
@@ -36,7 +36,7 @@ export interface IUserService<T extends BaseModelType> extends IBaseCrudService<
   verifyOtp(data: VerifyOtpReq): Promise<VerifyOtpRes>;
   resetPassword(data: ResetPasswordReq): Promise<ResetPasswordRes>;
   regisToTutor(id: string, data: RegisToTutorReq): Promise<void>;
-  updateTutorProfile(id: string, data: UpdateTutorProfileReq): Promise<void>;
+  updatePublicTutorProfile(id: string, data: UpdatePublicProfileReq): Promise<void>;
   getListRequest(status: string, searchData: SearchDataDto): Promise<GetListRequestRes>;
   solveRequest(userId: string, click: string, tutorLevelId?: string): Promise<void>;
   updateUserById(id: string, data: any): Promise<void>;

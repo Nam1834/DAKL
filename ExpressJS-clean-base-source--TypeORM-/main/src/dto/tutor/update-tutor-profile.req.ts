@@ -41,84 +41,116 @@ export class DateTimeLearnDto {
 }
 
 export class UpdateTutorProfileReq {
-  @IsOptional()
+  @IsNotEmpty({ message: 'Avatar is required' })
   @IsString({ message: 'Avatar must be a string' })
   avatar!: string;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'fullname is required' })
   @IsString({ message: 'fullname must be a string' })
   fullname!: string;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'MajorId is required' })
   @IsString({ message: 'MajorId must be a string' })
   majorId!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsDateString()
   birthday!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @Matches(/^(MALE|FEMALE)$/, { message: 'Gender must be either MALE or FEMALE' })
   gender!: 'MALE' | 'FEMALE';
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   bankNumber!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   bankName!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   subjectId!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   descriptionOfSubject!: string;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'University is required' })
   @IsString({ message: 'University must be a string' })
   univercity!: string;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'GPA is required' })
   @IsNumber({}, { message: 'GPA must be a number' })
   @Min(0, { message: 'GPA must be at least 0' })
   @Max(4, { message: 'GPA must not exceed 4' })
   GPA!: number;
 
-  @IsOptional()
-  @IsString()
-  educationalCertification!: string;
-
-  @IsOptional()
   @IsArray({ message: 'DateTimeLearn must be an array' })
+  @ArrayNotEmpty({ message: 'DateTimeLearn must not be empty' })
   @ValidateNested({ each: true })
   @Type(() => DateTimeLearnDto)
   dateTimeLearn!: DateTimeLearnDto[];
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'Educational Certification is required' })
   @IsNumber()
   teachingTime!: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   description!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   videoUrl!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsBoolean()
-  isPublicProfile!: boolean;
+  isUseCurriculumn!: boolean;
 
-  @IsOptional()
-  @IsEnum(TeachingMethod, { message: 'Teaching Method must be either ONLINE, OFFLINE or BOTH' })
-  teachingMethod!: TeachingMethod;
+  @IsNotEmpty()
+  @IsString()
+  evidenceOfGPA!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  evidenceOfSubject!: string;
 
   @IsOptional()
   @IsString()
+  subjectId2!: string;
+
+  @IsOptional()
+  @IsString()
+  evidenceOfSubject2!: string;
+
+  @IsOptional()
+  @IsString()
+  descriptionOfSubject2!: string;
+
+  @IsOptional()
+  @IsString()
+  subjectId3!: string;
+
+  @IsOptional()
+  @IsString()
+  evidenceOfSubject3!: string;
+
+  @IsOptional()
+  @IsString()
+  descriptionOfSubject3!: string;
+
+  @IsNotEmpty()
+  @IsEnum(TeachingMethod, { message: 'Teaching Method must be either ONLINE, OFFLINE or BOTH' })
+  teachingMethod!: TeachingMethod;
+
+  @IsNotEmpty()
+  @IsString()
   teachingPlace!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  tutorLevelId!: string;
 }

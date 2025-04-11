@@ -1,7 +1,7 @@
 import { Permissions } from '@/constants/permission.constants';
 import { userController } from '@/container/user.container';
+import { UpdatePublicProfileReq } from '@/dto/tutor/public-profile.req';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
-import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
 import { LoginUserReq } from '@/dto/user/login-user.req';
 import { RegisterUserReq } from '@/dto/user/register-user.req';
@@ -33,30 +33,30 @@ userRouter
   .post('/forgot-password', classValidate(ForgotPasswordUserReq), userController.forgotPassword.bind(userController))
   .post('/verify-otp', classValidate(VerifyOtpReq), userController.verifyOtp.bind(userController))
   .post('/reset-password', classValidate(ResetPasswordReq), userController.resetPassword.bind(userController))
-  .post(
-    '/regis-to-tutor',
-    authenticateJWT,
-    classValidate(RegisToTutorReq),
-    userController.regisUserToTutor.bind(userController)
-  )
+  // .post(
+  //   '/regis-to-tutor',
+  //   authenticateJWT,
+  //   classValidate(RegisToTutorReq),
+  //   userController.regisUserToTutor.bind(userController)
+  // )
   .put(
-    '/update-tutor-profile',
+    '/update-public-tutor-profile',
     authenticateJWT,
-    classValidate(UpdateTutorProfileReq),
-    userController.updateTutorProfile.bind(userController)
+    classValidate(UpdatePublicProfileReq),
+    userController.updatePublicTutorProfile.bind(userController)
   )
-  .get(
-    '/get-list/:status',
-    authenticateJWT,
-    checkPermission([Permissions.QUAN_LY_YEU_CAU]),
-    userController.getListRequest.bind(userController)
-  )
-  .post(
-    '/solve-request/:userId',
-    authenticateJWT,
-    checkPermission([Permissions.QUAN_LY_YEU_CAU]),
-    userController.solveRequest.bind(userController)
-  )
+  // .get(
+  //   '/get-list/:status',
+  //   authenticateJWT,
+  //   checkPermission([Permissions.QUAN_LY_YEU_CAU]),
+  //   userController.getListRequest.bind(userController)
+  // )
+  // .post(
+  //   '/solve-request/:userId',
+  //   authenticateJWT,
+  //   checkPermission([Permissions.QUAN_LY_YEU_CAU]),
+  //   userController.solveRequest.bind(userController)
+  // )
   .put(
     '/update-user-by-id/:id',
     authenticateJWT,

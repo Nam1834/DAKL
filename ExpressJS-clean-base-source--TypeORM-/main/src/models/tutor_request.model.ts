@@ -102,7 +102,7 @@ export class TutorRequest extends BaseModel {
   @Column({ nullable: true, name: 'teaching_time', type: 'decimal', precision: 4, scale: 2 })
   teachingTime!: number;
 
-  @Column({ name: 'teaching_method', nullable: true, default: TeachingMethod.ONLINE })
+  @Column({ name: 'teaching_method', nullable: true })
   teachingMethod!: string;
 
   @Column({ nullable: true, name: 'teaching_place' })
@@ -111,7 +111,7 @@ export class TutorRequest extends BaseModel {
   @Column({ nullable: true, name: 'video_url' })
   videoUrl!: string;
 
-  @Column({ name: 'is_use_curriculumn', type: 'boolean', default: false })
+  @Column({ name: 'is_use_curriculumn', type: 'boolean' })
   isUseCurriculumn!: boolean;
 
   @Column({ nullable: true, name: 'tutor_level_id' })
@@ -129,4 +129,7 @@ export class TutorRequest extends BaseModel {
 
   @Column({ default: TutorRequestStatus.REQUEST })
   status!: string;
+
+  @Column({ name: 'total_test_points', type: 'int', nullable: true })
+  totalTestPoints!: number;
 }
