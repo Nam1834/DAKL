@@ -8,6 +8,7 @@ import { IBaseCrudService } from '@/service/interface/i.base.service';
 import { BaseModelType } from '@/types/base-model.types';
 
 export interface ITutorRequestService<T extends BaseModelType> extends IBaseCrudService<T> {
+  getMyNewestRequest(userId: string): Promise<TutorRequest>;
   search(searchData: SearchDataDto): Promise<PagingResponseDto<TutorRequest>>;
   getMyListRequest(userId: string, searchData: SearchDataDto): Promise<PagingResponseDto<TutorRequest>>;
   regisToTutor(id: string, data: RegisToTutorReq): Promise<void>;
