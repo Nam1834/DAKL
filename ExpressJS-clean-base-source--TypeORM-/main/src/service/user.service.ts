@@ -464,6 +464,14 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new Error('User profile not found');
     }
 
+    const user = new User();
+    user.phoneNumber = data.phoneNumber;
+
+    await this.userRepository.findOneAndUpdate({
+      filter: { userId: userId },
+      updateData: user
+    });
+
     const userProfileUpdatePayload: Partial<UserProfile> = {
       fullname: data.fullname,
       phoneNumber: data.phoneNumber,
