@@ -32,6 +32,22 @@ export class TutorRequestController {
     }
   }
 
+  async getMyNewestRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const result = await this.tutorRequestService.getMyNewestRequest(userId);
+      res.send_ok('Tutor Request fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getMyListRequest(req: Request, res: Response, next: NextFunction) {
     try {
       const user = req.user;

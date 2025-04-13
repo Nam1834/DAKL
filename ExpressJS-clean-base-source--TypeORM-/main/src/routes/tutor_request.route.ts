@@ -28,6 +28,11 @@ tutorRequestRouter
     checkPermission([Permissions.QUAN_LY_YEU_CAU]),
     tutorRequestController.searchTutorRequest.bind(tutorRequestController)
   )
+  .get(
+    '/get-my-newest-request',
+    authenticateJWT,
+    tutorRequestController.getMyNewestRequest.bind(tutorRequestController)
+  )
   .get('/get-my-list-request', authenticateJWT, tutorRequestController.getMyListRequest.bind(tutorRequestController))
   .post(
     '/solve-request/:tutorRequestId',
