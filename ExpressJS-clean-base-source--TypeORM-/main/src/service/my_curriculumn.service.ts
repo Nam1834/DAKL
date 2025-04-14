@@ -96,5 +96,5 @@ export class MyCurriculumnService
     });
   }
 
-  async updateById(): Promise<void> {}
+  async createMyCurriculumn(): Promise<void> {}
 }
