@@ -11,7 +11,7 @@ export class MyCurriculumn extends BaseModel {
   @Column({ name: 'user_id' })
   userId!: string;
 
-  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
