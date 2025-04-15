@@ -327,19 +327,19 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           data: myCurriculumn
         });
 
-        const rootDir = process.cwd();
-        const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-regis-to-tutor.util.ejs');
+        // const rootDir = process.cwd();
+        // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-regis-to-tutor.util.ejs');
 
-        const emailContent = await ejs.renderFile(emailTemplatePath, {
-          fullname: checkStatus.fullname
-        });
+        // const emailContent = await ejs.renderFile(emailTemplatePath, {
+        //   fullname: checkStatus.fullname
+        // });
 
-        await sendEmail({
-          from: { name: 'GiaSuVLU' },
-          to: { emailAddress: [checkStatus.fullname] },
-          subject: 'Thông báo duyệt yêu cầu',
-          html: emailContent
-        });
+        // await sendEmail({
+        //   from: { name: 'GiaSuVLU' },
+        //   to: { emailAddress: [checkStatus.fullname] },
+        //   subject: 'Thông báo duyệt yêu cầu',
+        //   html: emailContent
+        // });
       } else if (checkStatus.type === TutorRequestType.UPDATE_PROFILE) {
         const tutorProfileUpdatePayload: Partial<TutorProfile> = {
           avatar: checkStatus.avatar,
@@ -388,19 +388,19 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           updateData: { status: TutorRequestStatus.ACCEPT }
         });
       }
-      const rootDir = process.cwd();
-      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-update-tutor.util.ejs');
+      // const rootDir = process.cwd();
+      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-update-tutor.util.ejs');
 
-      const emailContent = await ejs.renderFile(emailTemplatePath, {
-        fullname: checkStatus.fullname
-      });
+      // const emailContent = await ejs.renderFile(emailTemplatePath, {
+      //   fullname: checkStatus.fullname
+      // });
 
-      await sendEmail({
-        from: { name: 'GiaSuVLU' },
-        to: { emailAddress: [checkStatus.fullname] },
-        subject: 'Thông báo duyệt yêu cầu',
-        html: emailContent
-      });
+      // await sendEmail({
+      //   from: { name: 'GiaSuVLU' },
+      //   to: { emailAddress: [checkStatus.fullname] },
+      //   subject: 'Thông báo duyệt yêu cầu',
+      //   html: emailContent
+      // });
     } else if (click === TutorRequestStatus.REFUSE) {
       await this.tutorRequestRepository.findOneAndUpdate({
         filter: { tutorRequestId: tutorRequestId },
@@ -408,19 +408,19 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           status: TutorRequestStatus.REFUSE
         }
       });
-      const rootDir = process.cwd();
-      const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
+      // const rootDir = process.cwd();
+      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
 
-      const emailContent = await ejs.renderFile(emailTemplatePath, {
-        fullname: checkStatus.fullname
-      });
+      // const emailContent = await ejs.renderFile(emailTemplatePath, {
+      //   fullname: checkStatus.fullname
+      // });
 
-      await sendEmail({
-        from: { name: 'GiaSuVLU' },
-        to: { emailAddress: [checkStatus.fullname] },
-        subject: 'Thông báo duyệt yêu cầu',
-        html: emailContent
-      });
+      // await sendEmail({
+      //   from: { name: 'GiaSuVLU' },
+      //   to: { emailAddress: [checkStatus.fullname] },
+      //   subject: 'Thông báo duyệt yêu cầu',
+      //   html: emailContent
+      // });
     }
   }
 
