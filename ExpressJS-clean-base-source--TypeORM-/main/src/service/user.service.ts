@@ -438,17 +438,17 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     return result;
   }
 
-  async getProfile(userId: string): Promise<GetProfileRes> {
+  async getProfile(userId: string): Promise<User> {
     const user = await this.userRepository.findOne({
       filter: { userId },
-      relations: ['userProfile']
+      relations: ['userProfile', 'tutorProfile']
     });
 
     if (!user || !user.userProfile) {
       throw new Error('User profile not found');
     }
 
-    return user.userProfile;
+    return user;
   }
 
   async updateProfile(userId: string, data: UpdateProfileUserReq): Promise<UpdateProfileUserRes> {

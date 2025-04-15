@@ -180,8 +180,7 @@ export class UserController {
       }
 
       const profileData = await this.userService.getProfile(userId);
-      const responseBody = convertToDto(GetProfileRes, profileData);
-      res.send_ok('Get Profile success', responseBody);
+      res.send_ok('Get Profile success', profileData);
     } catch (error) {
       next(error);
     }
