@@ -70,6 +70,8 @@ export class MediaService implements IMediaService {
 
     await minioClient.fPutObject(this.bucketName, mediaCategory + '/' + fileName, tempFilePath);
 
+    const stat = await minioClient.statObject(this.bucketName, mediaCategory + '/' + fileName);
+
     // Xóa file tạm sau khi upload
     fs.unlink(tempFilePath, (unlinkErr) => {
       if (unlinkErr) {
@@ -78,7 +80,8 @@ export class MediaService implements IMediaService {
     });
 
     return {
-      mediaUrl: `${this.serverUrl}/media?mediaCategory=${mediaCategory}&fileName=${fileName}`
+      mediaUrl: `${this.serverUrl}/media?mediaCategory=${mediaCategory}&fileName=${fileName}`,
+      size: stat.size
     };
   }
 
@@ -109,6 +112,8 @@ export class MediaService implements IMediaService {
 
     await minioClient.fPutObject(this.bucketName, mediaCategory + '/' + fileName, tempFilePath);
 
+    const stat = await minioClient.statObject(this.bucketName, mediaCategory + '/' + fileName);
+
     // Xóa file tạm sau khi upload
     fs.unlink(tempFilePath, (unlinkErr) => {
       if (unlinkErr) {
@@ -117,7 +122,8 @@ export class MediaService implements IMediaService {
     });
 
     return {
-      mediaUrl: `${this.serverUrl}/media?mediaCategory=${mediaCategory}&fileName=${fileName}`
+      mediaUrl: `${this.serverUrl}/media?mediaCategory=${mediaCategory}&fileName=${fileName}`,
+      size: stat.size
     };
   }
 

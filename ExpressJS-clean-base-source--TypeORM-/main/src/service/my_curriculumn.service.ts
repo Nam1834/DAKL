@@ -10,22 +10,33 @@ import { BaseCrudService } from '@/service/base/base.service';
 import { IMyCurriculumnService } from '@/service/interface/i.my_curriculumn.service';
 import BaseError from '@/utils/error/base.error';
 import { inject, injectable } from 'inversify';
+import { CreateMyCurriculumnItemReq } from '@/dto/my-curriculumn/create-my-curriculumn-item.req';
+import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.repository';
+import { Curriculumn } from '@/models/curriculumn.model';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
+import { TutorProfile } from '@/models/tutor_profile.model';
 
 @injectable()
 export class MyCurriculumnService
   extends BaseCrudService<MyCurriculumn>
   implements IMyCurriculumnService<MyCurriculumn>
 {
+  private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
+  private curriculumnRepository: ICurriculumnRepository<Curriculumn>;
   private myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>;
   private myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>;
 
   constructor(
+    @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
+    @inject('CurriculumnRepository') curriculumnRepository: ICurriculumnRepository<Curriculumn>,
     @inject('MyCurriculumnRepository') myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>,
     @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>
   ) {
     super(myCurriculumnRepository);
     this.myCurriculumnRepository = myCurriculumnRepository;
     this.myCurriculumnItemRepository = myCurriculumnItemRepository;
+    this.curriculumnRepository = curriculumnRepository;
+    this.tutorProfileRepository = tutorProfileRepository;
   }
 
   async getMyCurriculumn(userId: string, paging: PagingDto): Promise<PagingResponseDto<MyCurriculumn>> {
@@ -96,5 +107,17 @@ export class MyCurriculumnService
     });
   }
 
-  async createMyCurriculumn(): Promise<void> {}
+  async createMyCurriculumnItem(userId: string, data: CreateMyCurriculumnItemReq): Promise<void> {
+    const myCurriculumn = await this.myCurriculumnRepository.findOne({
+      filter: {
+        userId: userId
+      }
+    });
+
+    if (!myCurriculumn) {
+      throw new BaseError(ErrorCode.BAD_REQUEST, 'My Currriculumn does not exist');
+    }
+
+    //More
+  }
 }
