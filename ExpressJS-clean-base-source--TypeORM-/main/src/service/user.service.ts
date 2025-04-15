@@ -536,7 +536,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       //Nếu input là email, gửi OTP qua email
       const isProd = process.env.NODE_ENV === 'production';
       const templatePath = isProd
-        ? path.join(__dirname, '../../utils/email/otp-forgot-template.util.ejs') // dist
+        ? path.join(__dirname, '../utils/email/otp-forgot-template.util.ejs') // dist
         : path.join(process.cwd(), 'src/utils/email/otp-forgot-template.util.ejs');
       const emailContent = await ejs.renderFile(templatePath, {
         email: user.email,
