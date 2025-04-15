@@ -69,20 +69,20 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
 
   async getMyNewestRequest(userId: string): Promise<TutorRequest> {
     const getMyRequests = await this.tutorRequestRepository.findMany({
-      filter: { userId: userId }
+      filter: { userId: userId },
+      order: [
+        {
+          column: 'createdAt',
+          direction: 'DESC'
+        }
+      ]
     });
 
     if (!getMyRequests || getMyRequests.length === 0) {
       throw new Error('Can not find your Request!');
     }
 
-    // B2: Tìm createdAt mới nhất
-    const sortedRequests = getMyRequests.sort((a, b) => {
-      return new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime();
-    });
-
-    // B2: Trả về request đầu tiên (mới nhất)
-    return sortedRequests[0];
+    return getMyRequests[0];
   }
 
   async getMyListRequest(userId: string, searchData: SearchDataDto): Promise<PagingResponseDto<TutorRequest>> {
