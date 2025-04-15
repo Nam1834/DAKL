@@ -117,12 +117,19 @@ export class TutorRequest extends BaseModel {
   @Column({ nullable: true, name: 'tutor_level_id' })
   tutorLevelId!: string;
 
+  @Column({ nullable: true, name: 'tutor_level_solved_id' })
+  tutorLevelSolvedId!: string;
+
   @OneToMany(() => TutorSubject, (tutorSubject) => tutorSubject.tutor)
   tutorSubjects!: TutorSubject[];
 
   @ManyToOne(() => TutorLevel, { eager: true })
   @JoinColumn({ name: 'tutor_level_id' })
   tutorLevel!: TutorLevel;
+
+  @ManyToOne(() => TutorLevel, { eager: true })
+  @JoinColumn({ name: 'tutor_level_solved_id' })
+  tutorLevelSolved!: TutorLevel;
 
   @Column({ nullable: true })
   type!: string;
