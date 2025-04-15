@@ -310,7 +310,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
 
         await this.tutorRequestRepository.findOneAndUpdate({
           filter: { tutorRequestId: tutorRequestId },
-          updateData: { status: TutorRequestStatus.ACCEPT }
+          updateData: { status: TutorRequestStatus.ACCEPT, tutorLevelSolvedId: tutorLevelId }
         });
 
         await this.userRepository.findOneAndUpdate({
@@ -385,7 +385,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
 
         await this.tutorRequestRepository.findOneAndUpdate({
           filter: { tutorRequestId: tutorRequestId },
-          updateData: { status: TutorRequestStatus.ACCEPT }
+          updateData: { status: TutorRequestStatus.ACCEPT, tutorLevelSolvedId: tutorLevelId }
         });
       }
       // const rootDir = process.cwd();
