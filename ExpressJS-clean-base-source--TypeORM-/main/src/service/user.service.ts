@@ -160,20 +160,20 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await redis.set(`REGISTER_${data.email}`, JSON.stringify(data), 'EX', 600);
 
     // const rootDir = process.cwd();
-    // const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-template.util.ejs');
+    const emailTemplatePath = path.join(__dirname, '../../utils/email/otp-template.util.ejs');
 
-    // const emailContent = await ejs.renderFile(emailTemplatePath, {
-    //   fullname: data.fullname,
-    //   email: data.email,
-    //   otp: otp
-    // });
+    const emailContent = await ejs.renderFile(emailTemplatePath, {
+      fullname: data.fullname,
+      email: data.email,
+      otp: otp
+    });
 
-    // await sendEmail({
-    //   from: { name: 'GiaSuVLU' },
-    //   to: { emailAddress: [data.email] },
-    //   subject: 'Xác nhận đăng ký tài khoản',
-    //   html: emailContent
-    // });
+    await sendEmail({
+      from: { name: 'GiaSuVLU' },
+      to: { emailAddress: [data.email] },
+      subject: 'Xác nhận đăng ký tài khoản',
+      html: emailContent
+    });
   }
 
   async resendOtp(email: string): Promise<void> {
@@ -533,19 +533,21 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       const internationalPhone = await this.convertVNPhone(user.phoneNumber);
       sendSms(`Mã OTP của bạn là ${otp}`, [internationalPhone]);
     } else {
-      // Nếu input là email, gửi OTP qua email
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-forgot-template.util.ejs');
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   email: user.email,
-      //   otp: otp
-      // });
-      // await sendEmail({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [user.email] },
-      //   subject: 'Tìm lại mật khẩu',
-      //   html: emailContent
-      // });
+      //Nếu input là email, gửi OTP qua email
+      const isProd = process.env.NODE_ENV === 'production';
+      const templatePath = isProd
+        ? path.join(__dirname, '../../utils/email/otp-forgot-template.util.ejs') // dist
+        : path.join(process.cwd(), 'src/utils/email/otp-forgot-template.util.ejs');
+      const emailContent = await ejs.renderFile(templatePath, {
+        email: user.email,
+        otp: otp
+      });
+      await sendEmail({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.email] },
+        subject: 'Tìm lại mật khẩu',
+        html: emailContent
+      });
     }
   }
 

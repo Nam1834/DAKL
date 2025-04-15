@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test jest",
-    "build": "rimraf ./dist && tsc && tsc-alias",
+    "build": "rimraf ./dist && tsc && tsc-alias && npm run copy:templates",
     "start:dev": "NODE_ENV=development nodemon --exec npx ts-node -r tsconfig-paths/register ./src/server.ts",
     "start:prod": "NODE_ENV=production node ./dist/server.js",
     "typeorm": "typeorm-ts-node-commonjs",
@@ -20,7 +20,8 @@
     "prettier": "prettier --check ./src",
     "prettier:fix": "prettier --write ./src",
     "prepare": "cd .. && husky main/.husky",
-    "create:module": "ts-node ./src/utils/tools/auto-generate-module.ts"
+    "create:module": "ts-node ./src/utils/tools/auto-generate-module.ts",
+    "copy:templates": "copyfiles -u 1 src/**/*.ejs dist"
   },
   "keywords": [],
   "author": "Nam1834",
@@ -45,6 +46,7 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
