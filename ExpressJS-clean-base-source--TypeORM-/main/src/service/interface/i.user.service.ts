@@ -30,7 +30,7 @@ export interface IUserService<T extends BaseModelType> extends IBaseCrudService<
   getMicrosoftAuthUrl(): Promise<{ authUrl: string }>;
   exchangeCodeForToken(code: string): Promise<any>;
   loginMicrosoft(code: string): Promise<LoginUserRes>;
-  getProfile(userId: string): Promise<GetProfileRes>;
+  getProfile(userId: string): Promise<User>;
   updateProfile(userId: string, data: UpdateProfileUserReq): Promise<UpdateProfileUserRes>;
   forgotPassword(data: ForgotPasswordUserReq): Promise<void>;
   verifyOtp(data: VerifyOtpReq): Promise<VerifyOtpRes>;
