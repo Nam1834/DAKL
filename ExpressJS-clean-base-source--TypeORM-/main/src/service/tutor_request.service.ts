@@ -327,8 +327,8 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           data: myCurriculumn
         });
 
-        // const rootDir = process.cwd();
-        // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-regis-to-tutor.util.ejs');
+        const rootDir = process.cwd();
+        const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-regis-to-tutor.util.ejs');
 
         // const emailContent = await ejs.renderFile(emailTemplatePath, {
         //   fullname: checkStatus.fullname

@@ -66,12 +66,15 @@ import path from 'path';
 import { IMyTutorRepository } from '@/repository/interface/i.my_tutor.repository';
 import { MyTutor } from '@/models/my_tutor.model';
 import { UpdatePublicProfileReq } from '@/dto/tutor/public-profile.req';
+import { SendEmailParams } from '@/dto/send-email/send-email-params.req';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_CLIENT_SECRET: any = process.env.MICROSOFT_CLIENT_SECRET;
 const MICROSOFT_REDIRECT_USER_URI: any = process.env.MICROSOFT_REDIRECT_USER_URI;
 const MICROSOFT_CLIENT_SCOPE: any = process.env.MICROSOFT_CLIENT_SCOPE;
+const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
+const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
 
 @injectable()
 export class UserService extends BaseCrudService<User> implements IUserService<User> {
@@ -108,6 +111,24 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.tutorSubjectRepository = tutorSubjectRepository;
     this.tutorLevelRepository = tutorLevelRepository;
     this.myTutorRepository = myTutorRepository;
+  }
+
+  async sendEmailViaApi(params: SendEmailParams): Promise<void> {
+    const response = await axios.post(
+      EMAIL_API_URL,
+      {
+        from: params.from,
+        to: { emailAddresses: params.to.emailAddress },
+        subject: params.subject,
+        html: params.html
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-SECRET-KEY': X_SECRET_KEY
+        }
+      }
+    );
   }
 
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<User>> {
@@ -536,22 +557,16 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       //Nếu input là email, gửi OTP qua email
       // const isProd = process.env.NODE_ENV === 'production';
       // const templatePath = isProd
-      //   ? path.join(__dirname, '../utils/email/otp-forgot-template.util.ejs') // dist
+      //   ? path.join(__dirname, '../utils/email/otp-forgot-template.util.ejs')
       //   : path.join(process.cwd(), 'src/utils/email/otp-forgot-template.util.ejs');
-      // const emailContent = await ejs.renderFile(templatePath, {
-      //   email: user.email,
-      //   otp: otp
-      // });
-      // await sendEmail({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [user.email] },
-      //   subject: 'Tìm lại mật khẩu',
-      //   html: emailContent
-      // });
-      const emailContent = createEmailOtpContent(otp);
 
-      // Gửi email
-      await sendEmail({
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-forgot-template.util.ejs');
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        email: user.email,
+        otp: otp
+      });
+      await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
         to: { emailAddress: [user.email] },
         subject: 'Tìm lại mật khẩu',
