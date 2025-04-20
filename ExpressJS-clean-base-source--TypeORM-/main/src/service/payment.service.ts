@@ -1,4 +1,5 @@
 import { GetVnpUrl } from '@/dto/payment/get-vnp-url.res';
+import { SendEmailParams } from '@/dto/send-email/send-email-params.req';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { OrderStatus } from '@/enums/order-status.enum';
 import { Order } from '@/models/order.model';
@@ -18,6 +19,9 @@ import ejs from 'ejs';
 import { inject, injectable } from 'inversify';
 import path from 'path';
 
+const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
+const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
+
 @injectable()
 export class PaymentService extends BaseCrudService<Payment> implements IPaymentService<Payment> {
   private paymentRepository: IPaymentRepository<Payment>;
@@ -36,6 +40,24 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     this.orderRepository = orderRepository;
     this.valueConfigRepository = valueConfigRepository;
     this.userRepository = userRepository;
+  }
+
+  async sendEmailViaApi(params: SendEmailParams): Promise<void> {
+    const response = await axios.post(
+      EMAIL_API_URL,
+      {
+        from: params.from,
+        to: { emailAddresses: params.to.emailAddress },
+        subject: params.subject,
+        html: params.html
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-SECRET-KEY': X_SECRET_KEY
+        }
+      }
+    );
   }
 
   async handleVNPayReturn(vnp_Params: any): Promise<void> {
@@ -122,19 +144,19 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     //Send success email
     const userEmail = order.customerEmail;
     if (userEmail) {
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-payment.util.ejs');
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   amount: payment.amount
-      // });
-      // sendEmail({
-      //   from: {
-      //     name: 'GiaSuVLU'
-      //   },
-      //   to: { emailAddress: [userEmail] },
-      //   subject: 'Thanh toán thành công',
-      //   html: emailContent
-      // });
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-payment.util.ejs');
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        amount: payment.amount
+      });
+      await this.sendEmailViaApi({
+        from: {
+          name: 'GiaSuVLU'
+        },
+        to: { emailAddress: [userEmail] },
+        subject: 'Thanh toán thành công',
+        html: emailContent
+      });
     }
 
     return;

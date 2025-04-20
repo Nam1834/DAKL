@@ -1,5 +1,6 @@
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
+import { SendEmailParams } from '@/dto/send-email/send-email-params.req';
 import { CancelRequestReq } from '@/dto/tutor/cancel-request.req';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
 import { UpdateTutorProfileReq } from '@/dto/tutor/update-tutor-profile.req';
@@ -28,6 +29,9 @@ import ejs from 'ejs';
 import { inject, injectable } from 'inversify';
 import path from 'path';
 
+const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
+const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
+
 @injectable()
 export class TutorRequestService extends BaseCrudService<TutorRequest> implements ITutorRequestService<TutorRequest> {
   private tutorRequestRepository: ITutorRequestRepository<TutorRequest>;
@@ -52,6 +56,24 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
     this.tutorLevelRepository = tutorLevelRepository;
     this.myCurriculumnRepository = myCurriculumnRepository;
     this.tutorProfileRepository = tutorProfileRepository;
+  }
+
+  async sendEmailViaApi(params: SendEmailParams): Promise<void> {
+    const response = await axios.post(
+      EMAIL_API_URL,
+      {
+        from: params.from,
+        to: { emailAddresses: params.to.emailAddress },
+        subject: params.subject,
+        html: params.html
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-SECRET-KEY': X_SECRET_KEY
+        }
+      }
+    );
   }
 
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<TutorRequest>> {
@@ -330,16 +352,16 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
         const rootDir = process.cwd();
         const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-regis-to-tutor.util.ejs');
 
-        // const emailContent = await ejs.renderFile(emailTemplatePath, {
-        //   fullname: checkStatus.fullname
-        // });
+        const emailContent = await ejs.renderFile(emailTemplatePath, {
+          fullname: checkStatus.fullname
+        });
 
-        // await sendEmail({
-        //   from: { name: 'GiaSuVLU' },
-        //   to: { emailAddress: [checkStatus.fullname] },
-        //   subject: 'Thông báo duyệt yêu cầu',
-        //   html: emailContent
-        // });
+        await this.sendEmailViaApi({
+          from: { name: 'GiaSuVLU' },
+          to: { emailAddress: [checkStatus.fullname] },
+          subject: 'Thông báo duyệt yêu cầu',
+          html: emailContent
+        });
       } else if (checkStatus.type === TutorRequestType.UPDATE_PROFILE) {
         const tutorProfileUpdatePayload: Partial<TutorProfile> = {
           avatar: checkStatus.avatar,
@@ -388,19 +410,19 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           updateData: { status: TutorRequestStatus.ACCEPT, tutorLevelSolvedId: tutorLevelId }
         });
       }
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-update-tutor.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-update-tutor.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: checkStatus.fullname
-      // });
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: checkStatus.fullname
+      });
 
-      // await sendEmail({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [checkStatus.fullname] },
-      //   subject: 'Thông báo duyệt yêu cầu',
-      //   html: emailContent
-      // });
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [checkStatus.fullname] },
+        subject: 'Thông báo duyệt yêu cầu',
+        html: emailContent
+      });
     } else if (click === TutorRequestStatus.REFUSE) {
       await this.tutorRequestRepository.findOneAndUpdate({
         filter: { tutorRequestId: tutorRequestId },
@@ -408,19 +430,19 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           status: TutorRequestStatus.REFUSE
         }
       });
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: checkStatus.fullname
-      // });
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: checkStatus.fullname
+      });
 
-      // await sendEmail({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [checkStatus.fullname] },
-      //   subject: 'Thông báo duyệt yêu cầu',
-      //   html: emailContent
-      // });
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [checkStatus.fullname] },
+        subject: 'Thông báo duyệt yêu cầu',
+        html: emailContent
+      });
     }
   }
 
