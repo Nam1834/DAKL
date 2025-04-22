@@ -58,7 +58,8 @@ const models = [
   TestResult,
   MyTutor,
   MyTutorItem,
-  TutorRequest
+  TutorRequest,
+  BookingRequest
 ];
 
 export class AppDataSourceSingleton {
