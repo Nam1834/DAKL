@@ -5,6 +5,8 @@ import { IBookingRequestService } from '@/service/interface/i.booking_request.se
 import { IBookingRequestRepository } from '@/repository/interface/i.booking_request.repository';
 import { BaseContainer } from '@/container/base.container';
 import { BookingRequest } from '@/models/booking_request.model';
+import { tutorProfileRepository } from './tutor_profile.container';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
 
 class BookingRequestContainer extends BaseContainer {
   constructor() {
@@ -14,6 +16,9 @@ class BookingRequestContainer extends BaseContainer {
       .bind<IBookingRequestRepository<BookingRequest>>('BookingRequestRepository')
       .to(BookingRequestRepository);
     this.container.bind<BookingRequestController>(BookingRequestController).toSelf();
+
+    //Import
+    this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
   export() {

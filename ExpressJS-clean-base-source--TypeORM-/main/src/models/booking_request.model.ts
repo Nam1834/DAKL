@@ -24,8 +24,8 @@ export class BookingRequest extends BaseModel {
   @JoinColumn({ name: 'tutor_id' })
   tutor!: TutorProfile;
 
-  @Column({ name: 'day_time_learn', type: 'json' })
-  dayTimeLearn!: string[];
+  @Column({ name: 'date_time_learn', type: 'json' })
+  dateTimeLearn!: string[];
 
   @Column({ name: 'lessons_per_week', type: 'int' })
   lessonsPerWeek!: number;
@@ -36,9 +36,15 @@ export class BookingRequest extends BaseModel {
   @Column({ name: 'hours_per_lesson', type: 'decimal', precision: 3, scale: 1 })
   hoursPerLesson!: number;
 
+  @Column({ name: 'total_coins', type: 'int' })
+  totalcoins!: number;
+
   @Column({ name: 'start_day', type: 'date' })
   startDay!: Date;
 
-  @Column({ default: BookingRequestStatus.PENDING })
+  @Column({ default: BookingRequestStatus.REQUEST })
   status!: string;
+
+  @Column({ name: 'note_of_tutor', nullable: true })
+  noteOfTutor!: string;
 }

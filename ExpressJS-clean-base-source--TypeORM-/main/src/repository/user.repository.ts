@@ -101,6 +101,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
     const checkPhoneNumber = await this.ormRepository.findOne({
       where: { phoneNumber: phoneNumber, userId: Not(id) }
     });
+
     if (checkPhoneNumber) {
       throw new Error('PhoneNumber has been exist!');
     }

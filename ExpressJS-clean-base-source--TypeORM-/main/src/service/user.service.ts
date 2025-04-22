@@ -473,8 +473,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   }
 
   async updateProfile(userId: string, data: UpdateProfileUserReq): Promise<UpdateProfileUserRes> {
-    await this.userRepository.checkPhoneNumber(data.phoneNumber, data.phoneNumber);
-    await this.userRepository.checkEmail(data.workEmail, data.workEmail);
+    await this.userRepository.checkPhoneNumber(data.phoneNumber, userId);
+    await this.userRepository.checkEmail(data.workEmail, userId);
 
     const updatedUser = await this.userRepository.findOne({
       filter: { userId },

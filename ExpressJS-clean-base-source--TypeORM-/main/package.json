@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test jest",
-    "build": "rimraf ./dist && tsc && tsc-alias && npm run copy:templates",
+    "build": "rimraf ./dist && tsc && tsc-alias",
     "start:dev": "NODE_ENV=development nodemon --exec npx ts-node -r tsconfig-paths/register ./src/server.ts",
     "start:prod": "NODE_ENV=production node ./dist/server.js",
     "typeorm": "typeorm-ts-node-commonjs",
@@ -20,8 +20,7 @@
     "prettier": "prettier --check ./src",
     "prettier:fix": "prettier --write ./src",
     "prepare": "cd .. && husky main/.husky",
-    "create:module": "ts-node ./src/utils/tools/auto-generate-module.ts",
-    "copy:templates": "copyfiles -u 1 src/**/*.ejs dist"
+    "create:module": "ts-node ./src/utils/tools/auto-generate-module.ts"
   },
   "keywords": [],
   "author": "Nam1834",
