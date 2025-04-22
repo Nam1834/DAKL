@@ -430,19 +430,19 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           status: TutorRequestStatus.REFUSE
         }
       });
-      const rootDir = process.cwd();
-      const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
+      // const rootDir = process.cwd();
+      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
 
-      const emailContent = await ejs.renderFile(emailTemplatePath, {
-        fullname: checkStatus.fullname
-      });
+      // const emailContent = await ejs.renderFile(emailTemplatePath, {
+      //   fullname: checkStatus.fullname
+      // });
 
-      await this.sendEmailViaApi({
-        from: { name: 'GiaSuVLU' },
-        to: { emailAddress: [checkStatus.fullname] },
-        subject: 'Thông báo duyệt yêu cầu',
-        html: emailContent
-      });
+      // await this.sendEmailViaApi({
+      //   from: { name: 'GiaSuVLU' },
+      //   to: { emailAddress: [checkStatus.fullname] },
+      //   subject: 'Thông báo duyệt yêu cầu',
+      //   html: emailContent
+      // });
     }
   }
 
