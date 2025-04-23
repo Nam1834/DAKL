@@ -33,7 +33,7 @@ export class BookingRequest extends BaseModel {
   @Column({ name: 'total_lessons', type: 'int' })
   totalLessons!: number;
 
-  @Column({ name: 'hours_per_lesson', type: 'decimal', precision: 3, scale: 1 })
+  @Column({ name: 'hours_per_lesson', type: 'decimal', precision: 3, scale: 2 })
   hoursPerLesson!: number;
 
   @Column({ name: 'total_coins', type: 'int' })

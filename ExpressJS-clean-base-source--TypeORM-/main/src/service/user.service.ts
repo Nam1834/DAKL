@@ -554,12 +554,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       const internationalPhone = await this.convertVNPhone(user.phoneNumber);
       sendSms(`Mã OTP của bạn là ${otp}`, [internationalPhone]);
     } else {
-      //Nếu input là email, gửi OTP qua email
-      // const isProd = process.env.NODE_ENV === 'production';
-      // const templatePath = isProd
-      //   ? path.join(__dirname, '../utils/email/otp-forgot-template.util.ejs')
-      //   : path.join(process.cwd(), 'src/utils/email/otp-forgot-template.util.ejs');
-
       const rootDir = process.cwd();
       const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-forgot-template.util.ejs');
       const emailContent = await ejs.renderFile(emailTemplatePath, {
