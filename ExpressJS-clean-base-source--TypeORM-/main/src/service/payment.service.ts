@@ -18,6 +18,7 @@ import { createVNPayUrl } from '@/utils/vnpay/create-pay-url.util';
 import ejs from 'ejs';
 import { inject, injectable } from 'inversify';
 import path from 'path';
+import axios from 'axios';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;

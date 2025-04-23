@@ -28,6 +28,7 @@ import { SearchUtil } from '@/utils/search.util';
 import ejs from 'ejs';
 import { inject, injectable } from 'inversify';
 import path from 'path';
+import axios from 'axios';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
@@ -349,6 +350,14 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           data: myCurriculumn
         });
 
+        const user = await this.userRepository.findOne({
+          filter: { userId: checkStatus.userId }
+        });
+
+        if (!user) {
+          throw new Error('user does not exist');
+        }
+
         const rootDir = process.cwd();
         const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-regis-to-tutor.util.ejs');
 
@@ -358,7 +367,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
 
         await this.sendEmailViaApi({
           from: { name: 'GiaSuVLU' },
-          to: { emailAddress: [checkStatus.fullname] },
+          to: { emailAddress: [user.email] },
           subject: 'Thông báo duyệt yêu cầu',
           html: emailContent
         });
@@ -417,9 +426,17 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
         fullname: checkStatus.fullname
       });
 
+      const user = await this.userRepository.findOne({
+        filter: { userId: checkStatus.userId }
+      });
+
+      if (!user) {
+        throw new Error('user does not exist');
+      }
+
       await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
-        to: { emailAddress: [checkStatus.fullname] },
+        to: { emailAddress: [user.email] },
         subject: 'Thông báo duyệt yêu cầu',
         html: emailContent
       });
@@ -430,19 +447,27 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           status: TutorRequestStatus.REFUSE
         }
       });
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: checkStatus.fullname
-      // });
+      const user = await this.userRepository.findOne({
+        filter: { userId: checkStatus.userId }
+      });
 
-      // await this.sendEmailViaApi({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [checkStatus.fullname] },
-      //   subject: 'Thông báo duyệt yêu cầu',
-      //   html: emailContent
-      // });
+      if (!user) {
+        throw new Error('user does not exist');
+      }
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
+
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: checkStatus.fullname
+      });
+
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.email] },
+        subject: 'Thông báo duyệt yêu cầu',
+        html: emailContent
+      });
     }
   }
 
