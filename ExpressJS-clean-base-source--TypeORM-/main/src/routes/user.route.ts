@@ -33,30 +33,14 @@ userRouter
   .post('/forgot-password', classValidate(ForgotPasswordUserReq), userController.forgotPassword.bind(userController))
   .post('/verify-otp', classValidate(VerifyOtpReq), userController.verifyOtp.bind(userController))
   .post('/reset-password', classValidate(ResetPasswordReq), userController.resetPassword.bind(userController))
-  // .post(
-  //   '/regis-to-tutor',
-  //   authenticateJWT,
-  //   classValidate(RegisToTutorReq),
-  //   userController.regisUserToTutor.bind(userController)
-  // )
+
   .put(
     '/update-public-tutor-profile',
     authenticateJWT,
     classValidate(UpdatePublicProfileReq),
     userController.updatePublicTutorProfile.bind(userController)
   )
-  // .get(
-  //   '/get-list/:status',
-  //   authenticateJWT,
-  //   checkPermission([Permissions.QUAN_LY_YEU_CAU]),
-  //   userController.getListRequest.bind(userController)
-  // )
-  // .post(
-  //   '/solve-request/:userId',
-  //   authenticateJWT,
-  //   checkPermission([Permissions.QUAN_LY_YEU_CAU]),
-  //   userController.solveRequest.bind(userController)
-  // )
+
   .put(
     '/update-user-by-id/:id',
     authenticateJWT,

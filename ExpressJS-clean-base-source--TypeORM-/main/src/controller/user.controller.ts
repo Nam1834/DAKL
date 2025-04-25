@@ -325,8 +325,14 @@ export class UserController {
 
   async getListTutorPublic(req: Request, res: Response, next: NextFunction) {
     try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
       const searchData: SearchDataDto = getSearchData(req);
-      const result = await this.userService.getListTutorPublic(searchData);
+      const result = await this.userService.getListTutorPublic(userId, searchData);
 
       res.send_ok('Tutor Public fetched successfully', result);
     } catch (error) {

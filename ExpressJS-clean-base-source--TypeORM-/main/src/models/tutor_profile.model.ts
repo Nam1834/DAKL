@@ -6,6 +6,7 @@ import { TutorLevel } from './tutor_level.model';
 import { Major } from './major.model';
 import { Subject } from './subject.model';
 import { TeachingMethod } from '@/enums/teaching-method.enum';
+import { BookingRequest } from './booking_request.model';
 
 @Entity('tutor_profiles')
 export class TutorProfile extends BaseModel {
@@ -125,4 +126,8 @@ export class TutorProfile extends BaseModel {
 
   @Column({ nullable: true, name: 'coin_per_hours' })
   coinPerHours!: number;
+
+  // Thêm cột bookingRequestId để lưu thông tin yêu cầu đặt lịch
+  @Column({ type: 'boolean', nullable: true, name: 'is_booking_request' })
+  isBookingRequest?: boolean;
 }

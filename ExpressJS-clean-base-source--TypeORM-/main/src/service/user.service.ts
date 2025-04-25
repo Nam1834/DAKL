@@ -67,6 +67,11 @@ import { IMyTutorRepository } from '@/repository/interface/i.my_tutor.repository
 import { MyTutor } from '@/models/my_tutor.model';
 import { UpdatePublicProfileReq } from '@/dto/tutor/public-profile.req';
 import { SendEmailParams } from '@/dto/send-email/send-email-params.req';
+import { BookingRequestStatus } from '@/enums/booking_request-status.enum';
+import { IBookingRequestRepository } from '@/repository/interface/i.booking_request.repository';
+import { BookingRequest } from '@/models/booking_request.model';
+import { In } from 'typeorm';
+import { IBookingRequestService } from './interface/i.booking_request.service';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
@@ -87,6 +92,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   private tutorSubjectRepository: ITutorSubjectRepository<TutorSubject>;
   private tutorLevelRepository: ITutorLevelRepository<TutorLevel>;
   private myTutorRepository: IMyTutorRepository<MyTutor>;
+  private bookingRequestRepository: IBookingRequestRepository<BookingRequest>;
+  private bookingRequestService: IBookingRequestService<BookingRequest>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
@@ -99,7 +106,9 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>,
     @inject('TutorSubjectRepository') tutorSubjectRepository: ITutorSubjectRepository<TutorSubject>,
     @inject('TutorLevelRepository') tutorLevelRepository: ITutorLevelRepository<TutorLevel>,
-    @inject('MyTutorRepository') myTutorRepository: IMyTutorRepository<MyTutor>
+    @inject('MyTutorRepository') myTutorRepository: IMyTutorRepository<MyTutor>,
+    @inject('BookingRequestRepository') bookingRequestRepository: IBookingRequestRepository<BookingRequest>,
+    @inject('BookingRequestService') bookingRequestService: IBookingRequestService<BookingRequest>
   ) {
     super(userRepository);
     this.userRepository = userRepository;
@@ -111,6 +120,8 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.tutorSubjectRepository = tutorSubjectRepository;
     this.tutorLevelRepository = tutorLevelRepository;
     this.myTutorRepository = myTutorRepository;
+    this.bookingRequestRepository = bookingRequestRepository;
+    this.bookingRequestService = bookingRequestService;
   }
 
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
@@ -828,7 +839,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await this.userRepository.save(updatedData);
   }
 
-  async getListTutorPublic(searchData: SearchDataDto): Promise<GetListPublicTutorProfileRes> {
+  async getListTutorPublic(userId: string, searchData: SearchDataDto): Promise<GetListPublicTutorProfileRes> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
     where.tutorProfile = {
@@ -847,6 +858,36 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       delete (publicUser as any).password;
     });
 
+    //
+    const tutorIds = publics.map((tutor) => tutor.userId);
+
+    // Truy vấn BookingRequest giữa currentUser và các tutor trong danh sách, status là REQUEST
+    if (tutorIds.length > 0) {
+      const relatedBookingRequests = await this.bookingRequestRepository.findBookingRequestsByTutorIds(
+        userId,
+        tutorIds,
+        BookingRequestStatus.REQUEST
+      );
+
+      // Map tutorId => bookingRequestId
+      const bookingMap = new Map<string, string>();
+      relatedBookingRequests.forEach((booking) => {
+        bookingMap.set(booking.tutorId, booking.bookingRequestId);
+      });
+
+      // Gắn giá trị isBookingRequest nếu có bookingRequestId
+      publics.forEach((publicUser) => {
+        const tutorId = publicUser.userId;
+        const bookingId = bookingMap.get(tutorId);
+
+        if (bookingId && publicUser.tutorProfile) {
+          // Nếu có bookingRequestId, gán isBookingRequest thành true
+          (publicUser.tutorProfile as any).isBookingRequest = true;
+        }
+      });
+    }
+
+    //
     const total = await this.userRepository.count({ filter: where });
 
     return {

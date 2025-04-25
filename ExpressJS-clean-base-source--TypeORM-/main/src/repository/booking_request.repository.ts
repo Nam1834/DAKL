@@ -1,3 +1,4 @@
+import { BookingRequestStatus } from '@/enums/booking_request-status.enum';
 import { BookingRequest } from '@/models/booking_request.model';
 import { BaseRepository } from '@/repository/base/base.repository';
 import { IBookingRequestRepository } from '@/repository/interface/i.booking_request.repository';
@@ -12,5 +13,21 @@ export class BookingRequestRepository
 {
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(BookingRequest));
+  }
+
+  async findBookingRequestsByTutorIds(
+    userId: string,
+    tutorIds: string[],
+    status: BookingRequestStatus
+  ): Promise<BookingRequest[]> {
+    const queryBuilder = this.ormRepository.createQueryBuilder('bookingRequest');
+
+    queryBuilder
+      .where('bookingRequest.userId = :userId', { userId })
+      .andWhere('bookingRequest.tutorId IN (:...tutorIds)', { tutorIds })
+      .andWhere('bookingRequest.status = :status', { status });
+
+    const bookingRequests = await queryBuilder.getMany();
+    return bookingRequests;
   }
 }
