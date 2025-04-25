@@ -21,6 +21,9 @@ import { ITutorLevelRepository } from '@/repository/interface/i.tutor_level.repo
 import { tutorLevelRepository } from './tutor_level.container';
 import { IMyTutorRepository } from '@/repository/interface/i.my_tutor.repository';
 import { myTutorRepository } from './my_tutor.container';
+import { IBookingRequestRepository } from '@/repository/interface/i.booking_request.repository';
+import { bookingRequestRepository, bookingRequestService } from './booking_request.container';
+import { IBookingRequestService } from '@/service/interface/i.booking_request.service';
 
 class UserContainer extends BaseContainer {
   constructor() {
@@ -42,6 +45,10 @@ class UserContainer extends BaseContainer {
     this.container.bind<ITutorSubjectRepository<any>>('TutorSubjectRepository').toConstantValue(tutorSubjectRepository);
     this.container.bind<ITutorLevelRepository<any>>('TutorLevelRepository').toConstantValue(tutorLevelRepository);
     this.container.bind<IMyTutorRepository<any>>('MyTutorRepository').toConstantValue(myTutorRepository);
+    this.container
+      .bind<IBookingRequestRepository<any>>('BookingRequestRepository')
+      .toConstantValue(bookingRequestRepository);
+    this.container.bind<IBookingRequestService<any>>('BookingRequestService').toConstantValue(bookingRequestService);
   }
 
   export() {

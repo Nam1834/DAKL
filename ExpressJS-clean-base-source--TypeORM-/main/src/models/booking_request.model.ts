@@ -13,14 +13,14 @@ export class BookingRequest extends BaseModel {
   @Column({ name: 'user_id' })
   userId!: string;
 
-  @ManyToOne(() => UserProfile, { onDelete: 'CASCADE' })
+  @ManyToOne(() => UserProfile, { onDelete: 'CASCADE', eager: true })
   @JoinColumn({ name: 'user_id' })
   user!: UserProfile;
 
   @Column({ name: 'tutor_id' })
   tutorId!: string;
 
-  @ManyToOne(() => TutorProfile, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TutorProfile, { onDelete: 'CASCADE', eager: true })
   @JoinColumn({ name: 'tutor_id' })
   tutor!: TutorProfile;
 
