@@ -1,10 +1,12 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { AddToMyTutorReq } from '@/dto/my-tutor/add-to-my-tutor.req';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { MyTutor } from '@/models/my_tutor.model';
 import { IMyTutorService } from '@/service/interface/i.my_tutor.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
+import { getSearchData } from '@/utils/get-search-data.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 
@@ -33,7 +35,9 @@ export class MyTutorController {
 
       const userId = user.id;
 
-      const result = await this.myTutorService.getMyTutor(userId);
+      const searchData: SearchDataDto = getSearchData(req);
+
+      const result = await this.myTutorService.getMyTutor(userId, searchData);
 
       res.send_ok('Lấy danh sách gia sư yêu thích thành công', result);
     } catch (error) {
