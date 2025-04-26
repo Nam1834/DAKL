@@ -68,7 +68,7 @@ export class BookingRequestService
   //   }
   // }
 
-  async cancelBookingRequestByTutorId(userId: string, tutorId: string, click: string): Promise<void> {
+  async cancelBookingRequestByTutor(userId: string, tutorId: string, click: string): Promise<void> {
     const bookingRequest = await this.bookingRequestRepository.findOne({
       filter: { userId: userId, tutorId: tutorId, status: BookingRequestStatus.REQUEST }
     });
@@ -88,10 +88,10 @@ export class BookingRequestService
   }
 
   async getListBookingRequest(tutorId: string, searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>> {
-    const { order, paging } = SearchUtil.getWhereCondition(searchData);
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
     const bookingRequests = await this.bookingRequestRepository.findMany({
-      filter: { tutorId: tutorId },
+      filter: { tutorId: tutorId, ...where },
       order: order,
       paging: paging
     });
@@ -103,7 +103,9 @@ export class BookingRequestService
     return new PagingResponseDto(total, bookingRequests);
   }
 
-  async solveBookingRequestByTutor(): Promise<void> {}
+  async solveBookingRequestByTutor(tutorId: string, click: string): Promise<void> {}
 
-  async hireTutorFromBookingRequest(): Promise<void> {}
+  async getMyBookingAccept(userId: string): Promise<void> {}
+
+  async hireTutorFromBookingRequest(tutorId: string): Promise<void> {}
 }
