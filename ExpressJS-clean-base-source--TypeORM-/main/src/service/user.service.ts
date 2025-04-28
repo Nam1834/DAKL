@@ -870,19 +870,20 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       );
 
       // Map tutorId => bookingRequestId
-      const bookingMap = new Map<string, string>();
+      const bookingMap = new Map<string, BookingRequest>();
       relatedBookingRequests.forEach((booking) => {
-        bookingMap.set(booking.tutorId, booking.bookingRequestId);
+        bookingMap.set(booking.tutorId, booking);
       });
 
-      // Gắn giá trị isBookingRequest nếu có bookingRequestId
+      // Gắn isBookingRequest, bookingRequestId, bookingRequest
       publics.forEach((publicUser) => {
         const tutorId = publicUser.userId;
-        const bookingId = bookingMap.get(tutorId);
+        const bookingRequest = bookingMap.get(tutorId);
 
-        if (bookingId && publicUser.tutorProfile) {
-          // Nếu có bookingRequestId, gán isBookingRequest thành true
+        if (bookingRequest && publicUser.tutorProfile) {
           (publicUser.tutorProfile as any).isBookingRequest = true;
+          (publicUser.tutorProfile as any).bookingRequestId = bookingRequest.bookingRequestId;
+          (publicUser.tutorProfile as any).bookingRequest = bookingRequest;
         }
       });
     }

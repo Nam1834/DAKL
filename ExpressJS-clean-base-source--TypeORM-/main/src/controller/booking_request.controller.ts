@@ -57,7 +57,7 @@ export class BookingRequestController {
     }
   }
 
-  async cancelBookingRequestByUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async cancelBookingRequestByUserController(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = req.user;
       const userId = user?.id;
@@ -65,11 +65,11 @@ export class BookingRequestController {
       if (!userId) {
         throw new Error('You must login');
       }
-      const tutorId = req.params.tutorId;
+      const bookingRequestId = req.params.bookingRequestId;
 
-      const click = req.body;
+      const click = req.body.click;
 
-      const result = await this.bookingRequestService.cancelBookingRequestByUser(userId, tutorId, click);
+      const result = await this.bookingRequestService.cancelBookingRequestByUser(userId, bookingRequestId, click);
 
       res.send_ok('Cancel booking request successfully', result);
     } catch (error) {

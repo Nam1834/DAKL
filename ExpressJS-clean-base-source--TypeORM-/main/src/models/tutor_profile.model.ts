@@ -130,4 +130,11 @@ export class TutorProfile extends BaseModel {
   // Thêm cột bookingRequestId để lưu thông tin yêu cầu đặt lịch
   @Column({ type: 'boolean', nullable: true, name: 'is_booking_request' })
   isBookingRequest?: boolean;
+
+  @Column({ nullable: true, name: 'booking_request_id' })
+  bookingRequestId?: string;
+
+  @ManyToOne(() => BookingRequest, { eager: true })
+  @JoinColumn({ name: 'booking_request_id' })
+  bookingRequest!: BookingRequest;
 }

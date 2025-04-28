@@ -100,9 +100,9 @@ export class BookingRequestService
   //   }
   // }
 
-  async cancelBookingRequestByUser(userId: string, tutorId: string, click: string): Promise<void> {
+  async cancelBookingRequestByUser(userId: string, bookingRequestId: string, click: string): Promise<void> {
     const bookingRequest = await this.bookingRequestRepository.findOne({
-      filter: { userId: userId, tutorId: tutorId, status: BookingRequestStatus.REQUEST }
+      filter: { userId: userId, bookingRequestId: bookingRequestId, status: BookingRequestStatus.REQUEST }
     });
 
     if (!bookingRequest) {
@@ -113,7 +113,7 @@ export class BookingRequestService
       dataUpdate.status = BookingRequestStatus.CANCEL;
 
       await this.bookingRequestRepository.findOneAndUpdate({
-        filter: { bookingRequestId: bookingRequest.bookingRequestId },
+        filter: { bookingRequestId: bookingRequestId },
         updateData: dataUpdate
       });
     }
@@ -124,6 +124,7 @@ export class BookingRequestService
 
     const bookingRequests = await this.bookingRequestRepository.findMany({
       filter: { tutorId: tutorId, ...where },
+      relations: ['user'],
       order: order,
       paging: paging
     });
