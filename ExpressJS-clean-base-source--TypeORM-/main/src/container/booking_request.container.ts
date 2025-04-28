@@ -7,6 +7,10 @@ import { BaseContainer } from '@/container/base.container';
 import { BookingRequest } from '@/models/booking_request.model';
 import { tutorProfileRepository } from './tutor_profile.container';
 import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { userRepository } from './user.container';
+import { IUserProfileRepository } from '@/repository/interface/i.user_profile.repository';
+import { userProfileRepository } from './user_profile.container';
 
 class BookingRequestContainer extends BaseContainer {
   constructor() {
@@ -19,6 +23,7 @@ class BookingRequestContainer extends BaseContainer {
 
     //Import
     this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
+    this.container.bind<IUserProfileRepository<any>>('UserProfileRepository').toConstantValue(userProfileRepository);
   }
 
   export() {

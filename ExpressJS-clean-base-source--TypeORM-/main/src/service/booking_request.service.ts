@@ -10,7 +10,18 @@ import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.
 import { BaseCrudService } from '@/service/base/base.service';
 import { IBookingRequestService } from '@/service/interface/i.booking_request.service';
 import { SearchUtil } from '@/utils/search.util';
+import ejs from 'ejs';
 import { inject, injectable } from 'inversify';
+import path from 'path';
+import axios from 'axios';
+import { SendEmailParams } from '@/dto/send-email/send-email-params.req';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { User } from '@/models/user.model';
+import { IUserProfileRepository } from '@/repository/interface/i.user_profile.repository';
+import { UserProfile } from '@/models/user_profile.model';
+
+const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
+const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
 
 @injectable()
 export class BookingRequestService
@@ -19,14 +30,35 @@ export class BookingRequestService
 {
   private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
   private bookingRequestRepository: IBookingRequestRepository<BookingRequest>;
+  private userProfileRepository: IUserProfileRepository<UserProfile>;
 
   constructor(
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
+    @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
     @inject('BookingRequestRepository') bookingRequestRepository: IBookingRequestRepository<BookingRequest>
   ) {
     super(bookingRequestRepository);
     this.bookingRequestRepository = bookingRequestRepository;
     this.tutorProfileRepository = tutorProfileRepository;
+    this.userProfileRepository = userProfileRepository;
+  }
+
+  async sendEmailViaApi(params: SendEmailParams): Promise<void> {
+    const response = await axios.post(
+      EMAIL_API_URL,
+      {
+        from: params.from,
+        to: { emailAddresses: params.to.emailAddress },
+        subject: params.subject,
+        html: params.html
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-SECRET-KEY': X_SECRET_KEY
+        }
+      }
+    );
   }
 
   async createBooking(userId: string, tutorId: string, data: CreateBookingRequestReq): Promise<void> {
@@ -68,7 +100,7 @@ export class BookingRequestService
   //   }
   // }
 
-  async cancelBookingRequestByTutor(userId: string, tutorId: string, click: string): Promise<void> {
+  async cancelBookingRequestByUser(userId: string, tutorId: string, click: string): Promise<void> {
     const bookingRequest = await this.bookingRequestRepository.findOne({
       filter: { userId: userId, tutorId: tutorId, status: BookingRequestStatus.REQUEST }
     });
@@ -103,7 +135,85 @@ export class BookingRequestService
     return new PagingResponseDto(total, bookingRequests);
   }
 
-  async solveBookingRequestByTutor(tutorId: string, click: string): Promise<void> {}
+  async solveBookingRequestByTutor(
+    tutorId: string,
+    bookingRequestId: string,
+    click: string,
+    noteOfTutor?: string
+  ): Promise<void> {
+    const bookingRequest = await this.bookingRequestRepository.findOne({
+      filter: { bookingRequestId: bookingRequestId, tutorId: tutorId, status: BookingRequestStatus.REQUEST }
+    });
+
+    if (!bookingRequest) {
+      throw new Error('Booking Reuqest does not exits!!');
+    }
+    if (click === BookingRequestStatus.ACCEPT) {
+      const dataUpdate = new BookingRequest();
+      dataUpdate.status = BookingRequestStatus.ACCEPT;
+
+      await this.bookingRequestRepository.findOneAndUpdate({
+        filter: { bookingRequestId: bookingRequest.bookingRequestId },
+        updateData: dataUpdate
+      });
+
+      const user = await this.userProfileRepository.findOne({
+        filter: { userId: bookingRequest.userId }
+      });
+
+      if (!user) {
+        throw new Error('Can not find userr!');
+      }
+
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-booking-request.util.ejs');
+
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: user.fullname
+      });
+
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.personalEmail] },
+        subject: 'Thông báo duyệt yêu cầu',
+        html: emailContent
+      });
+    } else if (click === BookingRequestStatus.REFUSE) {
+      if (!noteOfTutor) {
+        throw new Error('Note of tutor is required when refusing the booking request.');
+      }
+      const dataUpdate = new BookingRequest();
+      dataUpdate.status = BookingRequestStatus.REFUSE;
+      dataUpdate.noteOfTutor = noteOfTutor;
+
+      await this.bookingRequestRepository.findOneAndUpdate({
+        filter: { bookingRequestId: bookingRequest.bookingRequestId },
+        updateData: dataUpdate
+      });
+
+      const user = await this.userProfileRepository.findOne({
+        filter: { userId: bookingRequest.userId }
+      });
+
+      if (!user) {
+        throw new Error('Can not find userr!');
+      }
+
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
+
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: user.fullname
+      });
+
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.personalEmail] },
+        subject: 'Thông từ chối yêu cầu',
+        html: emailContent
+      });
+    }
+  }
 
   async getMyBookingAccept(userId: string): Promise<void> {}
 
