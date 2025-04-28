@@ -8,5 +8,11 @@ import { BaseModelType } from '@/types/base-model.types';
 export interface IBookingRequestService<T extends BaseModelType> extends IBaseCrudService<T> {
   createBooking(userId: string, tutorId: string, data: CreateBookingRequestReq): Promise<void>;
   getListBookingRequest(tutorId: string, searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>>;
-  cancelBookingRequestByTutor(userId: string, tutorId: string, click: string): Promise<void>;
+  cancelBookingRequestByUser(userId: string, tutorId: string, click: string): Promise<void>;
+  solveBookingRequestByTutor(
+    tutorId: string,
+    bookingRequestId: string,
+    click: string,
+    noteOfTutor?: string
+  ): Promise<void>;
 }
