@@ -5,10 +5,27 @@ import { classValidate } from '@/middleware/class-validate.middleware';
 import express from 'express';
 const bookingRequestRouter = express.Router();
 
-bookingRequestRouter.post(
-  '/create/:tutorId',
-  authenticateJWT,
-  classValidate(CreateBookingRequestReq),
-  bookingRequestController.createBookingRequest.bind(bookingRequestController)
-);
+bookingRequestRouter
+  .post(
+    '/create/:tutorId',
+    authenticateJWT,
+    classValidate(CreateBookingRequestReq),
+    bookingRequestController.createBookingRequest.bind(bookingRequestController)
+  )
+  .patch(
+    '/cancel-booking/:bookingRequestId',
+    authenticateJWT,
+    bookingRequestController.cancelBookingRequestByUserController.bind(bookingRequestController)
+  )
+  .get(
+    '/get-list-booking',
+    authenticateJWT,
+    bookingRequestController.getListBookingRequest.bind(bookingRequestController)
+  )
+  .patch(
+    '/solve-booking/:bookingRequestId',
+    authenticateJWT,
+    bookingRequestController.solveBookingRequestByTutor.bind(bookingRequestController)
+  );
+
 export default bookingRequestRouter;
