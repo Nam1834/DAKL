@@ -92,9 +92,9 @@ export class MenuService implements IMenuService {
       icon: 'fa-solid fa-hand-holding-dollar'
     },
     {
-      name: 'TRẢ LỜI TIN NHẮN',
+      name: 'GIÁO TRÌNH',
       isCollapsed: false,
-      permissions: [Permissions.REPLY_MESSAGE],
+      permissions: [Permissions.QUAN_LY_GIAO_TRINH],
       children: null,
       icon: null
     },

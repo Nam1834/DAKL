@@ -170,6 +170,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
     tutorRequest.teachingPlace = data.teachingPlace;
     tutorRequest.type = TutorRequestType.REGIS_TO_TUTOR;
     tutorRequest.status = TutorRequestStatus.REQUEST;
+    tutorRequest.emailOfTutor = existingUser.email;
 
     tutorRequest.totalTestPoints = checkPassTest.points;
 
@@ -236,6 +237,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
     tutorRequest.tutorLevelId = data.tutorLevelId;
     tutorRequest.type = TutorRequestType.UPDATE_PROFILE;
     tutorRequest.status = TutorRequestStatus.REQUEST;
+    tutorRequest.emailOfTutor = existingUser.email;
 
     return tutorRequest;
   }
