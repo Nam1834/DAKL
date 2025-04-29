@@ -137,4 +137,7 @@ export class TutorProfile extends BaseModel {
   @ManyToOne(() => BookingRequest, { eager: true })
   @JoinColumn({ name: 'booking_request_id' })
   bookingRequest!: BookingRequest;
+
+  @Column({ type: 'boolean', nullable: true, name: 'is_my_favourite_tutor' })
+  isMyFavouriteTutor?: boolean;
 }

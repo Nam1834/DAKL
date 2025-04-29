@@ -861,7 +861,29 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     //
     const tutorIds = publics.map((tutor) => tutor.userId);
 
+    const myTutor = await this.myTutorRepository.findOne({
+      filter: { userId: userId },
+      relations: ['items']
+    });
+
+    // Tạo Set chứa các tutorId đã được yêu thích
+    const myFavouriteTutorIds = new Set<string>(myTutor?.items.map((item) => item.tutorId) || []);
+
+    // Gắn isMyFavourite vào mỗi tutorProfile
+    publics.forEach((publicUser) => {
+      const tutorId = publicUser.userId;
+      if (publicUser.tutorProfile) {
+        (publicUser.tutorProfile as any).isMyFavouriteTutor = myFavouriteTutorIds.has(tutorId);
+      }
+    });
+
     // Truy vấn BookingRequest giữa currentUser và các tutor trong danh sách, status là REQUEST
+    publics.forEach((publicUser) => {
+      if (publicUser.tutorProfile) {
+        (publicUser.tutorProfile as any).isBookingRequest = false;
+      }
+    });
+
     if (tutorIds.length > 0) {
       const relatedBookingRequests = await this.bookingRequestRepository.findBookingRequestsByTutorIds(
         userId,
