@@ -139,4 +139,7 @@ export class TutorRequest extends BaseModel {
 
   @Column({ name: 'total_test_points', type: 'int', nullable: true })
   totalTestPoints!: number;
+
+  @Column({ nullable: true, name: 'email_of_tutor' })
+  emailOfTutor!: string;
 }
