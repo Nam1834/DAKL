@@ -1,9 +1,11 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Payment } from '@/models/payment.model';
 import { IPaymentService } from '@/service/interface/i.payment.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
+import { getSearchData } from '@/utils/get-search-data.util';
 import { checkVnpReturnUtil } from '@/utils/vnpay/check-vnp-return.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
@@ -22,6 +24,16 @@ export class PaymentController {
   ) {
     this.paymentService = paymentService;
     this.common = common;
+  }
+
+  async searchPayment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.paymentService.search(searchData);
+      res.send_ok('Payment fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async getVnpUrl(req: Request, res: Response, next: NextFunction) {
