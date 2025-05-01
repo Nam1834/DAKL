@@ -101,4 +101,25 @@ export class BookingRequestController {
       next(error);
     }
   }
+
+  async getMyBookingAcceptByTutorId(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const tutorId = req.params.tutorId;
+
+      const searchData: SearchDataDto = getSearchData(req);
+
+      const result = await this.bookingRequestService.getMyBookingAcceptByTutorId(userId, tutorId, searchData);
+
+      res.send_ok('Get My booking request accept successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
