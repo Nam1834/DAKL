@@ -46,17 +46,17 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     this.userRepository = userRepository;
   }
 
-  async search(searchData: SearchDataDto): Promise<PagingResponseDto<Payment>> {
+  async search(searchData: SearchDataDto): Promise<PagingResponseDto<Order>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    const majors = await this.paymentRepository.findMany({
+    const majors = await this.orderRepository.findMany({
       filter: where,
       order: order,
-      relations: [],
+      relations: ['payment', 'items', 'user'],
       paging: paging
     });
 
-    const total = await this.paymentRepository.count({
+    const total = await this.orderRepository.count({
       filter: where
     });
 
