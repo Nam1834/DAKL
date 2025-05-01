@@ -473,8 +473,6 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
     }
   }
 
-  async getMyNewRequest(): Promise<void> {}
-
   async cancelRequest(tutorRequestId: string, data: CancelRequestReq): Promise<void> {
     const tutorRequest = await this.tutorRequestRepository.findOne({
       filter: { tutorRequestId: tutorRequestId, status: TutorRequestStatus.REQUEST }
