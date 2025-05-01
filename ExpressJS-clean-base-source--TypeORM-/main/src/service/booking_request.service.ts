@@ -219,15 +219,71 @@ export class BookingRequestService
     }
   }
 
-  async getMyBookingAccept(userId: string): Promise<void> {}
+  async getMyBookingAcceptByTutorId(
+    userId: string,
+    tutorId: string,
+    searchData: SearchDataDto
+  ): Promise<PagingResponseDto<BookingRequest>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-  async hireTutorFromBookingRequest(tutorId: string, bookingRequestId: string): Promise<void> {
+    const bookingRequests = await this.bookingRequestRepository.findMany({
+      filter: { userId: userId, tutorId: tutorId, status: BookingRequestStatus.ACCEPT, isHire: false, ...where },
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.bookingRequestRepository.count({
+      filter: { userId: userId, tutorId: tutorId, status: BookingRequestStatus.ACCEPT, isHire: false }
+    });
+
+    return new PagingResponseDto(total, bookingRequests);
+  }
+
+  async hireTutorFromBookingRequest(userId: string, bookingRequestId: string): Promise<void> {
+    const user = await this.userRepository.findOne({
+      filter: { userId: userId }
+    });
+
+    if (!user) {
+      throw new Error('User must login first!');
+    }
+
     const bookingRequest = await this.bookingRequestRepository.findOne({
       filter: { bookingRequestId: bookingRequestId, status: BookingRequestStatus.ACCEPT, isHire: false }
     });
 
     if (!bookingRequest) {
       throw new Error('You does not have this booking!');
+    }
+
+    const userCoins = user.coin;
+    const bookingCoins = bookingRequest.totalcoins;
+
+    if (userCoins < bookingCoins) {
+      throw new Error('You does not have enough coins!');
+    } else {
+      await this.userRepository.findOneAndUpdate({
+        filter: { userId: userId },
+        updateData: {
+          coin: userCoins - bookingCoins
+        }
+      });
+
+      //Tao lop va send mail
+
+      // const rootDir = process.cwd();
+      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-booking-request.util.ejs');
+
+      // const emailContent = await ejs.renderFile(emailTemplatePath, {
+      //   fullname: user.fullname
+      // });
+
+      // await this.sendEmailViaApi({
+      //   from: { name: 'GiaSuVLU' },
+      //   to: { emailAddress: [user.personalEmail] },
+      //   subject: 'Thông báo duyệt yêu cầu',
+      //   html: emailContent
+      // });
     }
   }
 }

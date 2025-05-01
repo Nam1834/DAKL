@@ -50,7 +50,7 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
     const majors = await this.orderRepository.findMany({
-      filter: where,
+      filter: { status: OrderStatus.PAID, ...where },
       order: order,
       relations: ['payment', 'items', 'user'],
       paging: paging

@@ -22,6 +22,11 @@ bookingRequestRouter
     authenticateJWT,
     bookingRequestController.getListBookingRequest.bind(bookingRequestController)
   )
+  .get(
+    '/get-my-booking-request-accept/:tutorId',
+    authenticateJWT,
+    bookingRequestController.getMyBookingAcceptByTutorId.bind(bookingRequestController)
+  )
   .patch(
     '/solve-booking/:bookingRequestId',
     authenticateJWT,
