@@ -19,6 +19,9 @@ import ejs from 'ejs';
 import { inject, injectable } from 'inversify';
 import path from 'path';
 import axios from 'axios';
+import { SearchDataDto } from '@/dto/search-data.dto';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { SearchUtil } from '@/utils/search.util';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
@@ -43,6 +46,23 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     this.userRepository = userRepository;
   }
 
+  async search(searchData: SearchDataDto): Promise<PagingResponseDto<Payment>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const majors = await this.paymentRepository.findMany({
+      filter: where,
+      order: order,
+      relations: [],
+      paging: paging
+    });
+
+    const total = await this.paymentRepository.count({
+      filter: where
+    });
+
+    return new PagingResponseDto(total, majors);
+  }
+
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
     const response = await axios.post(
       EMAIL_API_URL,
@@ -59,6 +79,26 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
         }
       }
     );
+  }
+
+  async updateOrderStatus(orderId: string, status: OrderStatus): Promise<void> {
+    const order = await this.orderRepository.findOne({
+      filter: { orderId },
+      relations: ['payment']
+    });
+
+    if (!order) {
+      throw new BaseError(ErrorCode.NF_01, 'Không tìm thấy đơn hàng');
+    }
+
+    order.status = status;
+
+    if (order.payment) {
+      order.payment.paymentStatus = false;
+      await this.paymentRepository.save(order.payment);
+    }
+
+    await this.orderRepository.save(order);
   }
 
   async handleVNPayReturn(vnp_Params: any): Promise<void> {

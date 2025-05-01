@@ -31,16 +31,19 @@ export class BookingRequestService
   private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
   private bookingRequestRepository: IBookingRequestRepository<BookingRequest>;
   private userProfileRepository: IUserProfileRepository<UserProfile>;
+  private userRepository: IUserRepository<User>;
 
   constructor(
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
     @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
-    @inject('BookingRequestRepository') bookingRequestRepository: IBookingRequestRepository<BookingRequest>
+    @inject('BookingRequestRepository') bookingRequestRepository: IBookingRequestRepository<BookingRequest>,
+    @inject('UserRepository') userRepository: IUserRepository<User>
   ) {
     super(bookingRequestRepository);
     this.bookingRequestRepository = bookingRequestRepository;
     this.tutorProfileRepository = tutorProfileRepository;
     this.userProfileRepository = userProfileRepository;
+    this.userRepository = userRepository;
   }
 
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
@@ -218,5 +221,13 @@ export class BookingRequestService
 
   async getMyBookingAccept(userId: string): Promise<void> {}
 
-  async hireTutorFromBookingRequest(tutorId: string): Promise<void> {}
+  async hireTutorFromBookingRequest(tutorId: string, bookingRequestId: string): Promise<void> {
+    const bookingRequest = await this.bookingRequestRepository.findOne({
+      filter: { bookingRequestId: bookingRequestId, status: BookingRequestStatus.ACCEPT, isHire: false }
+    });
+
+    if (!bookingRequest) {
+      throw new Error('You does not have this booking!');
+    }
+  }
 }

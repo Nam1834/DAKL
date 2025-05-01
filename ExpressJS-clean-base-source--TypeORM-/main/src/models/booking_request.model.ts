@@ -47,4 +47,7 @@ export class BookingRequest extends BaseModel {
 
   @Column({ name: 'note_of_tutor', nullable: true })
   noteOfTutor!: string;
+
+  @Column({ type: 'boolean', name: 'is_hire', default: false })
+  isHire!: boolean;
 }

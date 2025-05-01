@@ -24,6 +24,7 @@ class BookingRequestContainer extends BaseContainer {
     //Import
     this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
     this.container.bind<IUserProfileRepository<any>>('UserProfileRepository').toConstantValue(userProfileRepository);
+    this.container.bind<IUserRepository<any>>('UserRepository').toConstantValue(userRepository);
   }
 
   export() {
