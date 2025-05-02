@@ -99,9 +99,9 @@ export class MenuService implements IMenuService {
       icon: null
     },
     {
-      name: 'GỬI TIN NHẮN',
+      name: 'NẠP VÍ NGƯỜI DÙNG',
       isCollapsed: false,
-      permissions: [Permissions.SEND_MESSAGE],
+      permissions: [Permissions.QUAN_LY_VI_NGUOI_DUNG],
       children: null,
       icon: null
     }
