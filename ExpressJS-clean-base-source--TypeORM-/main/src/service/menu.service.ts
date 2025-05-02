@@ -80,16 +80,16 @@ export class MenuService implements IMenuService {
           permissions: [Permissions.QUAN_LY_HANG_GIA_SU],
           children: null,
           icon: null
+        },
+        {
+          name: 'GÓI THANH TOÁN',
+          isCollapsed: false,
+          permissions: [Permissions.QUAN_LY_GOI_THANH_TOAN],
+          children: null,
+          icon: 'fa-solid fa-hand-holding-dollar'
         }
       ],
       icon: 'fa-solid fa-list'
-    },
-    {
-      name: 'GÓI THANH TOÁN',
-      isCollapsed: false,
-      permissions: [Permissions.QUAN_LY_GOI_THANH_TOAN],
-      children: null,
-      icon: 'fa-solid fa-hand-holding-dollar'
     },
     {
       name: 'GIÁO TRÌNH',

@@ -339,4 +339,15 @@ export class UserController {
       next(error);
     }
   }
+
+  async getListTutorPublicWithoutLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.userService.getListTutorPublicWithoutLogin(searchData);
+
+      res.send_ok('Tutor Public fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -921,4 +921,35 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       }
     };
   }
+
+  async getListTutorPublicWithoutLogin(searchData: SearchDataDto): Promise<GetListPublicTutorProfileRes> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    where.tutorProfile = {
+      ...(where.tutorProfile || {}),
+      isPublicProfile: true
+    };
+
+    const publics = await this.userRepository.findMany({
+      filter: where,
+      paging: paging,
+      relations: ['tutorProfile'],
+      order: order
+    });
+
+    publics.forEach((publicUser) => {
+      delete (publicUser as any).password;
+    });
+
+    //
+    const total = await this.userRepository.count({ filter: where });
+
+    return {
+      total,
+      items: publics,
+      counts: {
+        totalPublic: total
+      }
+    };
+  }
 }
