@@ -11,6 +11,7 @@ paymentRouter
     checkPermission([Permissions.QUAN_LY_VI_NGUOI_DUNG]),
     paymentController.searchPayment.bind(paymentController)
   )
+  .get('/get-my-payment', authenticateJWT, paymentController.getMyPayment.bind(paymentController))
   .get('/vnp-return', paymentController.vnpReturn.bind(paymentController))
 
   .get('/vnp-url/:paymentId', paymentController.getVnpUrl.bind(paymentController));
