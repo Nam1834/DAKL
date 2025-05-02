@@ -59,7 +59,8 @@ export class ValueConfigService extends BaseCrudService<ValueConfig> implements 
         valueConfigId: true,
         price: true,
         coinConfig: true,
-        description: true
+        description: true,
+        urlConfig: true
       }
     });
 
