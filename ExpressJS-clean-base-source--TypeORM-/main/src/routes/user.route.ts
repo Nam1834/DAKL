@@ -54,6 +54,7 @@ userRouter
     checkPermission([Permissions.QUAN_LY_ADMIN]),
     userController.deleteById.bind(userController)
   )
-  .get('/get-list-tutor-public', authenticateJWT, userController.getListTutorPublic.bind(userController));
+  .get('/get-list-tutor-public', authenticateJWT, userController.getListTutorPublic.bind(userController))
+  .get('/get-list-tutor-public-without-login', userController.getListTutorPublicWithoutLogin.bind(userController));
 
 export default userRouter;

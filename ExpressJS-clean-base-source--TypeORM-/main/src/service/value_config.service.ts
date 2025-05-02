@@ -34,13 +34,13 @@ export class ValueConfigService extends BaseCrudService<ValueConfig> implements 
   }
 
   async updateValueConfig(id: string, data: any): Promise<void> {
-    const existingMajor = await this.valueConfigRepository.findOne({
+    const value_config = await this.valueConfigRepository.findOne({
       filter: {
         valueConfigId: id
       }
     });
 
-    if (!existingMajor) {
+    if (!value_config) {
       throw new BaseError(ErrorCode.NF_01, 'Value Config not found');
     }
 
