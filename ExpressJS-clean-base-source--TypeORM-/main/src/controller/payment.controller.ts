@@ -1,6 +1,7 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
+import { OrderStatus } from '@/enums/order-status.enum';
 import { Payment } from '@/models/payment.model';
 import { IPaymentService } from '@/service/interface/i.payment.service';
 import { ITYPES } from '@/types/interface.types';
@@ -36,6 +37,23 @@ export class PaymentController {
     }
   }
 
+  async getMyPayment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user;
+      const userId = user!.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.paymentService.getMyPayment(userId, searchData);
+      res.send_ok('Payment fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getVnpUrl(req: Request, res: Response, next: NextFunction) {
     try {
       const { paymentId } = req.params;
@@ -60,8 +78,19 @@ export class PaymentController {
       const vnp_Params = req.query;
 
       const vnp_ResponseCode = vnp_Params['vnp_ResponseCode'];
+      const vnp_TxnRef = vnp_Params['vnp_TxnRef'];
+      if (typeof vnp_ResponseCode !== 'string' || typeof vnp_TxnRef !== 'string') {
+        throw new Error('Thông tin phản hồi từ VNPay không hợp lệ');
+      }
+
       if (vnp_ResponseCode !== '00') {
-        return res.redirect(this.FE_FAIL_PAYMENT_URL); // Điều hướng đến trang thất bại
+        // Người dùng hủy thanh toán
+        if (vnp_ResponseCode === '24') {
+          await this.paymentService.updateOrderStatus(vnp_TxnRef, OrderStatus.CANCELED);
+        } else {
+          await this.paymentService.updateOrderStatus(vnp_TxnRef, OrderStatus.FAILED);
+        }
+        return res.redirect(this.FE_FAIL_PAYMENT_URL);
       }
 
       await this.paymentService.handleVNPayReturn(vnp_Params);

@@ -49,7 +49,7 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<Order>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    const majors = await this.orderRepository.findMany({
+    const orders = await this.orderRepository.findMany({
       filter: { status: OrderStatus.PAID, ...where },
       order: order,
       relations: ['payment', 'items', 'user'],
@@ -57,10 +57,27 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     });
 
     const total = await this.orderRepository.count({
-      filter: where
+      filter: { status: OrderStatus.PAID, ...where }
     });
 
-    return new PagingResponseDto(total, majors);
+    return new PagingResponseDto(total, orders);
+  }
+
+  async getMyPayment(userId: string, searchData: SearchDataDto): Promise<PagingResponseDto<Order>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const orders = await this.orderRepository.findMany({
+      filter: { userId: userId, ...where },
+      order: order,
+      relations: ['payment', 'items', 'user'],
+      paging: paging
+    });
+
+    const total = await this.orderRepository.count({
+      filter: { userId: userId, ...where }
+    });
+
+    return new PagingResponseDto(total, orders);
   }
 
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
