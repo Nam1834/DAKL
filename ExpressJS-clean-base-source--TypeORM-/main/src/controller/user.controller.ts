@@ -1,5 +1,6 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { SearchDataDto } from '@/dto/search-data.dto';
+import { SearchMatchingTutor } from '@/dto/search-matching.dto';
 import { UpdatePublicProfileReq } from '@/dto/tutor/public-profile.req';
 import { RegisToTutorReq } from '@/dto/tutor/regis-tutor.req';
 import { ForgotPasswordUserReq } from '@/dto/user/forgot-password-user.req';
@@ -344,6 +345,22 @@ export class UserController {
     try {
       const searchData: SearchDataDto = getSearchData(req);
       const result = await this.userService.getListTutorPublicWithoutLogin(searchData);
+
+      res.send_ok('Tutor Public fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getListSuggestTutor(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user;
+      const userId = user!.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+      const result = await this.userService.getSuggestedTutors(userId);
 
       res.send_ok('Tutor Public fetched successfully', result);
     } catch (error) {

@@ -9,6 +9,7 @@ import { BaseModelType } from '@/types/base-model.types';
 
 export interface IMajorService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<Major>>;
+  // searchAll(searchData: SearchDataDto): Promise<PagingResponseDto<Major>>;
   createMajor(data: CreateMajorReq): Promise<void>;
   updateMajor(id: string, data: any): Promise<void>;
   getList(paging: PagingDto): Promise<PagingResponseDto<GetListMajorRes>>;

@@ -6,7 +6,7 @@ import { RecordOrderType } from '@/types/record-order.types';
 import BaseError from '@/utils/error/base.error';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { DeepPartial, FindOptionsSelect, IsNull, ObjectLiteral, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsSelect, FindOptionsWhere, IsNull, ObjectLiteral, Repository } from 'typeorm';
 
 @injectable()
 export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<T> {
@@ -165,6 +165,58 @@ export class BaseRepository<T extends ObjectLiteral> implements IBaseRepository<
       relations: relations,
       select: select
     });
+    return result;
+  }
+
+  async findToSearchAll(options: {
+    filter?: FindOptionsWhere<T>[]; // giữ dạng mảng => OR
+    paging?: PagingDto;
+    order?: RecordOrderType[];
+    relations?: string[];
+    select?: FindOptionsSelect<T>;
+  }): Promise<T[]> {
+    const { filter = [], paging, order, relations, select } = options;
+
+    let whereCondition: FindOptionsWhere<T>[] = filter;
+
+    // Đồng bộ xử lý deletedAt
+    if (this.hasDeleteAtColumn()) {
+      const deletedAtCondition = { deletedAt: IsNull() } as unknown as FindOptionsWhere<T>;
+
+      if (whereCondition.length === 0) {
+        whereCondition = [deletedAtCondition];
+      } else {
+        whereCondition = whereCondition.map((f) => ({
+          ...f,
+          deletedAt: (f as any).deletedAt ?? IsNull()
+        }));
+      }
+    }
+
+    let skip = undefined;
+    let take = undefined;
+    if (paging) {
+      skip = (paging.page - 1) * paging.rpp;
+      take = paging.rpp;
+    }
+
+    const orderObject: Record<string, 'ASC' | 'DESC'> = {};
+    if (order) {
+      order.forEach((o) => {
+        const orderCondition = this.createOrderCondition(o.column, o.direction);
+        Object.assign(orderObject, orderCondition);
+      });
+    }
+
+    const result = await this.ormRepository.find({
+      where: whereCondition as any, // ép kiểu thành any
+      take,
+      skip,
+      order: orderObject as any,
+      relations,
+      select
+    });
+
     return result;
   }
 

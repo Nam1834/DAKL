@@ -7,6 +7,7 @@ const majorRouter = express.Router();
 
 majorRouter
   .get('/search', majorController.searchMajor.bind(majorController))
+  // .get('/search-all', majorController.searchAllMajor.bind(majorController))
   .post(
     '/create',
     authenticateJWT,

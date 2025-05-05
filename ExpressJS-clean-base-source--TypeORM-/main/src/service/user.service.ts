@@ -72,6 +72,9 @@ import { IBookingRequestRepository } from '@/repository/interface/i.booking_requ
 import { BookingRequest } from '@/models/booking_request.model';
 import { In } from 'typeorm';
 import { IBookingRequestService } from './interface/i.booking_request.service';
+import { SuggestedTutorResponse } from '@/dto/tutor/suggest-tutor-response.res';
+import { SuggestedTutor } from '@/dto/tutor/suggest-tutor.res';
+import { SearchMatchingTutor } from '@/dto/search-matching.dto';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
@@ -951,5 +954,75 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
         totalPublic: total
       }
     };
+  }
+
+  async getSuggestedTutors(userId: string): Promise<PagingResponseDto<SuggestedTutor>> {
+    // 1. Lấy thông tin user hiện tại từ DB
+    const user = await this.userRepository.findOne({
+      filter: { userId },
+      relations: ['userProfile', 'userProfile.major']
+    });
+
+    if (!user || !user.userProfile) {
+      throw new Error('User profile not found');
+    }
+
+    const userProfile = user.userProfile;
+    const preferredGender = userProfile.gender === 'MALE' ? 'FEMALE' : 'MALE'; // ví dụ matching khác giới
+    const location = userProfile.homeAddress;
+
+    // Nếu có major thì map sang subjects
+    const subjects = userProfile.major?.subjects?.map((s) => s.subjectName) || [];
+
+    const availableTimes = (user as any).availableTimes || [];
+
+    // 2. Lọc danh sách gia sư công khai
+    const tutors = await this.tutorProfileRepository.findMany({
+      filter: {
+        isPublicProfile: true
+      },
+      relations: ['user', 'subject', 'subject2', 'subject3']
+    });
+
+    // 3. Tính điểm matching
+    const scoredTutors = await Promise.all(
+      tutors.map(async (tutor) => {
+        let score = 0;
+
+        const subjectsList = [
+          tutor.subject?.subjectName,
+          tutor.subject2?.subjectName,
+          tutor.subject3?.subjectName
+        ].filter(Boolean);
+
+        const matchedSubjects = subjectsList.filter((s) => subjects.includes(s));
+        if (matchedSubjects.length > 0) score += 40;
+
+        const tutorTimes = tutor.dateTimeLearn || [];
+        const matchedTimes = tutorTimes.filter((time) => availableTimes.includes(time));
+        if (matchedTimes.length > 0) score += 30;
+
+        if (tutor.teachingPlace === location) score += 15;
+        if (tutor.gender === preferredGender) score += 5;
+
+        return {
+          userId: userId,
+          tutorId: tutor.userId,
+          fullName: tutor.fullname,
+          gender: tutor.gender,
+          subject: tutor.subject?.subjectName || '',
+          teachingPlace: tutor.teachingPlace,
+          dateTimeLearn: tutor.dateTimeLearn || [],
+          rating: 0,
+          matchingScore: score,
+          profilePicture: tutor.avatar || ''
+        };
+      })
+    );
+
+    // 4. Sắp xếp kết quả
+    scoredTutors.sort((a, b) => b.matchingScore - a.matchingScore);
+
+    return new PagingResponseDto(scoredTutors.length, scoredTutors);
   }
 }

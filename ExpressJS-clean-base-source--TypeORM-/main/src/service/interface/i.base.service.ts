@@ -2,7 +2,7 @@ import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { PagingDto } from '@/dto/paging.dto';
 import { Page } from '@/types/page.types';
 import { RecordOrderType } from '@/types/record-order.types';
-import { DeepPartial, FindOptionsSelect } from 'typeorm';
+import { DeepPartial, FindOptionsSelect, FindOptionsWhere } from 'typeorm';
 
 export interface IBaseCrudService<MODEL> {
   /**
@@ -43,6 +43,14 @@ export interface IBaseCrudService<MODEL> {
    */
   findMany(options: {
     filter?: Partial<MODEL>;
+    paging?: PagingDto;
+    order?: RecordOrderType[];
+    relations?: string[];
+    select?: FindOptionsSelect<MODEL>;
+  }): Promise<MODEL[]>;
+
+  findToSearchAll(options: {
+    filter?: FindOptionsWhere<MODEL>[];
     paging?: PagingDto;
     order?: RecordOrderType[];
     relations?: string[];
