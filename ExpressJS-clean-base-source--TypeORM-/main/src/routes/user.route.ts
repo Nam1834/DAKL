@@ -55,6 +55,7 @@ userRouter
     userController.deleteById.bind(userController)
   )
   .get('/get-list-tutor-public', authenticateJWT, userController.getListTutorPublic.bind(userController))
-  .get('/get-list-tutor-public-without-login', userController.getListTutorPublicWithoutLogin.bind(userController));
+  .get('/get-list-tutor-public-without-login', userController.getListTutorPublicWithoutLogin.bind(userController))
+  .get('/get-list-tutor-public-suggest', authenticateJWT, userController.getListSuggestTutor.bind(userController));
 
 export default userRouter;

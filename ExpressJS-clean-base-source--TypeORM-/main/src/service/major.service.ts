@@ -38,6 +38,25 @@ export class MajorService extends BaseCrudService<Major> implements IMajorServic
     return new PagingResponseDto(total, majors);
   }
 
+  // async searchAll(searchData: SearchDataDto): Promise<PagingResponseDto<Major>> {
+  //   const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+  //   const filter = Array.isArray(where) ? where : [where];
+
+  //   const majors = await this.majorRepository.findToSearchAll({
+  //     filter: filter,
+  //     order: order,
+  //     relations: ['subjects'],
+  //     paging: paging
+  //   });
+
+  //   const total = await this.majorRepository.count({
+  //     filter: where
+  //   });
+
+  //   return new PagingResponseDto(total, majors);
+  // }
+
   async createMajor(data: CreateMajorReq): Promise<void> {
     const newMajor = new Major();
     newMajor.sumName = data.sumName;

@@ -6,7 +6,7 @@ import { ITYPES } from '@/types/interface.types';
 import { RecordOrderType } from '@/types/record-order.types';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { DeepPartial, FindOptionsSelect } from 'typeorm';
+import { DeepPartial, FindOptionsSelect, FindOptionsWhere } from 'typeorm';
 @injectable()
 export class BaseCrudService<MODEL> implements IBaseCrudService<MODEL> {
   protected baseRepository: IBaseRepository<MODEL>;
@@ -40,6 +40,16 @@ export class BaseCrudService<MODEL> implements IBaseCrudService<MODEL> {
     select?: FindOptionsSelect<MODEL>;
   }): Promise<MODEL[]> {
     return await this.baseRepository.findMany(options);
+  }
+
+  async findToSearchAll(options: {
+    filter?: FindOptionsWhere<MODEL>[];
+    paging?: PagingDto;
+    order?: RecordOrderType[];
+    relations?: string[];
+    select?: FindOptionsSelect<MODEL>;
+  }): Promise<MODEL[]> {
+    return await this.baseRepository.findToSearchAll(options);
   }
 
   async findOne(options: {

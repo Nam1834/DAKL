@@ -40,13 +40,13 @@ export class MenuService implements IMenuService {
       icon: 'fa-solid fa-user-tie'
     },
 
-    {
-      name: 'BÀI ĐĂNG',
-      isCollapsed: false,
-      permissions: [Permissions.QUAN_LY_BAI_DANG],
-      children: null,
-      icon: 'fa-regular fa-newspaper'
-    },
+    // {
+    //   name: 'BÀI ĐĂNG',
+    //   isCollapsed: false,
+    //   permissions: [Permissions.QUAN_LY_BAI_DANG],
+    //   children: null,
+    //   icon: 'fa-regular fa-newspaper'
+    // },
 
     {
       name: 'YÊU CẦU',

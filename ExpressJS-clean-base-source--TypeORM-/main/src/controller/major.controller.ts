@@ -34,6 +34,16 @@ export class MajorController {
     }
   }
 
+  // async searchAllMajor(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const searchData: SearchDataDto = getSearchData(req);
+  //     const result = await this.majorService.search(searchData);
+  //     res.send_ok('Major fetched successfully', result);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const requestBody: CreateMajorReq = req.body;
