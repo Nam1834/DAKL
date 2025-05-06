@@ -75,6 +75,8 @@ import { IBookingRequestService } from './interface/i.booking_request.service';
 import { SuggestedTutorResponse } from '@/dto/tutor/suggest-tutor-response.res';
 import { SuggestedTutor } from '@/dto/tutor/suggest-tutor.res';
 import { SearchMatchingTutor } from '@/dto/search-matching.dto';
+import { IRolePermissionRepository } from '@/repository/interface/i.role_permission.repository';
+import { RolePermission } from '@/models/role_permission.model';
 
 const SECRET_KEY: any = process.env.SECRET_KEY;
 const MICROSOFT_CLIENT_ID: any = process.env.MICROSOFT_CLIENT_ID;
@@ -97,10 +99,12 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
   private myTutorRepository: IMyTutorRepository<MyTutor>;
   private bookingRequestRepository: IBookingRequestRepository<BookingRequest>;
   private bookingRequestService: IBookingRequestService<BookingRequest>;
+  private rolePermissionRepository: IRolePermissionRepository<RolePermission>;
 
   private LOGIN_TOKEN_EXPIRE = 3 * 60 * 60;
 
   constructor(
+    @inject('RolePermissionRepository') rolePermissionRepository: IRolePermissionRepository<RolePermission>,
     @inject('UserRepository') userRepository: IUserRepository<User>,
     @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
@@ -125,6 +129,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     this.myTutorRepository = myTutorRepository;
     this.bookingRequestRepository = bookingRequestRepository;
     this.bookingRequestService = bookingRequestService;
+    this.rolePermissionRepository = rolePermissionRepository;
   }
 
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
@@ -338,8 +343,16 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new BaseError(ErrorCode.AUTH_01, 'Password is incorrect');
     }
 
+    const rolePermission = await this.rolePermissionRepository.findMany({
+      filter: {
+        roleId: user.roleId
+      }
+    });
+
+    const rolePermissionIds = rolePermission!.map((permission) => permission.permissionId) || [''];
+
     // Luu vao JWt
-    const claim = new JwtClaimDto(user.userId, '', [], '');
+    const claim = new JwtClaimDto(user.userId, '', rolePermissionIds, '');
 
     const token = jwt.sign(_.toPlainObject(claim), SECRET_KEY, {
       expiresIn: this.LOGIN_TOKEN_EXPIRE
@@ -463,7 +476,16 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     }
 
     // Bước 4: Tạo JWT Token
-    const claim = new JwtClaimDto(user.userId, '', [], '');
+    const rolePermission = await this.rolePermissionRepository.findMany({
+      filter: {
+        roleId: user.roleId
+      }
+    });
+
+    const rolePermissionIds = rolePermission!.map((permission) => permission.permissionId) || [''];
+
+    // Luu vao JWt
+    const claim = new JwtClaimDto(user.userId, '', rolePermissionIds, '');
     const token = jwt.sign(_.toPlainObject(claim), SECRET_KEY, { expiresIn: this.LOGIN_TOKEN_EXPIRE });
 
     // Bước 5: Trả về thông tin User

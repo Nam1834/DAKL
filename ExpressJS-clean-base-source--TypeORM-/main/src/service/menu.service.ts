@@ -104,6 +104,101 @@ export class MenuService implements IMenuService {
       permissions: [Permissions.QUAN_LY_VI_NGUOI_DUNG],
       children: null,
       icon: null
+    },
+
+    // User
+    {
+      name: 'HEADER MENU',
+      isCollapsed: false,
+      permissions: [Permissions.HEADER_MENU],
+      children: [
+        {
+          name: 'TRANG CHỦ',
+          isCollapsed: false,
+          permissions: [Permissions.TRANG_CHU],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'VỀ CHÚNG TÔI',
+          isCollapsed: false,
+          permissions: [Permissions.VE_CHUNG_TOI],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'QUY ĐỊNH',
+          isCollapsed: false,
+          permissions: [Permissions.QUY_DINH],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'TÌM KIẾM GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.TIM_KIEM_GIA_SU],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'ĐĂNG KÝ LÀM GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.DANG_KY_LAM_GIA_SU],
+          children: null,
+          icon: null
+        }
+      ],
+      icon: 'fa-solid fa-list'
+    },
+    {
+      name: 'SETTING MENU',
+      isCollapsed: false,
+      permissions: [Permissions.SETTING_MENU],
+      children: [
+        {
+          name: 'HỒ SƠ HỌC VIÊN',
+          isCollapsed: false,
+          permissions: [Permissions.HO_SO_HOC_VIEN],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'GIA SƯ YÊU THÍCH',
+          isCollapsed: false,
+          permissions: [Permissions.GIA_SU_YEU_THICH],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'HỒ SƠ GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.HO_SO_GIA_SU],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'VÍ CÁ NHÂN',
+          isCollapsed: false,
+          permissions: [Permissions.VI_CA_NHAN],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'YÊU CẦU THUÊ',
+          isCollapsed: false,
+          permissions: [Permissions.YEU_CAU_THUE],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'GIÁO TRÌNH CÁ NHÂN',
+          isCollapsed: false,
+          permissions: [Permissions.GIAO_TRINH_CA_NHAN],
+          children: null,
+          icon: null
+        }
+      ],
+      icon: 'fa-solid fa-list'
     }
   ];
 

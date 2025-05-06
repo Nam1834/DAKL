@@ -24,6 +24,8 @@ import { myTutorRepository } from './my_tutor.container';
 import { IBookingRequestRepository } from '@/repository/interface/i.booking_request.repository';
 import { bookingRequestRepository, bookingRequestService } from './booking_request.container';
 import { IBookingRequestService } from '@/service/interface/i.booking_request.service';
+import { IRolePermissionRepository } from '@/repository/interface/i.role_permission.repository';
+import { rolePermissionRepository } from './role_permission.container';
 
 class UserContainer extends BaseContainer {
   constructor() {
@@ -49,6 +51,9 @@ class UserContainer extends BaseContainer {
       .bind<IBookingRequestRepository<any>>('BookingRequestRepository')
       .toConstantValue(bookingRequestRepository);
     this.container.bind<IBookingRequestService<any>>('BookingRequestService').toConstantValue(bookingRequestService);
+    this.container
+      .bind<IRolePermissionRepository<any>>('RolePermissionRepository')
+      .toConstantValue(rolePermissionRepository);
   }
 
   export() {
