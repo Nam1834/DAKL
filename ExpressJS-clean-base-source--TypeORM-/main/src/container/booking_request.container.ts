@@ -7,14 +7,15 @@ import { BaseContainer } from '@/container/base.container';
 import { BookingRequest } from '@/models/booking_request.model';
 import { tutorProfileRepository } from './tutor_profile.container';
 import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
-import { IUserRepository } from '@/repository/interface/i.user.repository';
-import { userRepository } from './user.container';
 import { IUserProfileRepository } from '@/repository/interface/i.user_profile.repository';
 import { userProfileRepository } from './user_profile.container';
 import { IClassroomRepository } from '@/repository/interface/i.classroom.repository';
 import { classroomRepository } from './classroom.container';
 import { IManagePaymentRepository } from '@/repository/interface/i.manage_payment.repository';
 import { managePaymentRepository } from './manage_payment.container';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { UserRepository } from '@/repository/user.repository';
+import { User } from '@/models/user.model';
 
 class BookingRequestContainer extends BaseContainer {
   constructor() {
@@ -28,11 +29,11 @@ class BookingRequestContainer extends BaseContainer {
     //Import
     this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
     this.container.bind<IUserProfileRepository<any>>('UserProfileRepository').toConstantValue(userProfileRepository);
-    this.container.bind<IUserRepository<any>>('UserRepository').toConstantValue(userRepository);
     this.container.bind<IClassroomRepository<any>>('ClassroomRepository').toConstantValue(classroomRepository);
     this.container
       .bind<IManagePaymentRepository<any>>('ManagePaymentRepository')
       .toConstantValue(managePaymentRepository);
+    this.container.bind<IUserRepository<any>>('UserRepository').to(UserRepository);
   }
 
   export() {
