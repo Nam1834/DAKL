@@ -10,6 +10,9 @@ export class Classroom extends BaseModel {
   @PrimaryGeneratedColumn('uuid', { name: 'classroom_id' })
   classroomId!: string;
 
+  @Column({ name: 'name_of_room', nullable: true })
+  nameOfRoom!: string;
+
   @Column({ name: 'user_id' })
   userId!: string;
 

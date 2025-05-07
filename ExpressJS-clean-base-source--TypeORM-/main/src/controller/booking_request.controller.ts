@@ -122,4 +122,23 @@ export class BookingRequestController {
       next(error);
     }
   }
+
+  async hireTutor(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const bookingRequestId = req.params.bookingRequestId;
+
+      const result = await this.bookingRequestService.hireTutorFromBookingRequest(userId, bookingRequestId);
+
+      res.send_ok('Hire tutor successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
