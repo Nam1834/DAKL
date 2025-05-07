@@ -126,13 +126,16 @@ export class BookingRequestController {
   async hireTutor(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = req.user;
-      const userId = user?.id;
-
-      if (!userId) {
+      if (!user) {
         throw new Error('You must login');
       }
+      const userId = user.id;
 
       const bookingRequestId = req.params.bookingRequestId;
+
+      if (!bookingRequestId) {
+        throw new Error('Can not find bookingRequest');
+      }
 
       const result = await this.bookingRequestService.hireTutorFromBookingRequest(userId, bookingRequestId);
 

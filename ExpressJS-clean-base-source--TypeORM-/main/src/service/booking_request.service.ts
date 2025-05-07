@@ -15,16 +15,17 @@ import { inject, injectable } from 'inversify';
 import path from 'path';
 import axios from 'axios';
 import { SendEmailParams } from '@/dto/send-email/send-email-params.req';
-import { IUserRepository } from '@/repository/interface/i.user.repository';
-import { User } from '@/models/user.model';
 import { IUserProfileRepository } from '@/repository/interface/i.user_profile.repository';
 import { UserProfile } from '@/models/user_profile.model';
 import { Classroom } from '@/models/classroom.model';
 import { IClassroomRepository } from '@/repository/interface/i.classroom.repository';
 import { addWeeks, endOfWeek } from 'date-fns';
-import c from 'config';
 import { ManagePayment } from '@/models/manage_payment.model';
 import { IManagePaymentRepository } from '@/repository/interface/i.manage_payment.repository';
+import BaseError from '@/utils/error/base.error';
+import { ErrorCode } from '@/enums/error-code.enums';
+import { User } from '@/models/user.model';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
@@ -34,28 +35,28 @@ export class BookingRequestService
   extends BaseCrudService<BookingRequest>
   implements IBookingRequestService<BookingRequest>
 {
-  private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
   private bookingRequestRepository: IBookingRequestRepository<BookingRequest>;
+  private tutorProfileRepository: ITutorProfileRepository<TutorProfile>;
   private userProfileRepository: IUserProfileRepository<UserProfile>;
-  private userRepository: IUserRepository<User>;
   private classroomRepository: IClassroomRepository<Classroom>;
   private managePaymentRepository: IManagePaymentRepository<ManagePayment>;
+  private userRepository: IUserRepository<User>;
 
   constructor(
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
     @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
     @inject('BookingRequestRepository') bookingRequestRepository: IBookingRequestRepository<BookingRequest>,
-    @inject('UserRepository') userRepository: IUserRepository<User>,
     @inject('ClassroomRepository') classroomRepository: IClassroomRepository<Classroom>,
-    @inject('ManagePaymentRepository') managePaymentRepository: IManagePaymentRepository<ManagePayment>
+    @inject('ManagePaymentRepository') managePaymentRepository: IManagePaymentRepository<ManagePayment>,
+    @inject('UserRepository') userRepository: IUserRepository<User>
   ) {
     super(bookingRequestRepository);
     this.bookingRequestRepository = bookingRequestRepository;
     this.tutorProfileRepository = tutorProfileRepository;
     this.userProfileRepository = userProfileRepository;
-    this.userRepository = userRepository;
     this.classroomRepository = classroomRepository;
     this.managePaymentRepository = managePaymentRepository;
+    this.userRepository = userRepository;
   }
 
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
@@ -257,7 +258,7 @@ export class BookingRequestService
     });
 
     if (!user) {
-      throw new Error('User must login first!');
+      throw new BaseError(ErrorCode.NF_01, 'Không tìm thấy thông tin người dùng');
     }
 
     const bookingRequest = await this.bookingRequestRepository.findOne({
@@ -266,6 +267,14 @@ export class BookingRequestService
 
     if (!bookingRequest) {
       throw new Error('You does not have this booking!');
+    }
+
+    const tutorProfile = await this.tutorProfileRepository.findOne({
+      filter: { userId: bookingRequest.tutorId }
+    });
+
+    if (!tutorProfile) {
+      throw new Error('Tutor Profile does not exist!');
     }
 
     const userCoins = user.coin;
@@ -310,14 +319,6 @@ export class BookingRequestService
       });
 
       //Tao lop
-      const tutorProfile = await this.tutorProfileRepository.findOne({
-        filter: { userId: bookingRequest.userId }
-      });
-
-      if (!tutorProfile) {
-        throw new Error('Tutor Profile does not exist!');
-      }
-
       const classroom = new Classroom();
       classroom.userId = userId;
       classroom.tutorId = bookingRequest.tutorId;
@@ -341,5 +342,10 @@ export class BookingRequestService
         data: classroom
       });
     }
+
+    await this.bookingRequestRepository.findOneAndUpdate({
+      filter: { bookingRequestId: bookingRequestId },
+      updateData: { isHire: true }
+    });
   }
 }
