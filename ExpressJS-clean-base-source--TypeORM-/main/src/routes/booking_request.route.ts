@@ -31,6 +31,11 @@ bookingRequestRouter
     '/solve-booking/:bookingRequestId',
     authenticateJWT,
     bookingRequestController.solveBookingRequestByTutor.bind(bookingRequestController)
+  )
+  .put(
+    '/hire-tutor/:bookingRequestId',
+    authenticateJWT,
+    bookingRequestController.hireTutor.bind(bookingRequestController)
   );
 
 export default bookingRequestRouter;

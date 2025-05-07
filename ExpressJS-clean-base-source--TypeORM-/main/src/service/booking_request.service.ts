@@ -19,6 +19,12 @@ import { IUserRepository } from '@/repository/interface/i.user.repository';
 import { User } from '@/models/user.model';
 import { IUserProfileRepository } from '@/repository/interface/i.user_profile.repository';
 import { UserProfile } from '@/models/user_profile.model';
+import { Classroom } from '@/models/classroom.model';
+import { IClassroomRepository } from '@/repository/interface/i.classroom.repository';
+import { addWeeks, endOfWeek } from 'date-fns';
+import c from 'config';
+import { ManagePayment } from '@/models/manage_payment.model';
+import { IManagePaymentRepository } from '@/repository/interface/i.manage_payment.repository';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
@@ -32,18 +38,24 @@ export class BookingRequestService
   private bookingRequestRepository: IBookingRequestRepository<BookingRequest>;
   private userProfileRepository: IUserProfileRepository<UserProfile>;
   private userRepository: IUserRepository<User>;
+  private classroomRepository: IClassroomRepository<Classroom>;
+  private managePaymentRepository: IManagePaymentRepository<ManagePayment>;
 
   constructor(
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
     @inject('UserProfileRepository') userProfileRepository: IUserProfileRepository<UserProfile>,
     @inject('BookingRequestRepository') bookingRequestRepository: IBookingRequestRepository<BookingRequest>,
-    @inject('UserRepository') userRepository: IUserRepository<User>
+    @inject('UserRepository') userRepository: IUserRepository<User>,
+    @inject('ClassroomRepository') classroomRepository: IClassroomRepository<Classroom>,
+    @inject('ManagePaymentRepository') managePaymentRepository: IManagePaymentRepository<ManagePayment>
   ) {
     super(bookingRequestRepository);
     this.bookingRequestRepository = bookingRequestRepository;
     this.tutorProfileRepository = tutorProfileRepository;
     this.userProfileRepository = userProfileRepository;
     this.userRepository = userRepository;
+    this.classroomRepository = classroomRepository;
+    this.managePaymentRepository = managePaymentRepository;
   }
 
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
@@ -269,21 +281,65 @@ export class BookingRequestService
         }
       });
 
-      //Tao lop va send mail
+      //Cong coin cho gia su
+      const tutor = await this.userRepository.findOne({
+        filter: { userId: bookingRequest.tutorId }
+      });
 
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-booking-request.util.ejs');
+      if (!tutor) {
+        throw new Error('Tutor does not exist!');
+      }
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: user.fullname
-      // });
+      tutor.coin += Math.floor((bookingCoins * 90) / 100);
 
-      // await this.sendEmailViaApi({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [user.personalEmail] },
-      //   subject: 'Thông báo duyệt yêu cầu',
-      //   html: emailContent
-      // });
+      await this.userRepository.findOneAndUpdate({
+        filter: { userId: bookingRequest.tutorId },
+        updateData: { coin: tutor.coin }
+      });
+
+      //Quan ly thanh toan cho gia su
+      const managePayment = new ManagePayment();
+      managePayment.userId = userId;
+      managePayment.tutorId = bookingRequest.tutorId;
+      managePayment.coinOfUserPayment = bookingCoins;
+      managePayment.coinOfTutorReceive = tutor.coin;
+      managePayment.coinOfWebReceive = bookingCoins - tutor.coin;
+
+      await this.managePaymentRepository.create({
+        data: managePayment
+      });
+
+      //Tao lop
+      const tutorProfile = await this.tutorProfileRepository.findOne({
+        filter: { userId: bookingRequest.userId }
+      });
+
+      if (!tutorProfile) {
+        throw new Error('Tutor Profile does not exist!');
+      }
+
+      const classroom = new Classroom();
+      classroom.userId = userId;
+      classroom.tutorId = bookingRequest.tutorId;
+      const content = `Lớp học của gia sư ${tutorProfile.fullname}`;
+      classroom.nameOfRoom = content;
+      classroom.dateTimeLearn = bookingRequest.dateTimeLearn;
+      classroom.startDay = bookingRequest.startDay;
+
+      const lessonsPerWeek = bookingRequest.lessonsPerWeek;
+      const totalLessons = bookingRequest.totalLessons;
+      const startDay = new Date(bookingRequest.startDay);
+      const weeks = Math.ceil(totalLessons / lessonsPerWeek);
+      const endDay = endOfWeek(
+        addWeeks(startDay, weeks - 1),
+        { weekStartsOn: 1 } // Tuần bắt đầu từ Thứ 2
+      );
+
+      classroom.endDay = endDay;
+
+      await this.classroomRepository.create({
+        data: classroom
+      });
     }
   }
 }
