@@ -104,10 +104,6 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
       ]
     });
 
-    if (!getMyRequests || getMyRequests.length === 0) {
-      throw new Error('Can not find your Request!');
-    }
-
     return getMyRequests[0];
   }
 
