@@ -199,21 +199,21 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     await redis.set(`otp:${data.email}`, otp, 'EX', 300);
     await redis.set(`REGISTER_${data.email}`, JSON.stringify(data), 'EX', 600);
 
-    const rootDir = process.cwd();
-    const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-template.util.ejs');
+    // const rootDir = process.cwd();
+    // const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-template.util.ejs');
 
-    const emailContent = await ejs.renderFile(emailTemplatePath, {
-      fullname: data.fullname,
-      email: data.email,
-      otp: otp
-    });
+    // const emailContent = await ejs.renderFile(emailTemplatePath, {
+    //   fullname: data.fullname,
+    //   email: data.email,
+    //   otp: otp
+    // });
 
-    await this.sendEmailViaApi({
-      from: { name: 'GiaSuVLU' },
-      to: { emailAddress: [data.email] },
-      subject: 'Xác nhận đăng ký tài khoản',
-      html: emailContent
-    });
+    // await this.sendEmailViaApi({
+    //   from: { name: 'GiaSuVLU' },
+    //   to: { emailAddress: [data.email] },
+    //   subject: 'Xác nhận đăng ký tài khoản',
+    //   html: emailContent
+    // });
   }
 
   async resendOtp(email: string): Promise<void> {
@@ -228,21 +228,21 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     const data: RegisterUserReq = JSON.parse(storedData);
 
-    const rootDir = process.cwd();
-    const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-template.util.ejs');
+    // const rootDir = process.cwd();
+    // const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-template.util.ejs');
 
-    const emailContent = await ejs.renderFile(emailTemplatePath, {
-      fullname: data.fullname,
-      email: email,
-      otp: otp
-    });
+    // const emailContent = await ejs.renderFile(emailTemplatePath, {
+    //   fullname: data.fullname,
+    //   email: email,
+    //   otp: otp
+    // });
 
-    await this.sendEmailViaApi({
-      from: { name: 'GiaSuVLU' },
-      to: { emailAddress: [email] },
-      subject: 'Xác nhận đăng ký tài khoản',
-      html: emailContent
-    });
+    // await this.sendEmailViaApi({
+    //   from: { name: 'GiaSuVLU' },
+    //   to: { emailAddress: [email] },
+    //   subject: 'Xác nhận đăng ký tài khoản',
+    //   html: emailContent
+    // });
   }
 
   async register(email: string, otp: string): Promise<RegisterUserRes> {
@@ -294,21 +294,21 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       data: myTutor
     });
 
-    const rootDir = process.cwd();
-    const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-template.util.ejs');
+    // const rootDir = process.cwd();
+    // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-template.util.ejs');
 
-    const emailContent = await ejs.renderFile(emailTemplatePath, {
-      fullname: data.fullname,
-      email: email,
-      otp: otp
-    });
+    // const emailContent = await ejs.renderFile(emailTemplatePath, {
+    //   fullname: data.fullname,
+    //   email: email,
+    //   otp: otp
+    // });
 
-    await this.sendEmailViaApi({
-      from: { name: 'GiaSuVLU' },
-      to: { emailAddress: [email] },
-      subject: 'Chúc mừng đăng ký tài khoản thành công',
-      html: emailContent
-    });
+    // await this.sendEmailViaApi({
+    //   from: { name: 'GiaSuVLU' },
+    //   to: { emailAddress: [email] },
+    //   subject: 'Chúc mừng đăng ký tài khoản thành công',
+    //   html: emailContent
+    // });
 
     // Xóa OTP khỏi Redis sau khi xác thực thành công
     await redis.del(`otp:${data.email}`);
@@ -590,18 +590,18 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       const internationalPhone = await this.convertVNPhone(user.phoneNumber);
       sendSms(`Mã OTP của bạn là ${otp}`, [internationalPhone]);
     } else {
-      const rootDir = process.cwd();
-      const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-forgot-template.util.ejs');
-      const emailContent = await ejs.renderFile(emailTemplatePath, {
-        email: user.email,
-        otp: otp
-      });
-      await this.sendEmailViaApi({
-        from: { name: 'GiaSuVLU' },
-        to: { emailAddress: [user.email] },
-        subject: 'Tìm lại mật khẩu',
-        html: emailContent
-      });
+      // const rootDir = process.cwd();
+      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/otp-forgot-template.util.ejs');
+      // const emailContent = await ejs.renderFile(emailTemplatePath, {
+      //   email: user.email,
+      //   otp: otp
+      // });
+      // await this.sendEmailViaApi({
+      //   from: { name: 'GiaSuVLU' },
+      //   to: { emailAddress: [user.email] },
+      //   subject: 'Tìm lại mật khẩu',
+      //   html: emailContent
+      // });
     }
   }
 
