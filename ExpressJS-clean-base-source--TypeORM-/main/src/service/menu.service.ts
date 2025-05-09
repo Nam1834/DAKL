@@ -86,7 +86,7 @@ export class MenuService implements IMenuService {
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_GOI_THANH_TOAN],
           children: null,
-          icon: 'fa-solid fa-hand-holding-dollar'
+          icon: null
         }
       ],
       icon: 'fa-solid fa-list'
