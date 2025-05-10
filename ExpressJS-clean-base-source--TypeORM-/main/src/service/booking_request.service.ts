@@ -182,19 +182,19 @@ export class BookingRequestService
         throw new Error('Can not find userr!');
       }
 
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-booking-request.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-booking-request.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: user.fullname
-      // });
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: user.fullname
+      });
 
-      // await this.sendEmailViaApi({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [user.personalEmail] },
-      //   subject: 'Thông báo duyệt yêu cầu',
-      //   html: emailContent
-      // });
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.personalEmail] },
+        subject: 'Thông báo duyệt yêu cầu',
+        html: emailContent
+      });
     } else if (click === BookingRequestStatus.REFUSE) {
       if (!noteOfTutor) {
         throw new Error('Note of tutor is required when refusing the booking request.');
@@ -216,19 +216,19 @@ export class BookingRequestService
         throw new Error('Can not find userr!');
       }
 
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: user.fullname
-      // });
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: user.fullname
+      });
 
-      // await this.sendEmailViaApi({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [user.personalEmail] },
-      //   subject: 'Thông từ chối yêu cầu',
-      //   html: emailContent
-      // });
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.personalEmail] },
+        subject: 'Thông từ chối yêu cầu',
+        html: emailContent
+      });
     }
   }
 
