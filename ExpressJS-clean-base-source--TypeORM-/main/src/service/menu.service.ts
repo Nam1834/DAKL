@@ -37,7 +37,7 @@ export class MenuService implements IMenuService {
           icon: null
         }
       ],
-      icon: 'fa-solid fa-user-tie'
+      icon: null
     },
 
     // {
@@ -53,8 +53,9 @@ export class MenuService implements IMenuService {
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_YEU_CAU],
       children: null,
-      icon: 'fa-regular fa-paper-plane'
+      icon: null
     },
+
     {
       name: 'DANH MỤC',
       isCollapsed: false,
@@ -102,6 +103,13 @@ export class MenuService implements IMenuService {
       name: 'NẠP VÍ NGƯỜI DÙNG',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_VI_NGUOI_DUNG],
+      children: null,
+      icon: null
+    },
+    {
+      name: 'THANH TOÁN CHO GIA SƯ',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_THANH_TOAN_CHO_GIA_SU],
       children: null,
       icon: null
     },
