@@ -8,6 +8,8 @@ import { BaseContainer } from '@/container/base.container';
 import { IAdminRepository } from '@/repository/interface/i.admin.repository';
 import { Admin } from 'typeorm';
 import { adminRepository } from './admin.container';
+import { tutorProfileRepository } from './tutor_profile.container';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
 
 class CurriculumnContainer extends BaseContainer {
   constructor() {
@@ -18,6 +20,7 @@ class CurriculumnContainer extends BaseContainer {
 
     //Import
     this.container.bind<IAdminRepository<Admin>>('AdminRepository').toConstantValue(adminRepository);
+    this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
   export() {

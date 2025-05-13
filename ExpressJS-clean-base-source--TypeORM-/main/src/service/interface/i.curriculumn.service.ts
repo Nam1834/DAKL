@@ -9,6 +9,7 @@ import { BaseModelType } from '@/types/base-model.types';
 
 export interface ICurriculumnService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<Curriculumn>>;
+  searchForTutor(tutorId: string, searchData: SearchDataDto): Promise<PagingResponseDto<Curriculumn>>;
   createByAdmin(data: CreateCurriculumnReq, adminId: string): Promise<void>;
   getList(paging: PagingDto): Promise<PagingResponseDto<GetListCurriculumnRes>>;
 }
