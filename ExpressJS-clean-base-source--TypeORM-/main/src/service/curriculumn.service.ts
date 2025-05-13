@@ -42,6 +42,22 @@ export class CurriculumnService extends BaseCrudService<Curriculumn> implements 
     return new PagingResponseDto(total, curriculumns);
   }
 
+  async searchForTutor(searchData: SearchDataDto): Promise<PagingResponseDto<Curriculumn>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const curriculumns = await this.curriculumnRepository.findMany({
+      filter: where,
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.curriculumnRepository.count({
+      filter: where
+    });
+
+    return new PagingResponseDto(total, curriculumns);
+  }
+
   async createByAdmin(data: CreateCurriculumnReq, adminId: string): Promise<void> {
     const admin = await this.adminRepository.findOne({
       filter: { adminId: adminId }
