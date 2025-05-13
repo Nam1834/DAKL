@@ -78,6 +78,13 @@ export class BookingRequestService
   }
 
   async createBooking(userId: string, tutorId: string, data: CreateBookingRequestReq): Promise<void> {
+    const checkBookingRequest = await this.bookingRequestRepository.findOne({
+      filter: { userId: userId, tutorId: tutorId, status: BookingRequestStatus.REQUEST }
+    });
+
+    if (checkBookingRequest) {
+      throw new Error('You are in Request!');
+    }
     const tutor = await this.tutorProfileRepository.findOne({
       filter: { userId: tutorId }
     });
