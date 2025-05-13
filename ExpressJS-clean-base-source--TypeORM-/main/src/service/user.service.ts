@@ -919,7 +919,9 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       // Map tutorId => bookingRequestId
       const bookingMap = new Map<string, BookingRequest>();
       relatedBookingRequests.forEach((booking) => {
-        bookingMap.set(booking.tutorId, booking);
+        if (booking.status === BookingRequestStatus.REQUEST) {
+          bookingMap.set(booking.tutorId, booking);
+        }
       });
 
       // Gắn isBookingRequest, bookingRequestId, bookingRequest
