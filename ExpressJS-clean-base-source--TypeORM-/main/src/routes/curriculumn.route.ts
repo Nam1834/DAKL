@@ -36,6 +36,7 @@ curriculumnRouter
     curriculumnController.getListCurriculumn.bind(curriculumnController)
   )
   .get('/search', curriculumnController.searchCurriculumn.bind(curriculumnController))
+  .get('/search-for-tutor', authenticateJWT, curriculumnController.searchForTutor.bind(curriculumnController))
   .get(
     '/get-by-id/:id',
     authenticateJWT,

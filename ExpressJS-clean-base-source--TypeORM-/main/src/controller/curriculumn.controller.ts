@@ -38,6 +38,22 @@ export class CurriculumnController {
     }
   }
 
+  async searchForTutor(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tutor = req.user;
+      if (!tutor) {
+        throw new Error('You must login');
+      }
+      const tutorId = tutor.id;
+
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.curriculumnService.searchForTutor(tutorId, searchData);
+      res.send_ok('Curriculumn fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createByAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const admin = req.user;
