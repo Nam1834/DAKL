@@ -21,8 +21,4 @@ export class CreateCurriculumnReq {
   @IsNotEmpty()
   @IsString()
   description!: string;
-
-  @IsNotEmpty()
-  @IsEnum(CurriculumnStatus, { message: 'Status must be either ACTIVE or UNACTIVE' })
-  status!: CurriculumnStatus;
 }

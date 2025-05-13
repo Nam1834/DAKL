@@ -97,7 +97,7 @@ export class CurriculumnService extends BaseCrudService<Curriculumn> implements 
     newCurriculumn.subjectId = data.subjectId;
     newCurriculumn.curriculumnUrl = data.curriculumnUrl;
     newCurriculumn.description = data.description;
-    newCurriculumn.status = data.status;
+    newCurriculumn.status = CurriculumnStatus.ACTIVE;
     newCurriculumn.roleUserCreated = admin.roleId;
 
     await this.curriculumnRepository.createNewCurriculumn(newCurriculumn);
