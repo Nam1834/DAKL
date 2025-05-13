@@ -88,14 +88,6 @@ export class CurriculumnController {
       }
       const data: UpdateCurriculumnReq = req.body;
 
-      const existingCurriculumnName = await this.curriculumnService.findOne({
-        filter: { curriculumnName: data.curriculumnName }
-      });
-
-      if (existingCurriculumnName) {
-        throw new Error(`Curriculumn name "${data.curriculumnName}" already exists!`);
-      }
-
       await this.curriculumnService.findOneAndUpdate({ filter: { curriculumnId: id }, updateData: data });
 
       res.send_ok('Update major successfully', data);
