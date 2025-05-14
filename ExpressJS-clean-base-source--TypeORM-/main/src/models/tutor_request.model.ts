@@ -111,9 +111,6 @@ export class TutorRequest extends BaseModel {
   @Column({ nullable: true, name: 'video_url' })
   videoUrl!: string;
 
-  @Column({ name: 'is_use_curriculumn', type: 'boolean' })
-  isUseCurriculumn!: boolean;
-
   @Column({ nullable: true, name: 'tutor_level_id' })
   tutorLevelId!: string;
 

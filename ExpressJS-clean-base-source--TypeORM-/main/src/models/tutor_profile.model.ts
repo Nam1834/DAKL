@@ -108,9 +108,6 @@ export class TutorProfile extends BaseModel {
   @Column({ nullable: true, name: 'video_url' })
   videoUrl!: string;
 
-  @Column({ name: 'is_use_curriculumn', type: 'boolean', default: false })
-  isUseCurriculumn!: boolean;
-
   @Column({ name: 'is_public_profile', type: 'boolean', default: false })
   isPublicProfile!: boolean;
 

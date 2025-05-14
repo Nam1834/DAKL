@@ -152,7 +152,6 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
     tutorRequest.videoUrl = data.videoUrl;
     tutorRequest.teachingTime = data.teachingTime;
     tutorRequest.descriptionOfSubject = data.descriptionOfSubject;
-    tutorRequest.isUseCurriculumn = data.isUseCurriculumn;
 
     tutorRequest.subjectId2 = data.subjectId2;
     tutorRequest.evidenceOfSubject2 = data.evidenceOfSubject2;
@@ -218,7 +217,6 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
     tutorRequest.videoUrl = data.videoUrl;
     tutorRequest.teachingTime = data.teachingTime;
     tutorRequest.descriptionOfSubject = data.descriptionOfSubject;
-    tutorRequest.isUseCurriculumn = data.isUseCurriculumn;
 
     tutorRequest.subjectId2 = data.subjectId2;
     tutorRequest.evidenceOfSubject2 = data.evidenceOfSubject2;
@@ -321,7 +319,6 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
         tutorProfile.teachingMethod = checkStatus.teachingMethod;
         tutorProfile.teachingPlace = checkStatus.teachingPlace;
         tutorProfile.videoUrl = checkStatus.videoUrl;
-        tutorProfile.isUseCurriculumn = checkStatus.isUseCurriculumn;
         tutorProfile.tutorLevelId = tutorLevelId;
         tutorProfile.coinPerHours = coinPerHours;
 
@@ -395,7 +392,6 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           teachingMethod: checkStatus.teachingMethod,
           teachingPlace: checkStatus.teachingPlace,
           videoUrl: checkStatus.videoUrl,
-          isUseCurriculumn: checkStatus.isUseCurriculumn,
           teachingTime: checkStatus.teachingTime,
           tutorLevelId: tutorLevelId,
           coinPerHours: coinPerHours
