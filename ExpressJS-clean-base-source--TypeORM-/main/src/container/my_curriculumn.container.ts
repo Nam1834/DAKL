@@ -12,6 +12,8 @@ import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.rep
 import { curriculumnRepository } from './curriculumn.container';
 import { tutorProfileRepository } from './tutor_profile.container';
 import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { UserRepository } from '@/repository/user.repository';
 
 class MyCurriculumnContainer extends BaseContainer {
   constructor() {
@@ -26,6 +28,7 @@ class MyCurriculumnContainer extends BaseContainer {
       .toConstantValue(myCurriculumnItemRepository);
     this.container.bind<ICurriculumnRepository<any>>('CurriculumnRepository').toConstantValue(curriculumnRepository);
     this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
+    this.container.bind<IUserRepository<any>>('UserRepository').to(UserRepository);
   }
 
   export() {
