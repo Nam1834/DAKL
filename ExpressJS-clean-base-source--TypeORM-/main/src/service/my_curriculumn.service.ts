@@ -15,6 +15,8 @@ import { ICurriculumnRepository } from '@/repository/interface/i.curriculumn.rep
 import { Curriculumn } from '@/models/curriculumn.model';
 import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
 import { TutorProfile } from '@/models/tutor_profile.model';
+import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { User } from '@/models/user.model';
 
 @injectable()
 export class MyCurriculumnService
@@ -25,18 +27,21 @@ export class MyCurriculumnService
   private curriculumnRepository: ICurriculumnRepository<Curriculumn>;
   private myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>;
   private myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>;
+  private userRepository: IUserRepository<User>;
 
   constructor(
     @inject('TutorProfileRepository') tutorProfileRepository: ITutorProfileRepository<TutorProfile>,
     @inject('CurriculumnRepository') curriculumnRepository: ICurriculumnRepository<Curriculumn>,
     @inject('MyCurriculumnRepository') myCurriculumnRepository: IMyCurriculumnRepository<MyCurriculumn>,
-    @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>
+    @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>,
+    @inject('UserRepository') userRepository: IUserRepository<User>
   ) {
     super(myCurriculumnRepository);
     this.myCurriculumnRepository = myCurriculumnRepository;
     this.myCurriculumnItemRepository = myCurriculumnItemRepository;
     this.curriculumnRepository = curriculumnRepository;
     this.tutorProfileRepository = tutorProfileRepository;
+    this.userRepository = userRepository;
   }
 
   async getMyCurriculumn(userId: string, paging: PagingDto): Promise<PagingResponseDto<MyCurriculumn>> {
@@ -77,6 +82,39 @@ export class MyCurriculumnService
 
     if (!myCurriculumn) {
       throw new BaseError(ErrorCode.BAD_REQUEST, 'My Currriculumn does not exist');
+    }
+
+    const myCurriculumnItems = await this.myCurriculumnItemRepository.findOne({
+      filter: {
+        myCurriculumnId: myCurriculumn.myCurriculumnId,
+        curriculumnId: data.curriculumnId
+      }
+    });
+
+    if (myCurriculumnItems) {
+      throw new BaseError(ErrorCode.BAD_REQUEST, 'This Curriculum is exist in your item');
+    }
+
+    const user = await this.userRepository.findOne({
+      filter: { userId: userId }
+    });
+
+    if (!user) {
+      throw new BaseError(ErrorCode.NF_01, 'Không tìm thấy thông tin người dùng');
+    }
+    const userCoins = user.coin;
+
+    // Xu li tru coin
+
+    if (userCoins < 10) {
+      throw new Error('You does not have enough coins!');
+    } else {
+      await this.userRepository.findOneAndUpdate({
+        filter: { userId: userId },
+        updateData: {
+          coin: userCoins - 10
+        }
+      });
     }
 
     const myCurriculumnItem = new MyCurriculumnItem();
