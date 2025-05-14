@@ -676,7 +676,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
     tutorProfile.videoUrl = data.videoUrl;
     tutorProfile.teachingTime = data.teachingTime;
     tutorProfile.descriptionOfSubject = data.descriptionOfSubject;
-    tutorProfile.isUseCurriculumn = data.isUseCurriculumn;
 
     tutorProfile.subjectId2 = data.subjectId2;
     tutorProfile.evidenceOfSubject2 = data.evidenceOfSubject2;

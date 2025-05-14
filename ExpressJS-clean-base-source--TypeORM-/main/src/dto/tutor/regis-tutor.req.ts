@@ -107,10 +107,6 @@ export class RegisToTutorReq {
   videoUrl!: string;
 
   @IsNotEmpty()
-  @IsBoolean()
-  isUseCurriculumn!: boolean;
-
-  @IsNotEmpty()
   @IsString()
   evidenceOfGPA!: string;
 
