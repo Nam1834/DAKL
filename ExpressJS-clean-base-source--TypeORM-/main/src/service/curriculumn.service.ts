@@ -57,12 +57,12 @@ export class CurriculumnService extends BaseCrudService<Curriculumn> implements 
       throw new Error('You are not Tutor!');
     }
 
-    const tutorMajorId = tutorProfile.majorId;
+    // const tutorMajorId = tutorProfile.majorId;
 
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
     const curriculumns = await this.curriculumnRepository.findMany({
-      filter: { majorId: tutorMajorId, status: CurriculumnStatus.ACTIVE, ...where },
+      filter: { status: CurriculumnStatus.ACTIVE, ...where },
       order: order,
       paging: paging
     });
