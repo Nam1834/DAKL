@@ -22,6 +22,7 @@ import bookingRequestRouter from '../booking_request.route';
 import myTutorRouter from '../my_tutor.route';
 import tutorRequestRouter from '../tutor_request.route';
 import managePaymentRouter from '../manage_payment.route';
+import classroomRouter from '../classroom.route';
 
 export function route(app: any, root_api: string) {
   app.use(`/role`, roleRouter);
@@ -46,6 +47,7 @@ export function route(app: any, root_api: string) {
   app.use(`/my-tutor`, myTutorRouter);
   app.use(`/tutor-request`, tutorRequestRouter);
   app.use(`/manage-payment`, managePaymentRouter);
+  app.use(`/classroom`, classroomRouter);
   app.all('*', (req: any, res: any, next: any) => {
     const err = new BaseError(ErrorCode.API_NOT_EXISTS, 'API Not Exists');
     next(err);
