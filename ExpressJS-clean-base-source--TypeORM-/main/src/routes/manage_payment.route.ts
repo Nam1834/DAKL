@@ -5,10 +5,16 @@ import { Permissions } from '@/constants/permission.constants';
 import express from 'express';
 const managePaymentRouter = express.Router();
 
-managePaymentRouter.get(
-  '/search',
-  authenticateJWT,
-  checkPermission([Permissions.QUAN_LY_THANH_TOAN_CHO_GIA_SU]),
-  managePaymentController.searchManagePayment.bind(managePaymentController)
-);
+managePaymentRouter
+  .get(
+    '/search',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_THANH_TOAN_CHO_GIA_SU]),
+    managePaymentController.searchManagePayment.bind(managePaymentController)
+  )
+  .get(
+    '/search-for-tutor',
+    authenticateJWT,
+    managePaymentController.searchManagePaymentForTutor.bind(managePaymentController)
+  );
 export default managePaymentRouter;

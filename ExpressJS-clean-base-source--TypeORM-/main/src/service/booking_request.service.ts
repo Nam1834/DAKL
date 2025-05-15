@@ -348,11 +348,26 @@ export class BookingRequestService
       await this.classroomRepository.create({
         data: classroom
       });
-    }
+      await this.bookingRequestRepository.findOneAndUpdate({
+        filter: { bookingRequestId: bookingRequestId },
+        updateData: { isHire: true }
+      });
 
-    await this.bookingRequestRepository.findOneAndUpdate({
-      filter: { bookingRequestId: bookingRequestId },
-      updateData: { isHire: true }
-    });
+      //Gui email cho gia su
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/hire-tutor-email.util.ejs');
+
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: tutorProfile.fullname,
+        coin: tutor.coin
+      });
+
+      await this.sendEmailViaApi({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [tutor.email] },
+        subject: 'Thông báo thuê gia sư',
+        html: emailContent
+      });
+    }
   }
 }

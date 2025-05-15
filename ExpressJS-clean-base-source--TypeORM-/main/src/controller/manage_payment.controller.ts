@@ -28,4 +28,19 @@ export class ManagePaymentController {
       next(error);
     }
   }
+
+  async searchManagePaymentForTutor(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tutor = req.user;
+      if (!tutor) {
+        throw new Error('You must login');
+      }
+      const tutorId = tutor.id;
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.managePaymentService.searchForTutor(tutorId, searchData);
+      res.send_ok('Manage Payment fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
