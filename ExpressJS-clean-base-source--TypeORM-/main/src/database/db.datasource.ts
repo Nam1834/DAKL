@@ -32,6 +32,7 @@ import { MyTutorItem } from '@/models/my_tutor_item.model';
 import { TutorRequest } from '@/models/tutor_request.model';
 import { Classroom } from '@/models/classroom.model';
 import { ManagePayment } from '@/models/manage_payment.model';
+import { ClassroomAssessment } from '@/models/classroom_assessment.model';
 
 const models = [
   Role,
@@ -63,7 +64,8 @@ const models = [
   TutorRequest,
   BookingRequest,
   Classroom,
-  ManagePayment
+  ManagePayment,
+  ClassroomAssessment
 ];
 
 export class AppDataSourceSingleton {
