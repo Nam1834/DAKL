@@ -202,19 +202,19 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     //Send success email
     const userEmail = order.customerEmail;
     if (userEmail) {
-      const rootDir = process.cwd();
-      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-payment.util.ejs');
-      const emailContent = await ejs.renderFile(emailTemplatePath, {
-        amount: payment.amount
-      });
-      await this.sendEmailViaApi({
-        from: {
-          name: 'GiaSuVLU'
-        },
-        to: { emailAddress: [userEmail] },
-        subject: 'Thanh toán thành công',
-        html: emailContent
-      });
+      // const rootDir = process.cwd();
+      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-payment.util.ejs');
+      // const emailContent = await ejs.renderFile(emailTemplatePath, {
+      //   amount: payment.amount
+      // });
+      // await this.sendEmailViaApi({
+      //   from: {
+      //     name: 'GiaSuVLU'
+      //   },
+      //   to: { emailAddress: [userEmail] },
+      //   subject: 'Thanh toán thành công',
+      //   html: emailContent
+      // });
     }
 
     return;
