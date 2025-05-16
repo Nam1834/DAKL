@@ -596,7 +596,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
         email: user.email,
         otp: otp
       });
-      await sendEmail({
+      await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
         to: { emailAddress: [user.email] },
         subject: 'Tìm lại mật khẩu',
