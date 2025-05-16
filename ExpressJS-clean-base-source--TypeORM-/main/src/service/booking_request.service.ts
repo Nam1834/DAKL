@@ -26,6 +26,7 @@ import BaseError from '@/utils/error/base.error';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { User } from '@/models/user.model';
 import { IUserRepository } from '@/repository/interface/i.user.repository';
+import { sendEmail } from '@/utils/email/send-email.util';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
@@ -189,19 +190,19 @@ export class BookingRequestService
         throw new Error('Can not find userr!');
       }
 
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-booking-request.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/success-email-booking-request.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: user.fullname
-      // });
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: user.fullname
+      });
 
-      // await this.sendEmailViaApi({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [user.personalEmail] },
-      //   subject: 'Thông báo duyệt yêu cầu',
-      //   html: emailContent
-      // });
+      await sendEmail({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.personalEmail] },
+        subject: 'Thông báo duyệt yêu cầu',
+        html: emailContent
+      });
     } else if (click === BookingRequestStatus.REFUSE) {
       if (!noteOfTutor) {
         throw new Error('Note of tutor is required when refusing the booking request.');
@@ -223,19 +224,19 @@ export class BookingRequestService
         throw new Error('Can not find userr!');
       }
 
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/fail-email-tutor-request.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: user.fullname
-      // });
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: user.fullname
+      });
 
-      // await this.sendEmailViaApi({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [user.personalEmail] },
-      //   subject: 'Thông từ chối yêu cầu',
-      //   html: emailContent
-      // });
+      await sendEmail({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [user.personalEmail] },
+        subject: 'Thông từ chối yêu cầu',
+        html: emailContent
+      });
     }
   }
 
@@ -354,20 +355,20 @@ export class BookingRequestService
       });
 
       //Gui email cho gia su
-      // const rootDir = process.cwd();
-      // const emailTemplatePath = path.join(rootDir, 'src/utils/email/hire-tutor-email.util.ejs');
+      const rootDir = process.cwd();
+      const emailTemplatePath = path.join(rootDir, 'src/utils/email/hire-tutor-email.util.ejs');
 
-      // const emailContent = await ejs.renderFile(emailTemplatePath, {
-      //   fullname: tutorProfile.fullname,
-      //   coin: tutor.coin
-      // });
+      const emailContent = await ejs.renderFile(emailTemplatePath, {
+        fullname: tutorProfile.fullname,
+        coin: tutor.coin
+      });
 
-      // await this.sendEmailViaApi({
-      //   from: { name: 'GiaSuVLU' },
-      //   to: { emailAddress: [tutor.email] },
-      //   subject: 'Thông báo thuê gia sư',
-      //   html: emailContent
-      // });
+      await sendEmail({
+        from: { name: 'GiaSuVLU' },
+        to: { emailAddress: [tutor.email] },
+        subject: 'Thông báo thuê gia sư',
+        html: emailContent
+      });
     }
   }
 }
