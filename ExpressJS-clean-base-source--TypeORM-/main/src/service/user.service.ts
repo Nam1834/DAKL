@@ -208,7 +208,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       otp: otp
     });
 
-    await sendEmail({
+    await this.sendEmailViaApi({
       from: { name: 'GiaSuVLU' },
       to: { emailAddress: [data.email] },
       subject: 'Xác nhận đăng ký tài khoản',
@@ -237,7 +237,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       otp: otp
     });
 
-    await sendEmail({
+    await this.sendEmailViaApi({
       from: { name: 'GiaSuVLU' },
       to: { emailAddress: [email] },
       subject: 'Xác nhận đăng ký tài khoản',
@@ -303,7 +303,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       otp: otp
     });
 
-    await sendEmail({
+    await this.sendEmailViaApi({
       from: { name: 'GiaSuVLU' },
       to: { emailAddress: [email] },
       subject: 'Chúc mừng đăng ký tài khoản thành công',
