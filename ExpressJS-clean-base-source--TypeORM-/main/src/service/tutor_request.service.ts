@@ -360,7 +360,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
           fullname: checkStatus.fullname
         });
 
-        await sendEmail({
+        await this.sendEmailViaApi({
           from: { name: 'GiaSuVLU' },
           to: { emailAddress: [user.email] },
           subject: 'Thông báo duyệt yêu cầu',
@@ -428,7 +428,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
         throw new Error('user does not exist');
       }
 
-      await sendEmail({
+      await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
         to: { emailAddress: [user.email] },
         subject: 'Thông báo duyệt yêu cầu',
@@ -456,7 +456,7 @@ export class TutorRequestService extends BaseCrudService<TutorRequest> implement
         fullname: checkStatus.fullname
       });
 
-      await sendEmail({
+      await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
         to: { emailAddress: [user.email] },
         subject: 'Thông báo duyệt yêu cầu',

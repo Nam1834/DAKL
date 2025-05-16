@@ -207,7 +207,7 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
       const emailContent = await ejs.renderFile(emailTemplatePath, {
         amount: payment.amount
       });
-      await sendEmail({
+      await this.sendEmailViaApi({
         from: {
           name: 'GiaSuVLU'
         },

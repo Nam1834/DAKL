@@ -197,7 +197,7 @@ export class BookingRequestService
         fullname: user.fullname
       });
 
-      await sendEmail({
+      await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
         to: { emailAddress: [user.personalEmail] },
         subject: 'Thông báo duyệt yêu cầu',
@@ -231,7 +231,7 @@ export class BookingRequestService
         fullname: user.fullname
       });
 
-      await sendEmail({
+      await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
         to: { emailAddress: [user.personalEmail] },
         subject: 'Thông từ chối yêu cầu',
@@ -363,7 +363,7 @@ export class BookingRequestService
         coin: tutor.coin
       });
 
-      await sendEmail({
+      await this.sendEmailViaApi({
         from: { name: 'GiaSuVLU' },
         to: { emailAddress: [tutor.email] },
         subject: 'Thông báo thuê gia sư',
