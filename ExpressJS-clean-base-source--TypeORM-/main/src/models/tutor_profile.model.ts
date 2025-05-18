@@ -137,4 +137,11 @@ export class TutorProfile extends BaseModel {
 
   @Column({ type: 'boolean', nullable: true, name: 'is_my_favourite_tutor' })
   isMyFavouriteTutor?: boolean;
+
+  //Rating
+  @Column({ nullable: true, type: 'decimal', precision: 2, scale: 1, default: 0 })
+  rating!: number;
+
+  @Column({ nullable: true, name: 'number_of_rating', default: 0 })
+  numberOfRating!: number;
 }
