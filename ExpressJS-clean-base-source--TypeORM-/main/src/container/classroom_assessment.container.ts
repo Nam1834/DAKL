@@ -5,6 +5,10 @@ import { ClassroomAssessmentRepository } from '@/repository/classroom_assessment
 import { IClassroomAssessmentService } from '@/service/interface/i.classroom_assessment.service';
 import { IClassroomAssessmentRepository } from '@/repository/interface/i.classroom_assessment.repository';
 import { BaseContainer } from '@/container/base.container';
+import { IClassroomRepository } from '@/repository/interface/i.classroom.repository';
+import { classroomRepository } from './classroom.container';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
+import { tutorProfileRepository } from './tutor_profile.container';
 
 class ClassroomAssessmentContainer extends BaseContainer {
   constructor() {
@@ -16,6 +20,10 @@ class ClassroomAssessmentContainer extends BaseContainer {
       .bind<IClassroomAssessmentRepository<ClassroomAssessment>>('ClassroomAssessmentRepository')
       .to(ClassroomAssessmentRepository);
     this.container.bind<ClassroomAssessmentController>(ClassroomAssessmentController).toSelf();
+
+    //Import
+    this.container.bind<IClassroomRepository<any>>('ClassroomRepository').toConstantValue(classroomRepository);
+    this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
   export() {
