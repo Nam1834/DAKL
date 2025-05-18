@@ -113,6 +113,13 @@ export class MenuService implements IMenuService {
       children: null,
       icon: null
     },
+    {
+      name: 'ĐÁNH GIÁ',
+      isCollapsed: false,
+      permissions: [Permissions.QUAN_LY_DANH_GIA],
+      children: null,
+      icon: null
+    },
 
     // User
     {

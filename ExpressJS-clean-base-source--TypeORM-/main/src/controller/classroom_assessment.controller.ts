@@ -1,8 +1,10 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { CreateAssessmentReq } from '@/dto/assessment/create-assessment.req';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { ClassroomAssessment } from '@/models/classroom_assessment.model';
 import { IClassroomAssessmentService } from '@/service/interface/i.classroom_assessment.service';
 import { ITYPES } from '@/types/interface.types';
+import { getSearchData } from '@/utils/get-search-data.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 
@@ -16,6 +18,16 @@ export class ClassroomAssessmentController {
   ) {
     this.classroomAssessmentService = classroomAssessmentService;
     this.common = common;
+  }
+
+  async searchAssessment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.classroomAssessmentService.search(searchData);
+      res.send_ok('Assessment fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async createAssessment(req: Request, res: Response, next: NextFunction): Promise<void> {
