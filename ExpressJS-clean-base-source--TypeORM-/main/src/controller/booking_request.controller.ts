@@ -20,6 +20,29 @@ export class BookingRequestController {
     this.common = common;
   }
 
+  async calculateTotalCoins(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user;
+      const userId = user?.id;
+
+      if (!userId) {
+        throw new Error('You must login');
+      }
+
+      const { tutorId, hoursPerLesson, totalLessons } = req.body;
+
+      if (!tutorId || !hoursPerLesson || !totalLessons) {
+        throw new Error('Missing required fields');
+      }
+
+      const totalCoins = await this.bookingRequestService.calculateTotalCoins(tutorId, hoursPerLesson, totalLessons);
+
+      res.send_ok('Calculate total coins successfully', { totalCoins });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createBookingRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = req.user;

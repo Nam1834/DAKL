@@ -7,6 +7,11 @@ const bookingRequestRouter = express.Router();
 
 bookingRequestRouter
   .post(
+    '/calculate-coins',
+    authenticateJWT,
+    bookingRequestController.calculateTotalCoins.bind(bookingRequestController)
+  )
+  .post(
     '/create/:tutorId',
     authenticateJWT,
     classValidate(CreateBookingRequestReq),
