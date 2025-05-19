@@ -78,6 +78,22 @@ export class BookingRequestService
     );
   }
 
+  async calculateTotalCoins(tutorId: string, hoursPerLesson: number, totalLessons: number): Promise<number> {
+    const tutor = await this.tutorProfileRepository.findOne({
+      filter: { userId: tutorId }
+    });
+
+    if (!tutor) {
+      throw new Error('Tutor does not exist');
+    }
+
+    const rawTotal = totalLessons * hoursPerLesson * tutor.coinPerHours;
+    const decimalPart = rawTotal - Math.floor(rawTotal);
+    const totalCoins = decimalPart >= 0.5 ? Math.ceil(rawTotal) : Math.floor(rawTotal);
+
+    return totalCoins;
+  }
+
   async createBooking(userId: string, tutorId: string, data: CreateBookingRequestReq): Promise<void> {
     const checkBookingRequest = await this.bookingRequestRepository.findOne({
       filter: { userId: userId, tutorId: tutorId, status: BookingRequestStatus.REQUEST }
