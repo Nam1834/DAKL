@@ -10,4 +10,32 @@ export class StatisticalController {
   constructor(@inject('StatisticalService') statisticalService: IStatisticalService) {
     this.statisticalService = statisticalService;
   }
+
+  async getWeekStatistic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dailyRevenue = await this.statisticalService.getDailyRevenue();
+      const information = await this.statisticalService.getStatistics(7);
+      res.send_ok('Get statistics successfully', { dailyRevenue, information });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getMonthStatistic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const weekRevenue = await this.statisticalService.getWeekRevenue();
+      const information = await this.statisticalService.getStatistics(30);
+      res.send_ok('Get statistics successfully', { weekRevenue, information });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getYearStatistic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const monthRevenue = await this.statisticalService.getMonthRevenue();
+      const information = await this.statisticalService.getStatistics(365);
+      res.send_ok('Get statistics successfully', { monthRevenue, information });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
