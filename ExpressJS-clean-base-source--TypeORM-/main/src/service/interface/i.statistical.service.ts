@@ -8,4 +8,5 @@ export interface IStatisticalService {
   getDailyRevenue(): Promise<StatisticalRevenueRes>;
   getWeekRevenue(): Promise<StatisticalRevenueRes>;
   getMonthRevenue(): Promise<StatisticalRevenueRes>;
+  exportStatisticsToExcel(time: number): Promise<Buffer>;
 }
