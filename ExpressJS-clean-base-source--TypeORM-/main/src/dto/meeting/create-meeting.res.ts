@@ -5,7 +5,7 @@ export class CreateMeetingRes {
   meetingId!: string;
 
   @Expose()
-  microsoftMeetingId!: string;
+  zoomMeetingId!: string;
 
   @Expose()
   topic?: string;
