@@ -90,4 +90,31 @@ export class MeetingController {
       next(error);
     }
   }
+  // async generateZoomSignature(req: Request, res: Response, next: NextFunction): Promise<void> {
+  //   try {
+  //     const meetingId = typeof req.query.zoomMeetingId === 'string' ? req.query.zoomMeetingId.trim() : undefined;
+  //     const role = typeof req.query.role === 'string' ? parseInt(req.query.role) : 0;
+
+  //     if (!meetingId) {
+  //       res.status(400).send({ error: 'Missing meetingId' });
+  //       return;
+  //     }
+
+  //     const meeting = await this.meetingService.getMeetingById(meetingId);
+
+  //     if (!meeting?.zoomMeetingId) {
+  //       res.status(404).send({ error: 'Meeting not found or missing Zoom Meeting ID' });
+  //       return;
+  //     }
+
+  //     const signature = await this.meetingService.generateZoomSignature(meeting.zoomMeetingId, role);
+
+  //     res.send_ok('Zoom SDK signature generated successfully', {
+  //       signature,
+  //       meetingNumber: meeting.zoomMeetingId
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 }

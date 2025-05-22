@@ -2,7 +2,7 @@ import { Expose, Type } from 'class-transformer';
 
 export class ZoomMeetingRes {
   @Expose()
-  zoomMeetingId!: string;
+  id!: string;
 
   @Expose()
   topic!: string;
