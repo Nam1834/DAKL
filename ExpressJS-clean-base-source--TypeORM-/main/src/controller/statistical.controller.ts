@@ -38,4 +38,36 @@ export class StatisticalController {
       next(error);
     }
   }
+  async exportWeekStatistic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const buffer = await this.statisticalService.exportStatisticsToExcel(7);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=week_statistics.xlsx');
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exportMonthStatistic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const buffer = await this.statisticalService.exportStatisticsToExcel(30);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=month_statistics.xlsx');
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exportYearStatistic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const buffer = await this.statisticalService.exportStatisticsToExcel(365);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=year_statistics.xlsx');
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

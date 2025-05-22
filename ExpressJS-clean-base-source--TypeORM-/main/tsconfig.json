@@ -5,6 +5,7 @@
   "files": ["src/types/express/index.d.ts"],
   "compilerOptions": {
     "target": "es2021",
+    "types": ["node"],
     "lib": ["es2021", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
