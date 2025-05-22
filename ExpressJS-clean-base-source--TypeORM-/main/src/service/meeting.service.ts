@@ -114,30 +114,6 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     };
   }
 
-  async generateZoomSignature(meetingNumber: string, role: number): Promise<string> {
-    const sdkKey = process.env.ZOOM_CLIENT_ID;
-    const sdkSecret = process.env.ZOOM_CLIENT_SECRET;
-
-    if (!sdkKey || !sdkSecret) {
-      throw new Error('Missing ZOOM_CLIENT_ID or ZOOM_CLIENT_SECRET environment variable');
-    }
-
-    const iat = Math.floor((Date.now() - 30000) / 1000);
-    const exp = iat + 60 * 60;
-
-    const payload = {
-      sdkKey,
-      mn: meetingNumber,
-      role,
-      iat,
-      exp,
-      appKey: sdkKey,
-      tokenExp: exp
-    };
-
-    return jwt.sign(payload, sdkSecret, { algorithm: 'HS256' });
-  }
-
   async createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes> {
     const now = new Date();
     const startDateTime = new Date(now.getTime() + 5 * 60 * 1000);
@@ -177,5 +153,28 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     await this.meetingRepository.save(meeting);
 
     return convertToDto(CreateMeetingRes, meeting);
+  }
+  async generateZoomSignature(meetingNumber: string, role: number): Promise<string> {
+    const sdkKey = process.env.ZOOM_CLIENT_ID;
+    const sdkSecret = process.env.ZOOM_CLIENT_SECRET;
+
+    if (!sdkKey || !sdkSecret) {
+      throw new Error('Missing ZOOM_CLIENT_ID or ZOOM_CLIENT_SECRET environment variable');
+    }
+
+    const iat = Math.floor((Date.now() - 30000) / 1000);
+    const exp = iat + 60 * 60;
+
+    const payload = {
+      sdkKey,
+      mn: meetingNumber,
+      role,
+      iat,
+      exp,
+      appKey: sdkKey,
+      tokenExp: exp
+    };
+
+    return jwt.sign(payload, sdkSecret, { algorithm: 'HS256' });
   }
 }
