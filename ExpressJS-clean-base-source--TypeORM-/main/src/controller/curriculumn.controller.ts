@@ -8,6 +8,8 @@ import { AdminTypeEnum } from '@/enums/admin-type.enum';
 import { CurriculumnStatus } from '@/enums/curriculumn-status.eum';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Curriculumn } from '@/models/curriculumn.model';
+import { MyCurriculumnItem } from '@/models/my_curriculumn_item.model';
+import { IMyCurriculumnItemRepository } from '@/repository/interface/i.my_curriculumn_item.repository';
 import { ICurriculumnService } from '@/service/interface/i.curriculumn.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
@@ -20,11 +22,14 @@ import { filter } from 'lodash';
 export class CurriculumnController {
   public common: IBaseCrudController<Curriculumn>;
   private curriculumnService: ICurriculumnService<Curriculumn>;
+  private myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>;
   constructor(
     @inject('CurriculumnService') curriculumnService: ICurriculumnService<Curriculumn>,
+    @inject('MyCurriculumnItemRepository') myCurriculumnItemRepository: IMyCurriculumnItemRepository<MyCurriculumnItem>,
     @inject(ITYPES.Controller) common: IBaseCrudController<Curriculumn>
   ) {
     this.curriculumnService = curriculumnService;
+    this.myCurriculumnItemRepository = myCurriculumnItemRepository;
     this.common = common;
   }
 
@@ -97,18 +102,29 @@ export class CurriculumnController {
   }
 
   async deleteCurriculumnById(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const id = req.params.id;
+    try {
+      const id = req.params.id;
 
-    const existingMajor = await this.curriculumnService.findOne({
-      filter: { curriculumnId: id }
-    });
-    if (!existingMajor) {
-      throw new BaseError(ErrorCode.DOES_NOT_EXISTS, 'Curriculumn does not exist');
+      const existingMajor = await this.curriculumnService.findOne({
+        filter: { curriculumnId: id }
+      });
+      if (!existingMajor) {
+        throw new BaseError(ErrorCode.DOES_NOT_EXISTS, 'Curriculumn does not exist');
+      }
+
+      const existingCurriculumn = await this.myCurriculumnItemRepository.findOne({
+        filter: { curriculumnId: id }
+      });
+      if (existingCurriculumn) {
+        throw new Error('Curriculumn in use!');
+      }
+
+      await this.curriculumnService.findOneAndDelete({ filter: { curriculumnId: id } });
+
+      res.send_ok('Delete curriculumn successfully');
+    } catch (error) {
+      next(error);
     }
-
-    await this.curriculumnService.findOneAndDelete({ filter: { curriculumnId: id } });
-
-    res.send_ok('Delete curriculumn successfully');
   }
 
   async getListCurriculumn(req: Request, res: Response, next: NextFunction): Promise<void> {
