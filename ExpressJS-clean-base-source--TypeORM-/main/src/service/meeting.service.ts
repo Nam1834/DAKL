@@ -114,21 +114,29 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     };
   }
 
-  // async generateZoomSignature(meetingNumber: string, role: number): Promise<string> {
-  //   const timestamp = new Date().getTime() - 30000; // Đảm bảo thời gian không bị lệch quá xa
-  //   const payload = {
-  //     sdkKey: ZOOM_CLIENT_ID, // Thay bằng SDK Key của bạn
-  //     mn: meetingNumber,
-  //     role,
-  //     iat: Math.floor(timestamp / 1000),
-  //     exp: Math.floor(timestamp / 1000) + 60 * 60, // Chữ ký hết hạn sau 1 giờ
-  //     appKey: ZOOM_CLIENT_ID,
-  //     tokenExp: Math.floor(timestamp / 1000) + 60 * 60
-  //   };
+  async generateZoomSignature(meetingNumber: string, role: number): Promise<string> {
+    const sdkKey = process.env.ZOOM_CLIENT_ID;
+    const sdkSecret = process.env.ZOOM_CLIENT_SECRET;
 
-  //   // Tạo chữ ký
-  //   return jwt.sign(payload, ZOOM_CLIENT_SECRET, { algorithm: 'HS256' });
-  // }
+    if (!sdkKey || !sdkSecret) {
+      throw new Error('Missing ZOOM_CLIENT_ID or ZOOM_CLIENT_SECRET environment variable');
+    }
+
+    const iat = Math.floor((Date.now() - 30000) / 1000);
+    const exp = iat + 60 * 60;
+
+    const payload = {
+      sdkKey,
+      mn: meetingNumber,
+      role,
+      iat,
+      exp,
+      appKey: sdkKey,
+      tokenExp: exp
+    };
+
+    return jwt.sign(payload, sdkSecret, { algorithm: 'HS256' });
+  }
 
   async createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes> {
     const now = new Date();
@@ -160,7 +168,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     const meetingData = response.data;
 
     const meeting = new Meeting();
-    meeting.zoomMeetingId = meetingData.zoomMeetingId;
+    meeting.zoomMeetingId = meetingData.id?.toString();
     meeting.topic = meetingData.topic;
     meeting.startTime = new Date(meetingData.start_time);
     meeting.joinUrl = meetingData.join_url;
