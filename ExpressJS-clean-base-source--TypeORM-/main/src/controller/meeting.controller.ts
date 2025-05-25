@@ -119,4 +119,31 @@ export class MeetingController {
       next(error);
     }
   }
+
+  async getMeetingByClassroom(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { classroomId } = req.body;
+      if (!classroomId) {
+        res.status(400).send({ error: 'Missing meetingId' });
+        return;
+      }
+
+      const meeting = await this.meetingService.findOne({
+        filter: { classroomId: classroomId }
+      });
+
+      if (!meeting?.classroomId) {
+        res.status(404).send({ error: 'Meeting not found ' });
+        return;
+      }
+
+      const result = await this.meetingService.getMeetingByClassroom(classroomId);
+
+      res.send_ok('Get meeting successfully', {
+        result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
