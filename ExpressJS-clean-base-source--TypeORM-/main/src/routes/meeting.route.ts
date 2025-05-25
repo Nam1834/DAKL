@@ -1,9 +1,10 @@
 import { meetingController } from '@/container/meeting.container';
+import { authenticateJWT } from '@/middleware/authenticate.middleware';
 import express from 'express';
 const meetingRouter = express.Router();
 
 meetingRouter
-  .get('/get-meeting', meetingController.getMeetingByClassroom.bind(meetingController))
+  .get('/get-meeting', authenticateJWT, meetingController.getMeetingByClassroom.bind(meetingController))
   .get('/auth', meetingController.getZoomUrl.bind(meetingController))
   .get('/callback', meetingController.handleZoomCallback.bind(meetingController))
   .post('/handle', meetingController.handleZoomRedirect.bind(meetingController))
