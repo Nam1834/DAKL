@@ -149,6 +149,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     meeting.startTime = new Date(meetingData.start_time);
     meeting.joinUrl = meetingData.join_url;
     meeting.password = meetingData.password;
+    meeting.classroomId = data.classroomId;
 
     await this.meetingRepository.save(meeting);
 
@@ -176,5 +177,21 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     };
 
     return jwt.sign(payload, sdkSecret, { algorithm: 'HS256' });
+  }
+
+  async getMeetingByClassroom(classroomId: string): Promise<CreateMeetingRes | null> {
+    const meeting = await this.meetingRepository.findMany({
+      filter: { classroomId },
+      order: [
+        {
+          column: 'createdAt',
+          direction: 'DESC'
+        }
+      ] // nếu có nhiều meeting
+    });
+
+    if (!meeting) return null;
+
+    return convertToDto(CreateMeetingRes, meeting[0]);
   }
 }

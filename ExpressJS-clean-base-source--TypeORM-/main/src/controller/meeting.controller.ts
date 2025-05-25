@@ -110,8 +110,10 @@ export class MeetingController {
       const signature = await this.meetingService.generateZoomSignature(zoomMeetingId, role || 0);
 
       res.send_ok('Zoom SDK signature generated successfully', {
+        sdkKey: process.env.ZOOM_CLIENT_ID,
         signature,
-        meetingNumber: meeting.zoomMeetingId
+        meetingNumber: meeting.zoomMeetingId,
+        password: meeting.password
       });
     } catch (error) {
       next(error);

@@ -9,4 +9,8 @@ export class CreateMeetingReq {
   @IsOptional()
   @IsString()
   password!: string;
+
+  @IsOptional()
+  @IsString()
+  classroomId!: string;
 }
