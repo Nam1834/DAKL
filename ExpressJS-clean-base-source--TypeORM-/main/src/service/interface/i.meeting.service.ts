@@ -9,4 +9,5 @@ export interface IMeetingService<T extends BaseModelType> extends IBaseCrudServi
   refreshZoomAccessToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }>;
   createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes>;
   generateZoomSignature(meetingNumber: string, role: number): Promise<string>;
+  getMeetingByClassroom(classroomId: string): Promise<CreateMeetingRes | null>;
 }
