@@ -1,5 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn
+} from 'typeorm';
 import { BaseModel } from './base.model';
+import { Classroom } from './classroom.model';
 
 @Entity('meetings')
 export class Meeting extends BaseModel {
@@ -29,4 +38,11 @@ export class Meeting extends BaseModel {
 
   @Column('varchar', { length: 100, nullable: true })
   hostEmail!: string;
+
+  @Column({ name: 'classroom_id', nullable: true })
+  classroomId!: string;
+
+  @ManyToOne(() => Classroom, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'classroom_id' })
+  classroom!: Classroom;
 }
