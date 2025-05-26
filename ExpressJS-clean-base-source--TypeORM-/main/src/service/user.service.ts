@@ -936,6 +936,38 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       });
     }
 
+    publics.forEach((publicUser) => {
+      if (publicUser.tutorProfile) {
+        (publicUser.tutorProfile as any).is_booking_request_accepted = false;
+      }
+    });
+
+    if (tutorIds.length > 0) {
+      const relatedBookingRequests = await this.bookingRequestRepository.findBookingRequestsByTutorIds(
+        userId,
+        tutorIds,
+        BookingRequestStatus.ACCEPT
+      );
+
+      // Map tutorId => bookingRequestId
+      const bookingMap = new Map<string, BookingRequest>();
+      relatedBookingRequests.forEach((booking) => {
+        if (booking.status === BookingRequestStatus.ACCEPT && booking.isHire === false) {
+          bookingMap.set(booking.tutorId, booking);
+        }
+      });
+
+      // Gắn isBookingRequest, bookingRequestId, bookingRequest
+      publics.forEach((publicUser) => {
+        const tutorId = publicUser.userId;
+        const bookingRequest = bookingMap.get(tutorId);
+
+        if (bookingRequest && publicUser.tutorProfile) {
+          (publicUser.tutorProfile as any).is_booking_request_accepted = true;
+        }
+      });
+    }
+
     //
     const total = await this.userRepository.count({ filter: where });
 

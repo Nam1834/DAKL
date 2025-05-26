@@ -144,4 +144,7 @@ export class TutorProfile extends BaseModel {
 
   @Column({ nullable: true, name: 'number_of_rating', default: 0 })
   numberOfRating!: number;
+
+  @Column({ type: 'boolean', nullable: true, name: 'is_booking_request_accepted' })
+  isBookingRequestAccepted!: boolean;
 }
