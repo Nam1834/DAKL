@@ -8,7 +8,7 @@ export class CreateMeetingRes {
   zoomMeetingId!: string;
 
   @Expose()
-  topic?: string;
+  topic!: string;
 
   @Expose()
   startTime!: Date;
