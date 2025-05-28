@@ -36,7 +36,7 @@ export class MeetingController {
       const event = parsed.event;
       const payload = parsed.payload?.object;
 
-      console.log('Received Zoom webhook with event:', parsed.event);
+      console.log('Received Zoom webhook listen with event:', parsed.event);
       console.log('Payload:', JSON.stringify(payload, null, 2));
 
       if (event === 'meeting.ended') {
