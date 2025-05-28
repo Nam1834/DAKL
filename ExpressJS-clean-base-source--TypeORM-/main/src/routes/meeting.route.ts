@@ -10,6 +10,7 @@ meetingRouter
   //   bodyParser.raw({ type: 'application/json' }),
   //   meetingController.handleWebhook.bind(meetingController)
   // )
+  .get('/search', meetingController.searchMeeting.bind(meetingController))
   .get('/get-meeting', authenticateJWT, meetingController.getMeetingByClassroom.bind(meetingController))
   .get('/auth', meetingController.getZoomUrl.bind(meetingController))
   .get('/callback', meetingController.handleZoomCallback.bind(meetingController))

@@ -1,10 +1,12 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { CreateMeetingReq } from '@/dto/meeting/create-meeting.req';
+import { SearchDataDto } from '@/dto/search-data.dto';
 import { ErrorCode } from '@/enums/error-code.enums';
 import { Meeting } from '@/models/meeting.model';
 import { IMeetingService } from '@/service/interface/i.meeting.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
+import { getSearchData } from '@/utils/get-search-data.util';
 import { verifyZoomSignature } from '@/utils/zoom/verify-zoom-signature.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
@@ -20,6 +22,16 @@ export class MeetingController {
   ) {
     this.meetingService = meetingService;
     this.common = common;
+  }
+
+  async searchMeeting(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+      const result = await this.meetingService.search(searchData);
+      res.send_ok('Meeting fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async handleWebhook(req: Request, res: Response, next: NextFunction) {
