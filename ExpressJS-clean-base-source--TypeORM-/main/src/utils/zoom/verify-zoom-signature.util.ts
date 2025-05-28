@@ -14,5 +14,11 @@ export function verifyZoomSignature(req: Request, rawBody: string): boolean {
   const hash = crypto.createHmac('sha256', secretToken).update(message).digest('base64');
 
   const expectedSignature = `v0=${hash}`;
+  console.log('rawBody:', rawBody);
+  console.log('Headers:', {
+    signature: req.headers['x-zm-signature'],
+    timestamp: req.headers['x-zm-request-timestamp']
+  });
+  console.log('Expected signature:', expectedSignature);
   return signature === expectedSignature;
 }
