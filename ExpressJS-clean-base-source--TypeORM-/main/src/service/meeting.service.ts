@@ -18,6 +18,9 @@ import * as jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { SearchDataDto } from '@/dto/search-data.dto';
+import { PagingResponseDto } from '@/dto/paging-response.dto';
+import { SearchUtil } from '@/utils/search.util';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -34,6 +37,22 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     this.meetingRepository = meetingRepository;
   }
 
+  async search(searchData: SearchDataDto): Promise<PagingResponseDto<Meeting>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const meetings = await this.meetingRepository.findMany({
+      filter: where,
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.meetingRepository.count({
+      filter: where
+    });
+
+    return new PagingResponseDto(total, meetings);
+  }
+
   async handleMeetingEnded(payload: any): Promise<void> {
     const zoomMeetingId = payload.id?.toString();
     if (!zoomMeetingId) return;
@@ -48,7 +67,8 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     console.log('Original duration:', payload.duration);
 
     const endTime = payload.end_time ? new Date(payload.end_time) : new Date();
-    const calculatedDuration = Math.round((endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60)); // phút
+    const rawDurationInMinutes = (endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60);
+    const calculatedDuration = Math.max(1, Math.round(rawDurationInMinutes));
     meeting.duration = calculatedDuration;
 
     meeting.endTime = endTime;
