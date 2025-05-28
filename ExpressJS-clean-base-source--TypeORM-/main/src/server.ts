@@ -13,11 +13,17 @@ import chalk from 'chalk';
 import responseFormater from 'response-formater';
 import { accessLogMiddleware } from '@/middleware/access-log.middleware';
 import webhookRoute from './routes/webhook.route';
+import bodyParser from 'body-parser';
+import { meetingController } from './container/meeting.container';
 /**
  * Express app
  */
 const app = express();
-app.use(webhookRoute);
+app.post(
+  '/listen-webhook',
+  bodyParser.raw({ type: 'application/json' }),
+  meetingController.handleWebhook.bind(meetingController)
+);
 
 /**
  * Middlewares
