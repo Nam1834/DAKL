@@ -27,7 +27,7 @@ export class Meeting extends BaseModel {
   @Column({ type: 'int', nullable: true })
   duration!: number;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'end_time' })
+  @Column({ type: 'timestamptz', nullable: true, name: 'end_time' })
   endTime!: Date;
 
   @Column({ type: 'varchar', nullable: true, name: 'join_url' })

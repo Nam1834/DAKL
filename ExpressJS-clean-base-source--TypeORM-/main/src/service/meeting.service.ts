@@ -15,6 +15,12 @@ import { MicrosoftTokenRes } from '@/dto/user/microsoft-token.res';
 import { ZoomMeetingRes } from '@/dto/meeting/zoom-meeting.res';
 import { ZoomTokenRefreshRes } from '@/dto/meeting/zoom-token-refresh.res';
 import * as jwt from 'jsonwebtoken';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 const ZOOM_CLIENT_ID = process.env.ZOOM_CLIENT_ID;
 const ZOOM_CLIENT_SECRET = process.env.ZOOM_CLIENT_SECRET;
 const ZOOM_REDIRECT_URI = process.env.ZOOM_REDIRECT_URI;
@@ -35,7 +41,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
 
     if (!meeting) return;
 
-    const endTime = new Date();
+    const endTime = dayjs().tz('Asia/Ho_Chi_Minh').toDate();
     const duration = meeting.startTime ? Math.floor((endTime.getTime() - meeting.startTime.getTime()) / 60000) : null;
 
     meeting.endTime = endTime;
@@ -49,7 +55,6 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
 
   async getZoomAuth(): Promise<{ zoomAuthUrl: string }> {
     const zoomAuthUrl = `https://zoom.us/oauth/authorize?response_type=code&client_id=${ZOOM_CLIENT_ID}&redirect_uri=${ZOOM_REDIRECT_URI}`;
-
     return { zoomAuthUrl };
   }
 
@@ -134,9 +139,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
   }
 
   async createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes> {
-    const now = new Date();
-    const startDateTime = new Date(now.getTime() + 5 * 60 * 1000);
-
+    const startDateTime = dayjs().tz('Asia/Ho_Chi_Minh').toDate();
     const meetingExist = await this.meetingRepository.exists({
       filter: { topic: data.topic, startTime: startDateTime }
     });
@@ -169,6 +172,8 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     meeting.joinUrl = meetingData.join_url;
     meeting.password = meetingData.password;
     meeting.classroomId = data.classroomId;
+
+    console.log('Giờ Việt Nam:', dayjs(meeting.startTime).tz('Asia/Ho_Chi_Minh').format());
 
     await this.meetingRepository.save(meeting);
 
