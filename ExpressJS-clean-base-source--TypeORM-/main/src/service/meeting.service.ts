@@ -48,12 +48,13 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     console.log('Original duration:', payload.duration);
 
     const endTime = payload.end_time ? new Date(payload.end_time) : new Date();
-    const duration = payload.duration ?? null;
+    const calculatedDuration = Math.round((endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60)); // phút
+    meeting.duration = calculatedDuration;
 
     meeting.endTime = endTime;
-    if (duration !== null) {
-      meeting.duration = duration;
-    }
+    // if (duration !== null) {
+    //   meeting.duration = duration;
+    // }
 
     await this.meetingRepository.save(meeting);
   }
