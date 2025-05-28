@@ -28,6 +28,25 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     this.meetingRepository = meetingRepository;
   }
 
+  async handleMeetingEnded(zoomMeetingId: string): Promise<void> {
+    const meeting = await this.meetingRepository.findOne({
+      filter: { zoomMeetingId }
+    });
+
+    if (!meeting) return;
+
+    const endTime = new Date();
+    const duration = meeting.startTime ? Math.floor((endTime.getTime() - meeting.startTime.getTime()) / 60000) : null;
+
+    meeting.endTime = endTime;
+
+    if (duration !== null) {
+      meeting.duration = duration;
+    }
+
+    await this.meetingRepository.save(meeting);
+  }
+
   async getZoomAuth(): Promise<{ zoomAuthUrl: string }> {
     const zoomAuthUrl = `https://zoom.us/oauth/authorize?response_type=code&client_id=${ZOOM_CLIENT_ID}&redirect_uri=${ZOOM_REDIRECT_URI}`;
 
