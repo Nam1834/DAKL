@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { Request } from 'express';
 
-export function verifyZoomSignature(req: Request, rawBody: string): boolean {
+export function verifyZoomSignature(req: Request): boolean {
   const secretToken = process.env.ZOOM_WEBHOOK_SECRET_TOKEN;
   const signature = req.headers['x-zm-signature'];
   const timestamp = req.headers['x-zm-request-timestamp'];
@@ -10,15 +10,13 @@ export function verifyZoomSignature(req: Request, rawBody: string): boolean {
     return false;
   }
 
-  const message = `v0:${timestamp}:${rawBody}`;
-  const hash = crypto.createHmac('sha256', secretToken).update(message).digest('base64');
-
+  // KHÔNG dùng rawBody, mà stringify lại object
+  const message = `v0:${timestamp}:${JSON.stringify(req.body)}`;
+  const hash = crypto.createHmac('sha256', secretToken).update(message).digest('hex');
   const expectedSignature = `v0=${hash}`;
-  console.log('rawBody:', rawBody);
-  console.log('Headers:', {
-    signature: req.headers['x-zm-signature'],
-    timestamp: req.headers['x-zm-request-timestamp']
-  });
+
   console.log('Expected signature:', expectedSignature);
+  console.log('Signature from Zoom:', signature);
+
   return signature === expectedSignature;
 }
