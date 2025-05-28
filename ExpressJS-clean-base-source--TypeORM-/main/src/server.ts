@@ -11,6 +11,7 @@ import { globalErrorHanlder } from '@/middleware/error-handle.middleware';
 import { AppDataSourceSingleton } from '@/database/db.datasource';
 import chalk from 'chalk';
 import responseFormater from 'response-formater';
+import { accessLogMiddleware } from '@/middleware/access-log.middleware';
 /**
  * Express app
  */
@@ -25,7 +26,8 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(morgan(GlobalConfig.morgan.format || 'dev'));
+// app.use(morgan(GlobalConfig.morgan.format || 'dev'));
+app.use(accessLogMiddleware);
 app.use(cors(GlobalConfig.cors));
 if (GlobalConfig.helmet.enable) {
   app.use(helmet());

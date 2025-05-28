@@ -100,6 +100,7 @@
     "response-formater": "^1.0.2",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "winston": "^3.17.0"
   }
 }
