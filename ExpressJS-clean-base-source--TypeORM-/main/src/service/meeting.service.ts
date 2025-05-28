@@ -41,7 +41,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
 
     if (!meeting) return;
 
-    const endTime = dayjs().tz('Asia/Ho_Chi_Minh').toDate();
+    const endTime = new Date();
     const duration = meeting.startTime ? Math.floor((endTime.getTime() - meeting.startTime.getTime()) / 60000) : null;
 
     meeting.endTime = endTime;
@@ -139,7 +139,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
   }
 
   async createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes> {
-    const startDateTime = dayjs().tz('Asia/Ho_Chi_Minh').toDate();
+    const startDateTime = new Date();
     const meetingExist = await this.meetingRepository.exists({
       filter: { topic: data.topic, startTime: startDateTime }
     });
