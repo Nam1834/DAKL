@@ -23,6 +23,15 @@ export class MeetingController {
 
   async handleWebhook(req: Request, res: Response, next: NextFunction) {
     try {
+      const authHeader = req.headers['authorization'];
+
+      // So sánh với token Zoom cung cấp
+      const expectedToken = `Bearer ${process.env.ZOOM_WEBHOOK_VERIFY_TOKEN}`;
+
+      if (authHeader !== expectedToken) {
+        console.warn('Invalid Zoom webhook token');
+        return res.status(401).json({ message: 'Unauthorized webhook' });
+      }
       const event = req.body.event;
       const payload = req.body.payload?.object;
 
