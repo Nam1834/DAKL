@@ -24,9 +24,7 @@ export class MeetingController {
 
   async handleWebhook(req: Request, res: Response, next: NextFunction) {
     try {
-      const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : JSON.stringify(req.body);
-
-      // Tạm thời truyền rawBody vào verifyZoomSignature
+      const rawBody = req.body.toString('utf8');
       const isValid = verifyZoomSignature(req, rawBody);
 
       if (!isValid) {
@@ -34,8 +32,12 @@ export class MeetingController {
         return res.status(401).json({ message: 'Unauthorized webhook' });
       }
 
-      const event = req.body.event;
-      const payload = req.body.payload?.object;
+      const parsed = JSON.parse(rawBody);
+      const event = parsed.event;
+      const payload = parsed.payload?.object;
+
+      console.log('Received Zoom webhook with event:', parsed.event);
+      console.log('Payload:', JSON.stringify(payload, null, 2));
 
       if (event === 'meeting.ended') {
         await this.meetingService.handleMeetingEnded(payload);
