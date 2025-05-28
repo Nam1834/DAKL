@@ -12,10 +12,12 @@ import { AppDataSourceSingleton } from '@/database/db.datasource';
 import chalk from 'chalk';
 import responseFormater from 'response-formater';
 import { accessLogMiddleware } from '@/middleware/access-log.middleware';
+import webhookRoute from './routes/webhook.route';
 /**
  * Express app
  */
 const app = express();
+app.use(webhookRoute);
 
 /**
  * Middlewares
@@ -26,8 +28,8 @@ app.use(
   })
 );
 app.use(express.json());
-// app.use(morgan(GlobalConfig.morgan.format || 'dev'));
-app.use(accessLogMiddleware);
+app.use(morgan(GlobalConfig.morgan.format || 'dev'));
+// app.use(accessLogMiddleware);
 app.use(cors(GlobalConfig.cors));
 if (GlobalConfig.helmet.enable) {
   app.use(helmet());
