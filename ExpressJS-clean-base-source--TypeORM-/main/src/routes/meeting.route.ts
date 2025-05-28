@@ -4,6 +4,7 @@ import express from 'express';
 const meetingRouter = express.Router();
 
 meetingRouter
+  .post('/listen-webhook', meetingController.handleWebhook.bind(meetingController))
   .get('/get-meeting', authenticateJWT, meetingController.getMeetingByClassroom.bind(meetingController))
   .get('/auth', meetingController.getZoomUrl.bind(meetingController))
   .get('/callback', meetingController.handleZoomCallback.bind(meetingController))

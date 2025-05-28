@@ -7,6 +7,7 @@ import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
+import { error } from 'node:console';
 
 @injectable()
 export class MeetingController {
@@ -18,6 +19,25 @@ export class MeetingController {
   ) {
     this.meetingService = meetingService;
     this.common = common;
+  }
+
+  async handleWebhook(req: Request, res: Response, next: NextFunction) {
+    try {
+      const event = req.body.event;
+      const payload = req.body.payload?.object;
+
+      if (event === 'meeting.ended') {
+        const zoomMeetingId = payload.id?.toString(); // meeting id từ Zoom
+
+        if (zoomMeetingId) {
+          await this.meetingService.handleMeetingEnded(zoomMeetingId);
+        }
+      }
+
+      res.status(200).json({ received: true });
+    } catch (error) {
+      next(error);
+    }
   }
 
   async getZoomUrl(req: Request, res: Response, next: NextFunction): Promise<void> {

@@ -4,6 +4,7 @@ import { IBaseCrudService } from '@/service/interface/i.base.service';
 import { BaseModelType } from '@/types/base-model.types';
 
 export interface IMeetingService<T extends BaseModelType> extends IBaseCrudService<T> {
+  handleMeetingEnded(zoomMeetingId: string): Promise<void>;
   getZoomAuth(): Promise<{ zoomAuthUrl: string }>;
   getZoomAccessToken(authorizationCode: string): Promise<{ userId: string; accessToken: string; refreshToken: string }>;
   refreshZoomAccessToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }>;
