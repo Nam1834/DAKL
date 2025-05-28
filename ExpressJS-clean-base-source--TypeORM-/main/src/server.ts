@@ -19,11 +19,7 @@ import { meetingController } from './container/meeting.container';
  * Express app
  */
 const app = express();
-app.post(
-  '/listen-webhook',
-  bodyParser.raw({ type: 'application/json' }),
-  meetingController.handleWebhook.bind(meetingController)
-);
+app.post('/listen-webhook', bodyParser.json(), meetingController.handleWebhook.bind(meetingController));
 
 /**
  * Middlewares
