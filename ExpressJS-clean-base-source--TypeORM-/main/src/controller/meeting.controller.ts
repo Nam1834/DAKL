@@ -5,6 +5,7 @@ import { Meeting } from '@/models/meeting.model';
 import { IMeetingService } from '@/service/interface/i.meeting.service';
 import { ITYPES } from '@/types/interface.types';
 import BaseError from '@/utils/error/base.error';
+import { verifyZoomSignature } from '@/utils/zoom/verify-zoom-signature.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { error } from 'node:console';
@@ -23,24 +24,21 @@ export class MeetingController {
 
   async handleWebhook(req: Request, res: Response, next: NextFunction) {
     try {
-      const authHeader = req.headers['authorization'];
+      const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : JSON.stringify(req.body);
 
-      // So sánh với token Zoom cung cấp
-      const expectedToken = `Bearer ${process.env.ZOOM_WEBHOOK_VERIFY_TOKEN}`;
+      // Tạm thời truyền rawBody vào verifyZoomSignature
+      const isValid = verifyZoomSignature(req, rawBody);
 
-      if (authHeader !== expectedToken) {
-        console.warn('Invalid Zoom webhook token');
+      if (!isValid) {
+        console.warn('Invalid Zoom webhook signature');
         return res.status(401).json({ message: 'Unauthorized webhook' });
       }
+
       const event = req.body.event;
       const payload = req.body.payload?.object;
 
       if (event === 'meeting.ended') {
-        const zoomMeetingId = payload.id?.toString(); // meeting id từ Zoom
-
-        if (zoomMeetingId) {
-          await this.meetingService.handleMeetingEnded(zoomMeetingId);
-        }
+        await this.meetingService.handleMeetingEnded(payload);
       }
 
       res.status(200).json({ received: true });
