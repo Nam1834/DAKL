@@ -44,12 +44,24 @@ export class MeetingController {
       }
 
       const { event, payload } = req.body;
+      const object = payload.object;
 
       console.log('Zoom Event:', event);
       console.log('Payload:', payload);
 
-      if (event === 'meeting.ended') {
-        await this.meetingService.handleMeetingEnded(payload.object);
+      // if (event === 'meeting.ended') {
+      //   await this.meetingService.handleMeetingEnded(payload.object);
+      // }
+      switch (event) {
+        case 'meeting.ended':
+          await this.meetingService.handleMeetingEnded(object);
+          break;
+        case 'meeting.participant_admitted':
+          await this.meetingService.handleParticipantAdmitted(object);
+          break;
+        case 'meeting.participant_left':
+          await this.meetingService.handleParticipantLeft(object);
+          break;
       }
 
       res.status(200).json({ received: true });

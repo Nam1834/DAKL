@@ -45,4 +45,10 @@ export class Meeting extends BaseModel {
   @ManyToOne(() => Classroom, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'classroom_id' })
   classroom!: Classroom;
+
+  @Column({ type: 'timestamptz', nullable: true, name: 'user_join_time' })
+  userJoinTime!: Date;
+
+  @Column({ type: 'timestamptz', nullable: true, name: 'user_left_time' })
+  userLeftTime!: Date;
 }
