@@ -72,9 +72,44 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     meeting.duration = calculatedDuration;
 
     meeting.endTime = endTime;
-    // if (duration !== null) {
-    //   meeting.duration = duration;
-    // }
+
+    await this.meetingRepository.save(meeting);
+  }
+
+  async handleParticipantAdmitted(payload: any): Promise<void> {
+    const zoomMeetingId = payload.id?.toString();
+    if (!zoomMeetingId) return;
+
+    const meeting = await this.meetingRepository.findOne({
+      filter: { zoomMeetingId }
+    });
+
+    if (!meeting) return;
+
+    const joinTime = payload.participant?.date_time ? new Date(payload.participant.date_time) : new Date();
+
+    console.log('Participant join time:', joinTime);
+
+    meeting.userJoinTime = joinTime;
+
+    await this.meetingRepository.save(meeting);
+  }
+
+  async handleParticipantLeft(payload: any): Promise<void> {
+    const zoomMeetingId = payload.id?.toString();
+    if (!zoomMeetingId) return;
+
+    const meeting = await this.meetingRepository.findOne({
+      filter: { zoomMeetingId }
+    });
+
+    if (!meeting) return;
+
+    const leaveTime = payload.participant?.leave_time ? new Date(payload.participant.leave_time) : new Date();
+
+    console.log('Participant leave time:', leaveTime);
+
+    meeting.userLeftTime = leaveTime;
 
     await this.meetingRepository.save(meeting);
   }
