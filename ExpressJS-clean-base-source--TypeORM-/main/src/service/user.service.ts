@@ -938,7 +938,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     publics.forEach((publicUser) => {
       if (publicUser.tutorProfile) {
-        (publicUser.tutorProfile as any).is_booking_request_accepted = false;
+        (publicUser.tutorProfile as any).isBookingRequestAccepted = false;
       }
     });
 
@@ -963,7 +963,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
         const bookingRequest = bookingMap.get(tutorId);
 
         if (bookingRequest && publicUser.tutorProfile) {
-          (publicUser.tutorProfile as any).is_booking_request_accepted = true;
+          (publicUser.tutorProfile as any).isBookingRequestAccepted = true;
         }
       });
     }
