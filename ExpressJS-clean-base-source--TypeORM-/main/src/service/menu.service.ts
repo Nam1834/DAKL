@@ -20,14 +20,14 @@ export class MenuService implements IMenuService {
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_ADMIN],
           children: null,
-          icon: null
+          icon: 'fa-solid fa-user-tie'
         },
         {
           name: 'NGƯỜI HỌC',
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_NGUOI_HOC],
           children: null,
-          icon: null
+          icon: 'fa-solid fa-users'
         },
         {
           name: 'GIA SƯ',
@@ -53,7 +53,7 @@ export class MenuService implements IMenuService {
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_YEU_CAU],
       children: null,
-      icon: null
+      icon: 'fa-regular fa-paper-plane'
     },
 
     {
@@ -87,7 +87,7 @@ export class MenuService implements IMenuService {
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_GOI_THANH_TOAN],
           children: null,
-          icon: null
+          icon: 'fa-solid fa-hand-holding-dollar'
         }
       ],
       icon: 'fa-solid fa-list'
@@ -97,28 +97,28 @@ export class MenuService implements IMenuService {
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_GIAO_TRINH],
       children: null,
-      icon: null
+      icon: 'fa-solid fa-book'
     },
     {
       name: 'NẠP VÍ NGƯỜI DÙNG',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_VI_NGUOI_DUNG],
       children: null,
-      icon: null
+      icon: 'fa-solid fa-wallet'
     },
     {
       name: 'THANH TOÁN CHO GIA SƯ',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_THANH_TOAN_CHO_GIA_SU],
       children: null,
-      icon: null
+      icon: 'fa-solid fa-money-check-dollar'
     },
     {
       name: 'ĐÁNH GIÁ',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_DANH_GIA],
       children: null,
-      icon: null
+      icon: 'fa-solid fa-star'
     },
 
     // User
