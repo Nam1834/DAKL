@@ -20,14 +20,14 @@ export class MenuService implements IMenuService {
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_ADMIN],
           children: null,
-          icon: 'fa-solid fa-user-tie'
+          icon: null
         },
         {
           name: 'NGƯỜI HỌC',
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_NGUOI_HOC],
           children: null,
-          icon: 'fa-solid fa-users'
+          icon: null
         },
         {
           name: 'GIA SƯ',
@@ -37,7 +37,7 @@ export class MenuService implements IMenuService {
           icon: null
         }
       ],
-      icon: null
+      icon: 'a-solid fa-user-pen'
     },
 
     // {
@@ -87,7 +87,7 @@ export class MenuService implements IMenuService {
           isCollapsed: false,
           permissions: [Permissions.QUAN_LY_GOI_THANH_TOAN],
           children: null,
-          icon: 'fa-solid fa-hand-holding-dollar'
+          icon: null
         }
       ],
       icon: 'fa-solid fa-list'
