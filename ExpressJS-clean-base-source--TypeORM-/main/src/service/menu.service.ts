@@ -37,7 +37,7 @@ export class MenuService implements IMenuService {
           icon: null
         }
       ],
-      icon: 'a-solid fa-user-pen'
+      icon: 'fa-solid fa-user-pen'
     },
 
     // {
