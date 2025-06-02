@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { BaseModel } from './base.model';
 import { Classroom } from './classroom.model';
+import { MeetingStatus } from '@/enums/meeting-status.enum';
 
 @Entity('meetings')
 export class Meeting extends BaseModel {
@@ -51,4 +52,7 @@ export class Meeting extends BaseModel {
 
   @Column({ type: 'timestamptz', nullable: true, name: 'user_left_time' })
   userLeftTime!: Date;
+
+  @Column({ default: MeetingStatus.IN_SESSION })
+  status!: string;
 }

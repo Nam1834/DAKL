@@ -21,6 +21,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchUtil } from '@/utils/search.util';
+import { MeetingStatus } from '@/enums/meeting-status.enum';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -72,6 +73,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     meeting.duration = calculatedDuration;
 
     meeting.endTime = endTime;
+    meeting.status = MeetingStatus.ENDED;
 
     await this.meetingRepository.save(meeting);
   }
@@ -105,8 +107,16 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
 
     if (!meeting) return;
 
+    const participant = payload.participant;
     const leaveTime = payload.participant?.leave_time ? new Date(payload.participant.leave_time) : new Date();
 
+    const participantId = participant?.id || participant?.participant_user_id;
+    const hostId = payload.host_id;
+
+    if (participantId && participantId === hostId) {
+      console.log('Host left — skipping userLeftTime update.');
+      return;
+    }
     console.log('Participant leave time:', leaveTime);
 
     meeting.userLeftTime = leaveTime;
@@ -277,6 +287,6 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
 
     if (!meeting) return null;
 
-    return convertToDto(CreateMeetingRes, meeting[0]);
+    return convertToDto(CreateMeetingRes, meeting);
   }
 }
