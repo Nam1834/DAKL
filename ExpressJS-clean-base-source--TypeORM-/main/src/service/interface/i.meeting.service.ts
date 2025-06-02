@@ -1,5 +1,6 @@
 import { CreateMeetingReq } from '@/dto/meeting/create-meeting.req';
 import { CreateMeetingRes } from '@/dto/meeting/create-meeting.res';
+import { GetMeetingRes } from '@/dto/meeting/get-meeting.res';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { Meeting } from '@/models/meeting.model';
@@ -16,5 +17,5 @@ export interface IMeetingService<T extends BaseModelType> extends IBaseCrudServi
   refreshZoomAccessToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }>;
   createMeeting(accessToken: string, data: CreateMeetingReq): Promise<CreateMeetingRes>;
   generateZoomSignature(meetingNumber: string, role: number): Promise<string>;
-  getMeetingByClassroom(classroomId: string): Promise<CreateMeetingRes | null>;
+  getMeetingByClassroom(classroomId: string): Promise<GetMeetingRes | null>;
 }
