@@ -22,6 +22,7 @@ import { SearchDataDto } from '@/dto/search-data.dto';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchUtil } from '@/utils/search.util';
 import { MeetingStatus } from '@/enums/meeting-status.enum';
+import { GetMeetingRes } from '@/dto/meeting/get-meeting.res';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -274,7 +275,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     return jwt.sign(payload, sdkSecret, { algorithm: 'HS256' });
   }
 
-  async getMeetingByClassroom(classroomId: string): Promise<CreateMeetingRes | null> {
+  async getMeetingByClassroom(classroomId: string): Promise<GetMeetingRes | null> {
     const meeting = await this.meetingRepository.findMany({
       filter: { classroomId },
       order: [
@@ -287,6 +288,6 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
 
     if (!meeting) return null;
 
-    return convertToDto(CreateMeetingRes, meeting);
+    return convertToDto(GetMeetingRes, meeting);
   }
 }
