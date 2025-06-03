@@ -10,4 +10,12 @@ export class MeetingRepository extends BaseRepository<Meeting> implements IMeeti
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Meeting));
   }
+
+  async findMeetingsByClassroomIds(classroomIds: string[]): Promise<Meeting[]> {
+    const queryBuilder = this.ormRepository.createQueryBuilder('meeting');
+
+    queryBuilder.where('meeting.classroomId IN (:...classroomIds)', { classroomIds });
+
+    return await queryBuilder.getMany();
+  }
 }
