@@ -307,6 +307,8 @@ export class BookingRequestService
     if (userCoins < bookingCoins) {
       throw new Error('You does not have enough coins!');
     } else {
+      const tutorReceiveCoins = Math.floor((bookingCoins * 90) / 100);
+      const webReceiveCoins = bookingCoins - tutorReceiveCoins;
       await this.userRepository.findOneAndUpdate({
         filter: { userId: userId },
         updateData: {
@@ -323,20 +325,20 @@ export class BookingRequestService
         throw new Error('Tutor does not exist!');
       }
 
-      tutor.coin += Math.floor((bookingCoins * 90) / 100);
+      tutor.coin += tutorReceiveCoins;
 
       await this.userRepository.findOneAndUpdate({
         filter: { userId: bookingRequest.tutorId },
         updateData: { coin: tutor.coin }
       });
 
-      //Quan ly thanh toan cho gia su
+      // Lưu thông tin thanh toán
       const managePayment = new ManagePayment();
       managePayment.userId = userId;
       managePayment.tutorId = bookingRequest.tutorId;
       managePayment.coinOfUserPayment = bookingCoins;
-      managePayment.coinOfTutorReceive = tutor.coin;
-      managePayment.coinOfWebReceive = bookingCoins - tutor.coin;
+      managePayment.coinOfTutorReceive = tutorReceiveCoins;
+      managePayment.coinOfWebReceive = webReceiveCoins;
 
       await this.managePaymentRepository.create({
         data: managePayment
