@@ -1,19 +1,27 @@
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { Classroom } from '@/models/classroom.model';
+import { Meeting } from '@/models/meeting.model';
 import { IClassroomRepository } from '@/repository/interface/i.classroom.repository';
+import { IMeetingRepository } from '@/repository/interface/i.meeting.repository';
 import { BaseCrudService } from '@/service/base/base.service';
 import { IClassroomService } from '@/service/interface/i.classroom.service';
 import { SearchUtil } from '@/utils/search.util';
 import { inject, injectable } from 'inversify';
+import { In } from 'typeorm';
 
 @injectable()
 export class ClassroomService extends BaseCrudService<Classroom> implements IClassroomService<Classroom> {
   private classroomRepository: IClassroomRepository<Classroom>;
+  private meetingRepository: IMeetingRepository<Meeting>;
 
-  constructor(@inject('ClassroomRepository') classroomRepository: IClassroomRepository<Classroom>) {
+  constructor(
+    @inject('ClassroomRepository') classroomRepository: IClassroomRepository<Classroom>,
+    @inject('MeetingRepository') meetingRepository: IMeetingRepository<Meeting>
+  ) {
     super(classroomRepository);
     this.classroomRepository = classroomRepository;
+    this.meetingRepository = meetingRepository;
   }
 
   async getListClassroomForUser(userId: string, searchData: SearchDataDto): Promise<PagingResponseDto<Classroom>> {
@@ -25,6 +33,30 @@ export class ClassroomService extends BaseCrudService<Classroom> implements ICla
       relations: ['user', 'tutor'],
       paging: paging
     });
+
+    const classroomIds = myClassrooms.map((classroom) => classroom.classroomId);
+
+    // Gắn mặc định isMeeted = false
+    myClassrooms.forEach((classroom) => {
+      classroom.isMeeted = false;
+    });
+
+    if (classroomIds.length > 0) {
+      const relatedMeetings = await this.meetingRepository.findMeetingsByClassroomIds(classroomIds);
+
+      const meetingMap = new Map<string, Meeting>();
+      relatedMeetings.forEach((meeting) => {
+        if (meeting.classroomId) {
+          meetingMap.set(meeting.classroomId, meeting);
+        }
+      });
+
+      myClassrooms.forEach((classroom) => {
+        if (meetingMap.has(classroom.classroomId)) {
+          classroom.isMeeted = true;
+        }
+      });
+    }
 
     const total = await this.classroomRepository.count({
       filter: where
@@ -42,6 +74,30 @@ export class ClassroomService extends BaseCrudService<Classroom> implements ICla
       relations: ['user', 'tutor'],
       paging: paging
     });
+
+    const classroomIds = myClassrooms.map((classroom) => classroom.classroomId);
+
+    // Gắn mặc định isMeeted = false
+    myClassrooms.forEach((classroom) => {
+      classroom.isMeeted = false;
+    });
+
+    if (classroomIds.length > 0) {
+      const relatedMeetings = await this.meetingRepository.findMeetingsByClassroomIds(classroomIds);
+
+      const meetingMap = new Map<string, Meeting>();
+      relatedMeetings.forEach((meeting) => {
+        if (meeting.classroomId) {
+          meetingMap.set(meeting.classroomId, meeting);
+        }
+      });
+
+      myClassrooms.forEach((classroom) => {
+        if (meetingMap.has(classroom.classroomId)) {
+          classroom.isMeeted = true;
+        }
+      });
+    }
 
     const total = await this.classroomRepository.count({
       filter: where

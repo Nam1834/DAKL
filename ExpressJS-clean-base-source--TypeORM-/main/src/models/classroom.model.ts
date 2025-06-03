@@ -41,4 +41,7 @@ export class Classroom extends BaseModel {
 
   @Column({ default: ClassroomStatus.IN_SESSION })
   status!: string;
+
+  @Column({ type: 'boolean', nullable: true, name: 'is_meeted' })
+  isMeeted!: boolean;
 }
