@@ -70,14 +70,10 @@ export class ClassroomService extends BaseCrudService<Classroom> implements ICla
       }
     });
 
-    console.log('Updating classrooms:', classroomIds);
-
     // Cập nhật DB nếu có lớp học đã kết thúc
     if (endedClassroomIds.length > 0) {
       await this.classroomRepository.updateManyStatus(endedClassroomIds, ClassroomStatus.ENDED);
     }
-
-    console.log('Ended classroom IDs:', endedClassroomIds);
 
     const total = await this.classroomRepository.count({
       filter: { userId: userId, ...where }
@@ -118,6 +114,22 @@ export class ClassroomService extends BaseCrudService<Classroom> implements ICla
           classroom.isMeeted = true;
         }
       });
+    }
+
+    const now = new Date();
+    const endedClassroomIds: string[] = [];
+
+    myClassrooms.forEach((classroom) => {
+      const endDayDate = new Date(classroom.endDay);
+      if (endDayDate < now && classroom.status !== ClassroomStatus.ENDED) {
+        classroom.status = ClassroomStatus.ENDED;
+        endedClassroomIds.push(classroom.classroomId);
+      }
+    });
+
+    // Cập nhật DB nếu có lớp học đã kết thúc
+    if (endedClassroomIds.length > 0) {
+      await this.classroomRepository.updateManyStatus(endedClassroomIds, ClassroomStatus.ENDED);
     }
 
     const total = await this.classroomRepository.count({
