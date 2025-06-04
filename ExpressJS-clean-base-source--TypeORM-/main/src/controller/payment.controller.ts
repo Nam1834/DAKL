@@ -30,8 +30,23 @@ export class PaymentController {
   async searchPayment(req: Request, res: Response, next: NextFunction) {
     try {
       const searchData: SearchDataDto = getSearchData(req);
+
       const result = await this.paymentService.search(searchData);
       res.send_ok('Payment fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async searchPaymentWithTime(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+
+      searchData.periodType = req.query.periodType as any;
+      searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
+
+      const result = await this.paymentService.searchWithTime(searchData);
+      res.send_ok('Payment with time fetch successfully', result);
     } catch (error) {
       next(error);
     }

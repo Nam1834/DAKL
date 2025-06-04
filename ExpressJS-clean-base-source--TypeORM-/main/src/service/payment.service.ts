@@ -22,6 +22,8 @@ import axios from 'axios';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchUtil } from '@/utils/search.util';
+import { Between } from 'typeorm';
+import { RevenuePagingResponseDto } from '@/dto/paging-response-revenue.dto';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
@@ -61,6 +63,48 @@ export class PaymentService extends BaseCrudService<Payment> implements IPayment
     });
 
     return new PagingResponseDto(total, orders);
+  }
+
+  async searchWithTime(searchData: SearchDataDto): Promise<PagingResponseDto<Order>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    if (searchData.periodType) {
+      const now = new Date();
+      const timeStart = new Date(now);
+
+      switch (searchData.periodType) {
+        case 'DAY':
+          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          break;
+        case 'WEEK':
+          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          break;
+        case 'MONTH':
+          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          break;
+        case 'YEAR':
+          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          break;
+      }
+      Object.assign(where, {
+        createdAt: Between(timeStart, now)
+      });
+    }
+
+    const orders = await this.orderRepository.findMany({
+      filter: { status: OrderStatus.PAID, ...where },
+      order: order,
+      relations: ['payment', 'items', 'user'],
+      paging: paging
+    });
+
+    const total = await this.orderRepository.count({
+      filter: { status: OrderStatus.PAID, ...where }
+    });
+
+    const totalRevenue = await this.orderRepository.sum('totalPrice', { status: OrderStatus.PAID, ...where });
+
+    return new RevenuePagingResponseDto(total, orders, totalRevenue);
   }
 
   async getMyPayment(userId: string, searchData: SearchDataDto): Promise<PagingResponseDto<Order>> {

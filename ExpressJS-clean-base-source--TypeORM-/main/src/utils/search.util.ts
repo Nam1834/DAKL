@@ -43,6 +43,11 @@ export class SearchUtil {
 
     const { filters, sorts, rpp, page } = searchData;
 
+    const normalizeKey = (key: string) => key.toLowerCase().replace(/[_]/g, '');
+
+    // So sánh theo tên cột thật
+    const hasCreatedAtFilter = filters?.some((f) => normalizeKey(f.key) === 'createat');
+
     filters.forEach((filter) => {
       const key = filter.key as any;
       switch (filter.operator) {

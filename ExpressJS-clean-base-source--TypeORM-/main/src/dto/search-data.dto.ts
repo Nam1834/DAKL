@@ -6,4 +6,11 @@ export class SearchDataDto {
   sorts!: SearchSortReq[];
   rpp!: number;
   page!: number;
+
+  //Import
+  periodType?: 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
+  periodValue?: number;
+
+  startDate?: string; // ISO format
+  endDate?: string;
 }

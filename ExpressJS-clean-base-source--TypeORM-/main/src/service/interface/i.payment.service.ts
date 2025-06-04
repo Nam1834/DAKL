@@ -8,6 +8,7 @@ import { BaseModelType } from '@/types/base-model.types';
 
 export interface IPaymentService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<Order>>;
+  searchWithTime(searchData: SearchDataDto): Promise<PagingResponseDto<Order>>;
   getMyPayment(userId: string, searchData: SearchDataDto): Promise<PagingResponseDto<Order>>;
   handleVNPayReturn(vnp_Params: any): Promise<void>;
   getVnpUrl(paymentId: string, ipAddr: string): Promise<GetVnpUrl>;

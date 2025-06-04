@@ -164,7 +164,7 @@ export class BookingRequestService
 
     const bookingRequests = await this.bookingRequestRepository.findMany({
       filter: { tutorId: tutorId, ...where },
-      relations: ['user'],
+      relations: ['user', 'tutor'],
       order: order,
       paging: paging
     });
@@ -348,7 +348,7 @@ export class BookingRequestService
       const classroom = new Classroom();
       classroom.userId = userId;
       classroom.tutorId = bookingRequest.tutorId;
-      const content = `Lớp học của gia sư ${tutorProfile.fullname}`;
+      const content = `Lớp học với gia sư ${tutorProfile.fullname}`;
       classroom.nameOfRoom = content;
       classroom.dateTimeLearn = bookingRequest.dateTimeLearn;
       classroom.startDay = bookingRequest.startDay;
