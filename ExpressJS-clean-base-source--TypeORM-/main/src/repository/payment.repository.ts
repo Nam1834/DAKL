@@ -1,3 +1,4 @@
+import { Order } from '@/models/order.model';
 import { Payment } from '@/models/payment.model';
 import { BaseRepository } from '@/repository/base/base.repository';
 import { IPaymentRepository } from '@/repository/interface/i.payment.repository';

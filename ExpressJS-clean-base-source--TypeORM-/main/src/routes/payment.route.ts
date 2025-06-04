@@ -11,6 +11,12 @@ paymentRouter
     checkPermission([Permissions.QUAN_LY_VI_NGUOI_DUNG]),
     paymentController.searchPayment.bind(paymentController)
   )
+  .get(
+    '/search-with-time',
+    authenticateJWT,
+    checkPermission([Permissions.QUAN_LY_VI_NGUOI_DUNG]),
+    paymentController.searchPaymentWithTime.bind(paymentController)
+  )
   .get('/get-my-payment', authenticateJWT, paymentController.getMyPayment.bind(paymentController))
   .get('/vnp-return', paymentController.vnpReturn.bind(paymentController))
 
