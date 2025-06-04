@@ -1,5 +1,6 @@
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
+import { ClassroomStatus } from '@/enums/classroom-status.enum';
 import { Classroom } from '@/models/classroom.model';
 import { Meeting } from '@/models/meeting.model';
 import { IClassroomRepository } from '@/repository/interface/i.classroom.repository';
@@ -58,8 +59,28 @@ export class ClassroomService extends BaseCrudService<Classroom> implements ICla
       });
     }
 
+    const now = new Date();
+    const endedClassroomIds: string[] = [];
+
+    myClassrooms.forEach((classroom) => {
+      const endDayDate = new Date(classroom.endDay);
+      if (endDayDate < now && classroom.status !== ClassroomStatus.ENDED) {
+        classroom.status = ClassroomStatus.ENDED;
+        endedClassroomIds.push(classroom.classroomId);
+      }
+    });
+
+    console.log('Updating classrooms:', classroomIds);
+
+    // Cập nhật DB nếu có lớp học đã kết thúc
+    if (endedClassroomIds.length > 0) {
+      await this.classroomRepository.updateManyStatus(endedClassroomIds, ClassroomStatus.ENDED);
+    }
+
+    console.log('Ended classroom IDs:', endedClassroomIds);
+
     const total = await this.classroomRepository.count({
-      filter: where
+      filter: { userId: userId, ...where }
     });
 
     return new PagingResponseDto(total, myClassrooms);
@@ -100,7 +121,7 @@ export class ClassroomService extends BaseCrudService<Classroom> implements ICla
     }
 
     const total = await this.classroomRepository.count({
-      filter: where
+      filter: { tutorId: tutorId, ...where }
     });
 
     return new PagingResponseDto(total, myClassrooms);
