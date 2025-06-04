@@ -10,4 +10,15 @@ export class ClassroomRepository extends BaseRepository<Classroom> implements IC
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Classroom));
   }
+
+  async updateManyStatus(classroomIds: string[], status: string): Promise<void> {
+    if (!classroomIds || classroomIds.length === 0) return;
+
+    await this.ormRepository
+      .createQueryBuilder('classroom')
+      .update(Classroom)
+      .set({ status: status })
+      .whereInIds(classroomIds)
+      .execute();
+  }
 }
