@@ -120,6 +120,47 @@ export class MenuService implements IMenuService {
       children: null,
       icon: 'fa-solid fa-star'
     },
+    {
+      name: 'THỐNG KÊ',
+      isCollapsed: false,
+      permissions: [
+        Permissions.THONG_KE_LUOT_THUE,
+        Permissions.THONG_KE_DOANH_THU_GIA_SU,
+        Permissions.THONG_KE_DOANH_THU,
+        Permissions.THONG_KE_DANH_GIA_GIA_SU
+      ],
+      children: [
+        {
+          name: 'DOANH THU',
+          isCollapsed: false,
+          permissions: [Permissions.THONG_KE_DOANH_THU],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'LƯỢT THUÊ GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.THONG_KE_LUOT_THUE],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'DOANH THU GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.THONG_KE_DOANH_THU_GIA_SU],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'ĐÁNH GIÁ GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.THONG_KE_DANH_GIA_GIA_SU],
+          children: null,
+          icon: null
+        }
+      ],
+      icon: 'fa-solid fa-user-pen'
+    },
 
     // User
     {

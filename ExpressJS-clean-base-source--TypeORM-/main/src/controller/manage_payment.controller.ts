@@ -43,4 +43,17 @@ export class ManagePaymentController {
       next(error);
     }
   }
+  async searchManagePaymentWithTime(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+
+      searchData.periodType = req.query.periodType as any;
+      searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
+
+      const result = await this.managePaymentService.searchWithTime(searchData);
+      res.send_ok('Manage Payment with time fetch successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

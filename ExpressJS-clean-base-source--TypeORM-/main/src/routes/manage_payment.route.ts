@@ -16,5 +16,11 @@ managePaymentRouter
     '/search-for-tutor',
     authenticateJWT,
     managePaymentController.searchManagePaymentForTutor.bind(managePaymentController)
+  )
+  .get(
+    '/search-with-time',
+    authenticateJWT,
+    checkPermission([Permissions.THONG_KE_DOANH_THU_GIA_SU]),
+    managePaymentController.searchManagePaymentWithTime.bind(managePaymentController)
   );
 export default managePaymentRouter;

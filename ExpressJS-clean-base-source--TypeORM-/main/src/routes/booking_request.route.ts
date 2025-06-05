@@ -1,11 +1,19 @@
 import { bookingRequestController } from '@/container/booking_request.container';
 import { CreateBookingRequestReq } from '@/dto/booking-request/create-booking-request.req';
 import { authenticateJWT } from '@/middleware/authenticate.middleware';
+import { checkPermission } from '@/middleware/check-permission.middleware';
 import { classValidate } from '@/middleware/class-validate.middleware';
+import { Permissions } from '@/constants/permission.constants';
 import express from 'express';
 const bookingRequestRouter = express.Router();
 
 bookingRequestRouter
+  .get(
+    '/search-with-time',
+    authenticateJWT,
+    checkPermission([Permissions.THONG_KE_LUOT_THUE]),
+    bookingRequestController.searchBookingRequestWithTime.bind(bookingRequestController)
+  )
   .post(
     '/calculate-coins',
     authenticateJWT,

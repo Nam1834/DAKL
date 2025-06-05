@@ -14,7 +14,7 @@ paymentRouter
   .get(
     '/search-with-time',
     authenticateJWT,
-    checkPermission([Permissions.QUAN_LY_VI_NGUOI_DUNG]),
+    checkPermission([Permissions.THONG_KE_DOANH_THU]),
     paymentController.searchPaymentWithTime.bind(paymentController)
   )
   .get('/get-my-payment', authenticateJWT, paymentController.getMyPayment.bind(paymentController))

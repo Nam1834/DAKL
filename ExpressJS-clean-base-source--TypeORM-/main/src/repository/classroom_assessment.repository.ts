@@ -13,4 +13,10 @@ export class ClassroomAssessmentRepository
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(ClassroomAssessment));
   }
+
+  async countWithFilter(filter: Record<string, any>): Promise<number> {
+    return await this.ormRepository.count({
+      where: filter
+    });
+  }
 }

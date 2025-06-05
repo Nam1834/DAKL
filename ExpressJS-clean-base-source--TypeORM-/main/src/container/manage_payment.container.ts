@@ -5,6 +5,8 @@ import { ManagePaymentRepository } from '@/repository/manage_payment.repository'
 import { IManagePaymentService } from '@/service/interface/i.manage_payment.service';
 import { IManagePaymentRepository } from '@/repository/interface/i.manage_payment.repository';
 import { BaseContainer } from '@/container/base.container';
+import { tutorProfileRepository } from './tutor_profile.container';
+import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
 
 class ManagePaymentContainer extends BaseContainer {
   constructor() {
@@ -12,6 +14,8 @@ class ManagePaymentContainer extends BaseContainer {
     this.container.bind<IManagePaymentService<ManagePayment>>('ManagePaymentService').to(ManagePaymentService);
     this.container.bind<IManagePaymentRepository<ManagePayment>>('ManagePaymentRepository').to(ManagePaymentRepository);
     this.container.bind<ManagePaymentController>(ManagePaymentController).toSelf();
+
+    this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
   export() {

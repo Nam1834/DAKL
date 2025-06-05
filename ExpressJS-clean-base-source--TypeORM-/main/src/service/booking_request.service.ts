@@ -27,6 +27,7 @@ import { ErrorCode } from '@/enums/error-code.enums';
 import { User } from '@/models/user.model';
 import { IUserRepository } from '@/repository/interface/i.user.repository';
 import { sendEmail } from '@/utils/email/send-email.util';
+import { Between } from 'typeorm';
 
 const EMAIL_API_URL: any = process.env.EMAIL_API_URL;
 const X_SECRET_KEY: any = process.env.X_SECRET_KEY;
@@ -58,6 +59,45 @@ export class BookingRequestService
     this.classroomRepository = classroomRepository;
     this.managePaymentRepository = managePaymentRepository;
     this.userRepository = userRepository;
+  }
+
+  async searchWithTime(searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    if (searchData.periodType) {
+      const now = new Date();
+      const timeStart = new Date(now);
+
+      switch (searchData.periodType) {
+        case 'DAY':
+          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          break;
+        case 'WEEK':
+          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          break;
+        case 'MONTH':
+          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          break;
+        case 'YEAR':
+          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          break;
+      }
+      Object.assign(where, {
+        createdAt: Between(timeStart, now)
+      });
+    }
+
+    const bookingRequests = await this.bookingRequestRepository.findMany({
+      filter: { status: BookingRequestStatus.ACCEPT, isHire: true, ...where },
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.bookingRequestRepository.count({
+      filter: { status: BookingRequestStatus.ACCEPT, isHire: true, ...where }
+    });
+
+    return new PagingResponseDto(total, bookingRequests);
   }
 
   async sendEmailViaApi(params: SendEmailParams): Promise<void> {
