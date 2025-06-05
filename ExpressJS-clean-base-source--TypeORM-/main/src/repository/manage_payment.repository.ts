@@ -39,6 +39,12 @@ export class ManagePaymentRepository
           case 'equal':
             qb.andWhere(`mp.${key} = :${paramName}`, { [paramName]: value['_value'] });
             break;
+          case 'between':
+            qb.andWhere(`mp.${key} BETWEEN :${paramName}_start AND :${paramName}_end`, {
+              [`${paramName}_start`]: value['_value'][0],
+              [`${paramName}_end`]: value['_value'][1]
+            });
+            break;
           // Add other operators if needed
           default:
             throw new Error(`Unsupported operator in sum(): ${operator}`);
