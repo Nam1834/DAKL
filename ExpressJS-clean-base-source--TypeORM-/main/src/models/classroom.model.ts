@@ -36,7 +36,7 @@ export class Classroom extends BaseModel {
   @Column({ name: 'end_day', type: 'date' })
   endDay!: Date;
 
-  @Column({ name: 'classroom_evaluation', type: 'decimal', precision: 2, scale: 1, nullable: true })
+  @Column({ name: 'classroom_evaluation', type: 'decimal', precision: 2, scale: 1, nullable: true, default: 0 })
   classroomEvaluation!: number;
 
   @Column({ default: ClassroomStatus.IN_SESSION })

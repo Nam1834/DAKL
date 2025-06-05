@@ -1,4 +1,5 @@
 import { CreateAssessmentReq } from '@/dto/assessment/create-assessment.req';
+import { AssessmentPagingResponseDto } from '@/dto/paging-response-assessment.dto';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { ClassroomAssessment } from '@/models/classroom_assessment.model';
@@ -7,5 +8,6 @@ import { BaseModelType } from '@/types/base-model.types';
 
 export interface IClassroomAssessmentService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<ClassroomAssessment>>;
+  searchWithTime(searchData: SearchDataDto): Promise<AssessmentPagingResponseDto<ClassroomAssessment>>;
   createAssessment(userId: string, classroomId: string, data: CreateAssessmentReq): Promise<void>;
 }

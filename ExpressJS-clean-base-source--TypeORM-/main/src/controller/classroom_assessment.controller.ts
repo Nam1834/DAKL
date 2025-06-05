@@ -20,6 +20,20 @@ export class ClassroomAssessmentController {
     this.common = common;
   }
 
+  async searchAssessmentWithTime(req: Request, res: Response, next: NextFunction) {
+    try {
+      const searchData: SearchDataDto = getSearchData(req);
+
+      searchData.periodType = req.query.periodType as any;
+      searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
+
+      const result = await this.classroomAssessmentService.searchWithTime(searchData);
+      res.send_ok('Assessment with time fetched successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async searchAssessment(req: Request, res: Response, next: NextFunction) {
     try {
       const searchData: SearchDataDto = getSearchData(req);

@@ -6,6 +6,7 @@ import { IBaseCrudService } from '@/service/interface/i.base.service';
 import { BaseModelType } from '@/types/base-model.types';
 
 export interface IBookingRequestService<T extends BaseModelType> extends IBaseCrudService<T> {
+  searchWithTime(searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>>;
   calculateTotalCoins(tutorId: string, hoursPerLesson: number, totalLessons: number): Promise<number>;
   createBooking(userId: string, tutorId: string, data: CreateBookingRequestReq): Promise<void>;
   getListBookingRequest(tutorId: string, searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>>;

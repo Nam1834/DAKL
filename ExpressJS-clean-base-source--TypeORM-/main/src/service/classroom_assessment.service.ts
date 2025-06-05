@@ -1,4 +1,5 @@
 import { CreateAssessmentReq } from '@/dto/assessment/create-assessment.req';
+import { AssessmentPagingResponseDto } from '@/dto/paging-response-assessment.dto';
 import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchDataDto } from '@/dto/search-data.dto';
 import { Classroom } from '@/models/classroom.model';
@@ -11,6 +12,7 @@ import { BaseCrudService } from '@/service/base/base.service';
 import { IClassroomAssessmentService } from '@/service/interface/i.classroom_assessment.service';
 import { SearchUtil } from '@/utils/search.util';
 import { inject, injectable } from 'inversify';
+import { Between, MoreThanOrEqual } from 'typeorm';
 
 @injectable()
 export class ClassroomAssessmentService
@@ -39,6 +41,7 @@ export class ClassroomAssessmentService
     const assessments = await this.classroomAssessmentRepository.findMany({
       filter: where,
       order: order,
+      relations: ['user', 'tutor', 'classroom'],
       paging: paging
     });
 
@@ -47,6 +50,57 @@ export class ClassroomAssessmentService
     });
 
     return new PagingResponseDto(total, assessments);
+  }
+
+  async searchWithTime(searchData: SearchDataDto): Promise<AssessmentPagingResponseDto<ClassroomAssessment>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    if (searchData.periodType) {
+      const now = new Date();
+      const timeStart = new Date(now);
+
+      switch (searchData.periodType) {
+        case 'DAY':
+          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          break;
+        case 'WEEK':
+          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          break;
+        case 'MONTH':
+          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          break;
+        case 'YEAR':
+          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          break;
+      }
+      Object.assign(where, {
+        createdAt: Between(timeStart, now)
+      });
+    }
+
+    const assessments = await this.classroomAssessmentRepository.findMany({
+      filter: where,
+      order: order,
+      relations: ['user', 'tutor', 'classroom'],
+      paging: paging
+    });
+
+    //Ty le danh gia tich cuc
+
+    const positiveWhere = {
+      ...where,
+      classroomEvaluation: MoreThanOrEqual(4)
+    };
+
+    const positiveCount = await this.classroomAssessmentRepository.countWithFilter(positiveWhere);
+
+    const total = await this.classroomAssessmentRepository.count({
+      filter: where
+    });
+
+    const positiveRate = total > 0 ? Math.round((positiveCount / total) * 1000) / 10 : 0;
+
+    return new AssessmentPagingResponseDto(total, assessments, positiveRate);
   }
 
   async createAssessment(userId: string, classroomId: string, data: CreateAssessmentReq): Promise<void> {
@@ -87,6 +141,26 @@ export class ClassroomAssessmentService
       updateData: {
         numberOfRating: numberOfRating,
         rating: avgRating
+      }
+    });
+
+    // 2. Tính classroomEvaluation cho classroomId
+    const classroomAssessments = await this.classroomAssessmentRepository.findMany({
+      filter: { classroomId: classroomId }
+    });
+
+    const totalClassroomRating = classroomAssessments.reduce((sum, assessment) => {
+      const score = Number(assessment.classroomEvaluation) || 0;
+      return sum + score;
+    }, 0);
+
+    const classroomAvgRating =
+      classroomAssessments.length > 0 ? Math.round((totalClassroomRating / classroomAssessments.length) * 10) / 10 : 0;
+
+    await this.classroomRespository.findOneAndUpdate({
+      filter: { classroomId: classroomId },
+      updateData: {
+        classroomEvaluation: classroomAvgRating
       }
     });
   }
