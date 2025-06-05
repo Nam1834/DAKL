@@ -67,10 +67,9 @@ export class ManagePaymentService
     return new RevenuePagingResponseDto(total, payments, totalRevenue);
   }
 
-  async searchWithTime(searchData: SearchDataDto): Promise<RevenuePagingResponseDto<TutorProfile>> {
+  async searchWithTime(searchData: SearchDataDto): Promise<RevenuePagingResponseDto<ManagePayment>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    const paymentTimeFilter: any = {};
     if (searchData.periodType) {
       const now = new Date();
       const timeStart = new Date(now);
@@ -95,55 +94,19 @@ export class ManagePaymentService
     }
 
     // Lấy danh sách tutorProfile theo filter
-    const tutorProfiles = await this.tutorProfileRepository.findMany({
+    const managePayments = await this.managePaymentRepository.findMany({
       filter: where,
       paging: paging,
+      relations: ['tutor'],
       order: order
     });
 
-    // Lấy tutorIds
-    const tutorIds = tutorProfiles.map((tutor) => tutor.userId);
-
-    if (tutorIds.length === 0) {
-      // Trường hợp không có tutor nào thỏa filter thì trả về mặc định
-      return new RevenuePagingResponseDto(0, [], 0);
-    }
-
-    // Truy vấn managePayment theo tutorIds và filter thời gian
-    const paymentFilter = {
-      tutorId: { $in: tutorIds },
-      ...paymentTimeFilter
-    };
-
-    const payments = await this.managePaymentRepository.findMany({
-      filter: paymentFilter,
-      order
+    const total = await this.managePaymentRepository.count({
+      filter: where
     });
 
-    // Tính tổng số lần thanh toán và tổng coin theo tutorId
-    const paymentStatsMap = new Map<string, { totalPayments: number; totalCoins: number }>();
+    const totalPayment = await this.managePaymentRepository.sum('coinOfTutorReceive', where);
 
-    payments.forEach((payment) => {
-      const tutorId = payment.tutorId;
-      const stats = paymentStatsMap.get(tutorId) || { totalPayments: 0, totalCoins: 0 };
-      stats.totalPayments += 1;
-      stats.totalCoins += payment.coinOfTutorReceive || 0;
-      paymentStatsMap.set(tutorId, stats);
-    });
-
-    // Gắn tổng thanh toán và tổng coin vào tutorProfiles
-    tutorProfiles.forEach((profile) => {
-      const stats = paymentStatsMap.get(profile.userId);
-      (profile as any).totalPaymentCount = stats?.totalPayments || 0;
-      (profile as any).totalCoinReceived = stats?.totalCoins || 0;
-    });
-
-    // Tính tổng doanh thu (totalRevenue) trên tất cả payments
-    const totalRevenue = payments.reduce((sum, p) => sum + (p.coinOfTutorReceive || 0), 0);
-
-    // Tổng số bản ghi tutorProfiles (nếu cần, hoặc dùng count riêng)
-    const total = await this.tutorProfileRepository.count({});
-
-    return new RevenuePagingResponseDto(total, tutorProfiles, totalRevenue);
+    return new RevenuePagingResponseDto(total, managePayments, totalPayment);
   }
 }
