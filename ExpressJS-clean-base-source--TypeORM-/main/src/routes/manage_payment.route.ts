@@ -20,7 +20,13 @@ managePaymentRouter
   .get(
     '/search-with-time',
     authenticateJWT,
-    checkPermission([Permissions.THONG_KE_DOANH_THU_GIA_SU]),
+    checkPermission([Permissions.THONG_KE_DOANH_THU]),
     managePaymentController.searchManagePaymentWithTime.bind(managePaymentController)
+  )
+  .get(
+    '/search-with-time-for-tutor-revenue',
+    authenticateJWT,
+    checkPermission([Permissions.THONG_KE_DOANH_THU_GIA_SU]),
+    managePaymentController.searchWithTimeForTutorRevenue.bind(managePaymentController)
   );
 export default managePaymentRouter;
