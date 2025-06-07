@@ -58,4 +58,28 @@ export class ManagePaymentRepository
     const result = await qb.getRawOne();
     return Number(result.sum || 0);
   }
+
+  async findManagePaymentsByTutorIds(tutorIds: string[], timeStart: Date, timeEnd: Date): Promise<ManagePayment[]> {
+    const queryBuilder = this.ormRepository.createQueryBuilder('payment');
+
+    queryBuilder.where('payment.createdAt BETWEEN :start AND :end', {
+      start: timeStart,
+      end: timeEnd
+    });
+
+    // Thêm điều kiện OR cho từng tutorId
+    tutorIds.forEach((id, index) => {
+      if (index === 0) {
+        queryBuilder.andWhere('(payment.tutorId = :id0', { [`id0`]: id });
+      } else {
+        queryBuilder.orWhere(`payment.tutorId = :id${index}`, { [`id${index}`]: id });
+      }
+    });
+
+    if (tutorIds.length > 0) {
+      queryBuilder.andWhere('1=1)'); // đóng ngoặc
+    }
+
+    return await queryBuilder.getMany();
+  }
 }

@@ -30,4 +30,35 @@ export class BookingRequestRepository
     const bookingRequests = await queryBuilder.getMany();
     return bookingRequests;
   }
+
+  async findBookingRequestsByTutorIdsAndIsHire(
+    tutorIds: string[],
+    timeStart: Date,
+    timeEnd: Date
+  ): Promise<BookingRequest[]> {
+    const queryBuilder = this.ormRepository.createQueryBuilder('bookingRequest');
+
+    // Lọc theo thời gian và isHire = true
+    queryBuilder
+      .where('bookingRequest.createdAt BETWEEN :start AND :end', {
+        start: timeStart,
+        end: timeEnd
+      })
+      .andWhere('bookingRequest.isHire = :isHire', { isHire: true });
+
+    // Thêm điều kiện OR cho từng tutorId
+    tutorIds.forEach((id, index) => {
+      if (index === 0) {
+        queryBuilder.andWhere('(bookingRequest.tutorId = :id0', { [`id0`]: id });
+      } else {
+        queryBuilder.orWhere(`bookingRequest.tutorId = :id${index}`, { [`id${index}`]: id });
+      }
+    });
+
+    if (tutorIds.length > 0) {
+      queryBuilder.andWhere('1=1)'); // đóng ngoặc
+    }
+
+    return await queryBuilder.getMany();
+  }
 }

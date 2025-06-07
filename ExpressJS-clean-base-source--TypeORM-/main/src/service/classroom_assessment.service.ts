@@ -52,8 +52,22 @@ export class ClassroomAssessmentService
     return new PagingResponseDto(total, assessments);
   }
 
-  async searchWithTime(searchData: SearchDataDto): Promise<AssessmentPagingResponseDto<ClassroomAssessment>> {
+  async searchWithTime(searchData: SearchDataDto): Promise<PagingResponseDto<TutorProfile>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    const tutors = await this.tutorProfileRepository.findMany({
+      filter: where,
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.tutorProfileRepository.count({
+      filter: where
+    });
+
+    const tutorIds = tutors.map((t) => t.userId);
+
+    let classroomAssessments: ClassroomAssessment[] = [];
 
     if (searchData.periodType) {
       const now = new Date();
@@ -76,31 +90,40 @@ export class ClassroomAssessmentService
       Object.assign(where, {
         createdAt: Between(timeStart, now)
       });
+
+      classroomAssessments = await this.classroomAssessmentRepository.findClassroomAssessmentsByTutorIds(
+        tutorIds,
+        timeStart,
+        now
+      );
     }
 
-    const assessments = await this.classroomAssessmentRepository.findMany({
-      filter: where,
-      order: order,
-      relations: ['user', 'tutor', 'classroom'],
-      paging: paging
+    // Tính số lượt đánh giá và tổng điểm đánh giá
+    const assessmentCountMap = new Map<string, number>();
+    const assessmentSumMap = new Map<string, number>();
+
+    classroomAssessments.forEach((assessment) => {
+      const tutorId = assessment.tutorId;
+      const currentCount = assessmentCountMap.get(tutorId) || 0;
+      const currentSum = assessmentSumMap.get(tutorId) || 0;
+
+      assessmentCountMap.set(tutorId, currentCount + 1);
+
+      if (assessment.classroomEvaluation !== null && assessment.classroomEvaluation !== undefined) {
+        assessmentSumMap.set(tutorId, currentSum + Number(assessment.classroomEvaluation));
+      }
     });
 
-    //Ty le danh gia tich cuc
+    // Gắn thuộc tính vào TutorProfile
+    tutors.forEach((tutor) => {
+      const count = assessmentCountMap.get(tutor.userId) || 0;
+      const sum = assessmentSumMap.get(tutor.userId) || 0;
 
-    const positiveWhere = {
-      ...where,
-      classroomEvaluation: MoreThanOrEqual(4)
-    };
-
-    const positiveCount = await this.classroomAssessmentRepository.countWithFilter(positiveWhere);
-
-    const total = await this.classroomAssessmentRepository.count({
-      filter: where
+      (tutor as any).totalAssessmentWithTime = count;
+      (tutor as any).averageAssessmentWithTime = count > 0 ? parseFloat((sum / count).toFixed(1)) : 0;
     });
 
-    const positiveRate = total > 0 ? Math.round((positiveCount / total) * 1000) / 10 : 0;
-
-    return new AssessmentPagingResponseDto(total, assessments, positiveRate);
+    return new PagingResponseDto(total, tutors);
   }
 
   async createAssessment(userId: string, classroomId: string, data: CreateAssessmentReq): Promise<void> {

@@ -19,4 +19,32 @@ export class ClassroomAssessmentRepository
       where: filter
     });
   }
+
+  async findClassroomAssessmentsByTutorIds(
+    tutorIds: string[],
+    timeStart: Date,
+    timeEnd: Date
+  ): Promise<ClassroomAssessment[]> {
+    const queryBuilder = this.ormRepository.createQueryBuilder('assessment');
+
+    queryBuilder.where('assessment.createdAt BETWEEN :start AND :end', {
+      start: timeStart,
+      end: timeEnd
+    });
+
+    // Thêm điều kiện OR từng tutorId
+    tutorIds.forEach((id, index) => {
+      if (index === 0) {
+        queryBuilder.andWhere('(assessment.tutorId = :id0', { [`id0`]: id });
+      } else {
+        queryBuilder.orWhere(`assessment.tutorId = :id${index}`, { [`id${index}`]: id });
+      }
+    });
+
+    if (tutorIds.length > 0) {
+      queryBuilder.andWhere('1=1)'); // đóng ngoặc
+    }
+
+    return await queryBuilder.getMany();
+  }
 }

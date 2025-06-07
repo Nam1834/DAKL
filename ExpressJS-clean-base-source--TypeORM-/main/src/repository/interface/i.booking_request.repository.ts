@@ -8,4 +8,5 @@ export interface IBookingRequestRepository<T> extends IBaseRepository<T> {
     tutorIds: string[],
     status: BookingRequestStatus
   ): Promise<BookingRequest[]>;
+  findBookingRequestsByTutorIdsAndIsHire(tutorIds: string[], timeStart: Date, timeEnd: Date): Promise<BookingRequest[]>;
 }

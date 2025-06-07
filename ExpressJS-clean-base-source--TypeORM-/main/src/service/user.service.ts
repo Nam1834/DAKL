@@ -157,7 +157,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       filter: where,
       order: order,
       paging: paging,
-      relations: ['userProfile', 'tutorProfile']
+      relations: ['tutorProfile']
     });
 
     users.forEach((admin) => {
