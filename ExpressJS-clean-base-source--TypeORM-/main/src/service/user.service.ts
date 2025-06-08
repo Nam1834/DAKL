@@ -1080,4 +1080,6 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
 
     return new PagingResponseDto(scoredTutors.length, scoredTutors);
   }
+
+  async tutorRevenue() {}
 }
