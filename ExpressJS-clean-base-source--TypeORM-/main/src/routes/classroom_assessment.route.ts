@@ -20,6 +20,11 @@ classroomAssessmentRouter
     checkPermission([Permissions.THONG_KE_DANH_GIA_GIA_SU]),
     classroomAssessmentController.searchAssessmentWithTime.bind(classroomAssessmentController)
   )
+  .get(
+    '/search-with-time-for-tutor',
+    authenticateJWT,
+    classroomAssessmentController.searchAssessmentWithTimeForTutor.bind(classroomAssessmentController)
+  )
   .post(
     '/create/:classroomId',
     authenticateJWT,

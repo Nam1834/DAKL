@@ -10,5 +10,9 @@ import { BaseModelType } from '@/types/base-model.types';
 export interface IClassroomAssessmentService<T extends BaseModelType> extends IBaseCrudService<T> {
   search(searchData: SearchDataDto): Promise<PagingResponseDto<ClassroomAssessment>>;
   searchWithTime(searchData: SearchDataDto): Promise<PagingResponseDto<TutorProfile>>;
+  searchWithTimeForTutor(
+    tutorId: string,
+    searchData: SearchDataDto
+  ): Promise<AssessmentPagingResponseDto<ClassroomAssessment>>;
   createAssessment(userId: string, classroomId: string, data: CreateAssessmentReq): Promise<void>;
 }
