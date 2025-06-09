@@ -14,6 +14,11 @@ bookingRequestRouter
     checkPermission([Permissions.THONG_KE_LUOT_THUE]),
     bookingRequestController.searchBookingRequestWithTime.bind(bookingRequestController)
   )
+  .get(
+    '/search-with-time-for-tutor',
+    authenticateJWT,
+    bookingRequestController.searchBookingRequestWithTimeForTutor.bind(bookingRequestController)
+  )
   .post(
     '/calculate-coins',
     authenticateJWT,

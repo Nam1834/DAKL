@@ -90,11 +90,51 @@ export class BookingRequestService
     const bookingRequests = await this.bookingRequestRepository.findMany({
       filter: { status: BookingRequestStatus.ACCEPT, isHire: true, ...where },
       order: order,
+      relations: ['user', 'tutor'],
       paging: paging
     });
 
     const total = await this.bookingRequestRepository.count({
       filter: { status: BookingRequestStatus.ACCEPT, isHire: true, ...where }
+    });
+
+    return new PagingResponseDto(total, bookingRequests);
+  }
+
+  async searchWithTimeForTutor(tutorId: string, searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    if (searchData.periodType) {
+      const now = new Date();
+      const timeStart = new Date(now);
+
+      switch (searchData.periodType) {
+        case 'DAY':
+          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          break;
+        case 'WEEK':
+          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          break;
+        case 'MONTH':
+          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          break;
+        case 'YEAR':
+          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          break;
+      }
+      Object.assign(where, {
+        createdAt: Between(timeStart, now)
+      });
+    }
+
+    const bookingRequests = await this.bookingRequestRepository.findMany({
+      filter: { tutorId: tutorId, isHire: true, ...where },
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.bookingRequestRepository.count({
+      filter: { tutorId: tutorId, isHire: true, ...where }
     });
 
     return new PagingResponseDto(total, bookingRequests);
