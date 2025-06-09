@@ -51,8 +51,23 @@ export class MenuService implements IMenuService {
     {
       name: 'YÊU CẦU',
       isCollapsed: false,
-      permissions: [Permissions.QUAN_LY_YEU_CAU],
-      children: null,
+      permissions: [Permissions.QUAN_LY_YEU_CAU, Permissions.RUT_TIEN],
+      children: [
+        {
+          name: 'TÀI KHOẢN GIA SƯ',
+          isCollapsed: false,
+          permissions: [Permissions.QUAN_LY_YEU_CAU],
+          children: null,
+          icon: null
+        },
+        {
+          name: 'RÚT TIỀN',
+          isCollapsed: false,
+          permissions: [Permissions.RUT_TIEN],
+          children: null,
+          icon: null
+        }
+      ],
       icon: 'fa-regular fa-paper-plane'
     },
 

@@ -88,7 +88,7 @@ export class ManageBankingService
     });
   }
 
-  async solveManageBanking(click: string, manageBankingId: string): Promise<void> {
+  async solveManageBanking(click: string, manageBankingId: string, description?: string): Promise<void> {
     const manageBanking = await this.manageBankingRepository.findOne({
       filter: { manageBankingId: manageBankingId, status: ManageBankingStatus.REQUEST }
     });
@@ -100,6 +100,7 @@ export class ManageBankingService
     if (click === ManageBankingStatus.ACCEPT) {
       const updatedManageBanking = new ManageBanking();
       updatedManageBanking.status = ManageBankingStatus.ACCEPT;
+      updatedManageBanking.description = 'Chúc mừng bạn đã rút xu thành công';
 
       await this.manageBankingRepository.findOneAndUpdate({
         filter: { manageBankingId: manageBankingId },
@@ -126,22 +127,37 @@ export class ManageBankingService
         filter: { userId: manageBanking.tutorId },
         updateData: { coin: coinIfWithDraw }
       });
-    } else if (click === ManageBankingStatus.REFUSE) {
+    } else if (click === ManageBankingStatus.REFUSE || click === ManageBankingStatus.CANCEL) {
+      if (!description) {
+        throw new Error('description is required for REFUSE or CANCEL status!');
+      }
       const updatedManageBanking = new ManageBanking();
       updatedManageBanking.status = ManageBankingStatus.REFUSE;
-
-      await this.manageBankingRepository.findOneAndUpdate({
-        filter: { manageBankingId: manageBankingId },
-        updateData: updatedManageBanking
-      });
-    } else if (click === ManageBankingStatus.CANCEL) {
-      const updatedManageBanking = new ManageBanking();
-      updatedManageBanking.status = ManageBankingStatus.CANCEL;
+      updatedManageBanking.description = description;
 
       await this.manageBankingRepository.findOneAndUpdate({
         filter: { manageBankingId: manageBankingId },
         updateData: updatedManageBanking
       });
     }
+  }
+
+  async cancelManageBankingByTutor(tutorId: string, manageBankingId: string): Promise<void> {
+    const manageBanking = await this.manageBankingRepository.findOne({
+      filter: { manageBankingId: manageBankingId, tutorId: tutorId, status: ManageBankingStatus.REQUEST }
+    });
+
+    if (!manageBanking) {
+      throw new Error('You can not solve this manage banking!');
+    }
+
+    const updatedManageBanking = new ManageBanking();
+    updatedManageBanking.status = ManageBankingStatus.CANCEL;
+    updatedManageBanking.description = 'Yêu cầu này đã bị bạn hủy';
+
+    await this.manageBankingRepository.findOneAndUpdate({
+      filter: { manageBankingId: manageBankingId },
+      updateData: updatedManageBanking
+    });
   }
 }

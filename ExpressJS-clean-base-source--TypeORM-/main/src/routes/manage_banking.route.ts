@@ -18,6 +18,11 @@ manageBankingRouter
     '/solve-manage-banking',
     authenticateJWT,
     manageBankingController.solveManageBanking.bind(manageBankingController)
+  )
+  .put(
+    '/cancel-manage-banking',
+    authenticateJWT,
+    manageBankingController.cancelManageBankingByTutor.bind(manageBankingController)
   );
 
 export default manageBankingRouter;
