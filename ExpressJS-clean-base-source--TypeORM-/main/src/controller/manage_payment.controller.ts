@@ -57,6 +57,25 @@ export class ManagePaymentController {
     }
   }
 
+  async searchWithTimeByTutorId(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tutor = req.user;
+      if (!tutor) {
+        throw new Error('You must login');
+      }
+      const tutorId = tutor.id;
+      const searchData: SearchDataDto = getSearchData(req);
+
+      searchData.periodType = req.query.periodType as any;
+      searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
+
+      const result = await this.managePaymentService.searchWithTimeForTutor(tutorId, searchData);
+      res.send_ok('Manage Payment with time fetch successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async searchWithTimeForTutorRevenue(req: Request, res: Response, next: NextFunction) {
     try {
       const searchData: SearchDataDto = getSearchData(req);

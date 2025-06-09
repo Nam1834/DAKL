@@ -72,6 +72,54 @@ export class ManagePaymentService
     return new RevenuePagingResponseDto(total, payments, totalRevenue);
   }
 
+  async searchWithTimeForTutor(
+    tutorId: string,
+    searchData: SearchDataDto
+  ): Promise<RevenuePagingResponseDto<ManagePayment>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    if (searchData.periodType) {
+      const now = new Date();
+      const timeStart = new Date(now);
+
+      switch (searchData.periodType) {
+        case 'DAY':
+          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          break;
+        case 'WEEK':
+          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          break;
+        case 'MONTH':
+          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          break;
+        case 'YEAR':
+          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          break;
+      }
+      Object.assign(where, {
+        createdAt: Between(timeStart, now)
+      });
+    }
+
+    const payments = await this.managePaymentRepository.findMany({
+      filter: { tutorId: tutorId, ...where },
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.managePaymentRepository.count({
+      filter: { tutorId: tutorId, ...where }
+    });
+
+    // Tong doanh thu
+    const totalRevenue = await this.managePaymentRepository.sum('coinOfTutorReceive', {
+      tutorId,
+      ...where
+    });
+
+    return new RevenuePagingResponseDto(total, payments, totalRevenue);
+  }
+
   async searchWithTime(searchData: SearchDataDto): Promise<RevenuePagingResponseDto<ManagePayment>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
