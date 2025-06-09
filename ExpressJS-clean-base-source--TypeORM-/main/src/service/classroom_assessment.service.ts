@@ -126,6 +126,53 @@ export class ClassroomAssessmentService
     return new PagingResponseDto(total, tutors);
   }
 
+  async searchWithTimeForTutor(
+    tutorId: string,
+    searchData: SearchDataDto
+  ): Promise<PagingResponseDto<ClassroomAssessment>> {
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    if (searchData.periodType) {
+      const now = new Date();
+      const timeStart = new Date(now);
+
+      switch (searchData.periodType) {
+        case 'DAY':
+          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          break;
+        case 'WEEK':
+          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          break;
+        case 'MONTH':
+          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          break;
+        case 'YEAR':
+          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          break;
+      }
+      Object.assign(where, {
+        createdAt: Between(timeStart, now)
+      });
+    }
+
+    const classroomAssessments = await this.classroomAssessmentRepository.findMany({
+      filter: { tutorId: tutorId, ...where },
+      order: order,
+      paging: paging
+    });
+
+    const total = await this.classroomAssessmentRepository.count({
+      filter: { tutorId: tutorId, ...where }
+    });
+
+    const averageRatingWithTime = await this.classroomAssessmentRepository.avg('classroomEvaluation', {
+      tutorId: tutorId,
+      ...where
+    });
+
+    return new PagingResponseDto(total, classroomAssessments);
+  }
+
   async createAssessment(userId: string, classroomId: string, data: CreateAssessmentReq): Promise<void> {
     const classroom = await this.classroomRespository.findOne({
       filter: { classroomId: classroomId }

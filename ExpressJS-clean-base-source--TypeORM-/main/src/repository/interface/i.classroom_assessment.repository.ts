@@ -8,4 +8,5 @@ export interface IClassroomAssessmentRepository<T> extends IBaseRepository<T> {
     timeStart: Date,
     timeEnd: Date
   ): Promise<ClassroomAssessment[]>;
+  avg(field: keyof ClassroomAssessment, filter: any): Promise<number | null>;
 }

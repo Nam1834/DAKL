@@ -34,6 +34,26 @@ export class BookingRequestController {
     }
   }
 
+  async searchBookingRequestWithTimeForTutor(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user;
+      const tutorId = user?.id;
+
+      if (!tutorId) {
+        throw new Error('You must login');
+      }
+      const searchData: SearchDataDto = getSearchData(req);
+
+      searchData.periodType = req.query.periodType as any;
+      searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
+
+      const result = await this.bookingRequestService.searchWithTimeForTutor(tutorId, searchData);
+      res.send_ok('Booking Request with time fetch successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async calculateTotalCoins(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = req.user;
