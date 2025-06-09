@@ -10,5 +10,6 @@ export interface IManagePaymentService<T extends BaseModelType> extends IBaseCru
   search(searchData: SearchDataDto): Promise<PagingResponseDto<ManagePayment>>;
   searchForTutor(tutorId: string, searchData: SearchDataDto): Promise<RevenuePagingResponseDto<ManagePayment>>;
   searchWithTime(searchData: SearchDataDto): Promise<RevenuePagingResponseDto<ManagePayment>>;
+  searchWithTimeForTutor(tutorId: string, searchData: SearchDataDto): Promise<RevenuePagingResponseDto<ManagePayment>>;
   searchWithTimeForTutorRevenue(searchData: SearchDataDto): Promise<PagingResponseDto<TutorProfile>>;
 }
