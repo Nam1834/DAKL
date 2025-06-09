@@ -129,7 +129,7 @@ export class ClassroomAssessmentService
   async searchWithTimeForTutor(
     tutorId: string,
     searchData: SearchDataDto
-  ): Promise<PagingResponseDto<ClassroomAssessment>> {
+  ): Promise<AssessmentPagingResponseDto<ClassroomAssessment>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
     if (searchData.periodType) {
@@ -170,7 +170,7 @@ export class ClassroomAssessmentService
       ...where
     });
 
-    return new PagingResponseDto(total, classroomAssessments);
+    return new AssessmentPagingResponseDto(total, classroomAssessments, averageRatingWithTime);
   }
 
   async createAssessment(userId: string, classroomId: string, data: CreateAssessmentReq): Promise<void> {
