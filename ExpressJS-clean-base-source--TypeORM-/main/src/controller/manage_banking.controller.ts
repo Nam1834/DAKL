@@ -64,9 +64,27 @@ export class ManageBankingController {
   }
   async solveManageBanking(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { click, manageBankingId } = req.body;
+      const { click, manageBankingId, description } = req.body;
 
-      const result = await this.manageBankingService.solveManageBanking(click, manageBankingId);
+      const result = await this.manageBankingService.solveManageBanking(click, manageBankingId, description);
+
+      res.send_ok('Solve manage banking successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async cancelManageBankingByTutor(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user;
+      const tutorId = user?.id;
+
+      if (!tutorId) {
+        throw new Error('You must login');
+      }
+      const { manageBankingId } = req.body;
+
+      const result = await this.manageBankingService.cancelManageBankingByTutor(tutorId, manageBankingId);
 
       res.send_ok('Solve manage banking successfully', result);
     } catch (error) {

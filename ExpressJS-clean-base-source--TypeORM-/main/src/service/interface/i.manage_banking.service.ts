@@ -9,5 +9,6 @@ export interface IManageBankingService<T extends BaseModelType> extends IBaseCru
   search(searchData: SearchDataDto): Promise<PagingResponseDto<ManageBanking>>;
   getMyManageBanking(tutorId: string, searchData: SearchDataDto): Promise<PagingResponseDto<ManageBanking>>;
   createManageBanking(tutorId: string, data: CreateManageBankingReq): Promise<void>;
-  solveManageBanking(click: string, manageBankingId: string): Promise<void>;
+  solveManageBanking(click: string, manageBankingId: string, description?: string): Promise<void>;
+  cancelManageBankingByTutor(tutorId: string, manageBankingId: string): Promise<void>;
 }

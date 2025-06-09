@@ -23,4 +23,7 @@ export class ManageBanking extends BaseModel {
 
   @Column({ default: ManageBankingStatus.REQUEST })
   status!: string;
+
+  @Column({ nullable: true })
+  description!: string;
 }
