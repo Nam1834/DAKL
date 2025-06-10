@@ -48,6 +48,19 @@ export class ClassroomAssessmentRepository
     return await queryBuilder.getMany();
   }
 
+  async findAssessmentsByClassroomAndMeetingIds(
+    classroomId: string,
+    meetingIds: string[]
+  ): Promise<ClassroomAssessment[]> {
+    const queryBuilder = this.ormRepository.createQueryBuilder('assessment');
+
+    queryBuilder
+      .where('assessment.classroomId = :classroomId', { classroomId })
+      .andWhere('assessment.meetingId IN (:...meetingIds)', { meetingIds });
+
+    return await queryBuilder.getMany();
+  }
+
   async avg(field: keyof ClassroomAssessment, filter: any): Promise<number | null> {
     const qb = this.ormRepository.createQueryBuilder('ca');
     qb.select(`AVG(ca.${field})`, 'avg');

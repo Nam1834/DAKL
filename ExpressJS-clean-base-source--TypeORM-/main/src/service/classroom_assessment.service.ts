@@ -186,6 +186,7 @@ export class ClassroomAssessmentService
     classroomAssessment.userId = userId;
     classroomAssessment.tutorId = data.tutorId;
     classroomAssessment.classroomId = classroomId;
+    classroomAssessment.meetingId = data.meetingId;
     classroomAssessment.classroomEvaluation = data.classroomEvaluation;
     classroomAssessment.description = data.description;
 

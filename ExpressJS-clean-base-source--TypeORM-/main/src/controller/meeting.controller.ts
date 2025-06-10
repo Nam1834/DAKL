@@ -187,7 +187,9 @@ export class MeetingController {
         return;
       }
 
-      const result = await this.meetingService.getMeetingByClassroom(classroomId);
+      const searchData: SearchDataDto = getSearchData(req);
+
+      const result = await this.meetingService.getMeetingByClassroom(classroomId, searchData);
 
       res.send_ok('Get meeting successfully', {
         result
