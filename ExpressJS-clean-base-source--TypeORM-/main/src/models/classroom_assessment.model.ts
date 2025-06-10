@@ -4,6 +4,7 @@ import { BaseModel } from './base.model';
 import { UserProfile } from './user_profile.model';
 import { ClassroomStatus } from '@/enums/classroom-status.enum';
 import { Classroom } from './classroom.model';
+import { Meeting } from './meeting.model';
 
 @Entity('classroom_assessments')
 export class ClassroomAssessment extends BaseModel {
@@ -30,6 +31,13 @@ export class ClassroomAssessment extends BaseModel {
   @ManyToOne(() => Classroom, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'classroom_id' })
   classroom!: Classroom;
+
+  @Column({ name: 'meeting_id', nullable: true })
+  meetingId!: string;
+
+  @ManyToOne(() => Meeting, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'meeting_id' })
+  meeting!: Meeting;
 
   @Column({ name: 'classroom_evaluation', type: 'decimal', precision: 2, scale: 1, nullable: true })
   classroomEvaluation!: number;

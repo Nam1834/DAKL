@@ -12,4 +12,8 @@ export class CreateAssessmentReq {
   @IsNotEmpty()
   @IsString()
   tutorId!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  meetingId!: string;
 }

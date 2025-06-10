@@ -23,6 +23,8 @@ import { PagingResponseDto } from '@/dto/paging-response.dto';
 import { SearchUtil } from '@/utils/search.util';
 import { MeetingStatus } from '@/enums/meeting-status.enum';
 import { GetMeetingRes } from '@/dto/meeting/get-meeting.res';
+import { IClassroomAssessmentRepository } from '@/repository/interface/i.classroom_assessment.repository';
+import { ClassroomAssessment } from '@/models/classroom_assessment.model';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -33,10 +35,16 @@ const ZOOM_REDIRECT_URI = process.env.ZOOM_REDIRECT_URI;
 @injectable()
 export class MeetingService extends BaseCrudService<Meeting> implements IMeetingService<Meeting> {
   private meetingRepository: IMeetingRepository<Meeting>;
+  private classroomAssessmentRepository: IClassroomAssessmentRepository<ClassroomAssessment>;
 
-  constructor(@inject('MeetingRepository') meetingRepository: IMeetingRepository<Meeting>) {
+  constructor(
+    @inject('MeetingRepository') meetingRepository: IMeetingRepository<Meeting>,
+    @inject('ClassroomAssessmentRepository')
+    classroomAssessmentRepository: IClassroomAssessmentRepository<ClassroomAssessment>
+  ) {
     super(meetingRepository);
     this.meetingRepository = meetingRepository;
+    this.classroomAssessmentRepository = classroomAssessmentRepository;
   }
 
   async search(searchData: SearchDataDto): Promise<PagingResponseDto<Meeting>> {
@@ -275,19 +283,44 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     return jwt.sign(payload, sdkSecret, { algorithm: 'HS256' });
   }
 
-  async getMeetingByClassroom(classroomId: string): Promise<GetMeetingRes | null> {
-    const meeting = await this.meetingRepository.findMany({
-      filter: { classroomId },
-      order: [
-        {
-          column: 'createdAt',
-          direction: 'DESC'
-        }
-      ] // nếu có nhiều meeting
+  async getMeetingByClassroom(classroomId: string, searchData: SearchDataDto): Promise<PagingResponseDto<Meeting>> {
+    // Parse các điều kiện where/order/paging từ searchData
+    const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
+
+    // Thêm điều kiện classroomId vào filter
+    const filterWithClassroom = {
+      ...where,
+      classroomId
+    };
+
+    // Truy vấn dữ liệu
+    const meetings = await this.meetingRepository.findMany({
+      filter: filterWithClassroom,
+      order: order,
+      paging: paging
     });
 
-    if (!meeting) return null;
+    // Đếm tổng số bản ghi
+    const total = await this.meetingRepository.count({
+      filter: filterWithClassroom
+    });
 
-    return convertToDto(GetMeetingRes, meeting);
+    const meetingIds = meetings.map((meeting) => meeting.meetingId);
+
+    // Truy vấn các ClassroomAssessment theo classroomId và meetingIds
+    const assessments = await this.classroomAssessmentRepository.findAssessmentsByClassroomAndMeetingIds(
+      classroomId,
+      meetingIds
+    );
+
+    const ratedMeetingIdSet = new Set<string>(assessments.map((a) => a.meetingId));
+
+    // Gắn isRating = true/false vào từng meeting
+    const enrichedMeetings = meetings.map((meeting) => ({
+      ...meeting,
+      isRating: ratedMeetingIdSet.has(meeting.meetingId)
+    }));
+
+    return new PagingResponseDto(total, enrichedMeetings);
   }
 }

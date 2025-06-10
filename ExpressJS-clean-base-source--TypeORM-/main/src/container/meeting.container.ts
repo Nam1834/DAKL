@@ -5,6 +5,9 @@ import { MeetingRepository } from '@/repository/meeting.repository';
 import { IMeetingService } from '@/service/interface/i.meeting.service';
 import { IMeetingRepository } from '@/repository/interface/i.meeting.repository';
 import { BaseContainer } from '@/container/base.container';
+import { IClassroomAssessmentRepository } from '@/repository/interface/i.classroom_assessment.repository';
+import { ClassroomAssessment } from '@/models/classroom_assessment.model';
+import { classroomAssessmentRepository } from './classroom_assessment.container';
 
 class MeetingContainer extends BaseContainer {
   constructor() {
@@ -12,6 +15,11 @@ class MeetingContainer extends BaseContainer {
     this.container.bind<IMeetingService<Meeting>>('MeetingService').to(MeetingService);
     this.container.bind<IMeetingRepository<Meeting>>('MeetingRepository').to(MeetingRepository);
     this.container.bind<MeetingController>(MeetingController).toSelf();
+
+    //Import
+    this.container
+      .bind<IClassroomAssessmentRepository<ClassroomAssessment>>('ClassroomAssessmentRepository')
+      .toConstantValue(classroomAssessmentRepository);
   }
 
   export() {
