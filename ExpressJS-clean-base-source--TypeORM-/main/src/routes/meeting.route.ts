@@ -11,7 +11,7 @@ meetingRouter
   //   meetingController.handleWebhook.bind(meetingController)
   // )
   .get('/search', meetingController.searchMeeting.bind(meetingController))
-  .get('/get-meeting', authenticateJWT, meetingController.getMeetingByClassroom.bind(meetingController))
+  .post('/get-meeting', authenticateJWT, meetingController.getMeetingByClassroom.bind(meetingController))
   .get('/auth', meetingController.getZoomUrl.bind(meetingController))
   .get('/callback', meetingController.handleZoomCallback.bind(meetingController))
   .post('/handle', meetingController.handleZoomRedirect.bind(meetingController))
