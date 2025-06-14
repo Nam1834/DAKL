@@ -40,7 +40,9 @@ export class StatisticalService implements IStatisticalService {
       newClassActive: statistics.newClassActive,
       newClassActivePercentage: statistics.newClassActivePercentage,
       classroomRating: statistics.classroomRating,
-      classroomRatingPercentage: statistics.classroomRatingPercentage
+      classroomRatingPercentage: statistics.classroomRatingPercentage,
+      totalManagePayment: statistics.totalManagePayment,
+      totalManagePaymentPercentage: statistics.totalManagePaymentPercentage
     });
     return result;
   }
