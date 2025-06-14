@@ -11,6 +11,6 @@ export class SearchDataDto {
   periodType?: 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
   periodValue?: number;
 
-  startDate?: string; // ISO format
-  endDate?: string;
+  startDate?: Date | string;
+  endDate?: Date | string;
 }

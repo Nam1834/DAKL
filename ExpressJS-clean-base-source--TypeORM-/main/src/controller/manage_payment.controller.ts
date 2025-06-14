@@ -50,6 +50,16 @@ export class ManagePaymentController {
       searchData.periodType = req.query.periodType as any;
       searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
 
+      if (req.query.startDate) {
+        const [day, month, year] = (req.query.startDate as string).split('/').map(Number);
+        searchData.startDate = new Date(year, month - 1, day);
+      }
+
+      if (req.query.endDate) {
+        const [day, month, year] = (req.query.endDate as string).split('/').map(Number);
+        searchData.endDate = new Date(year, month - 1, day + 1); // thêm 1 ngày để bao trùm cả ngày cuối
+      }
+
       const result = await this.managePaymentService.searchWithTime(searchData);
       res.send_ok('Manage Payment with time fetch successfully', result);
     } catch (error) {
@@ -69,6 +79,16 @@ export class ManagePaymentController {
       searchData.periodType = req.query.periodType as any;
       searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
 
+      if (req.query.startDate) {
+        const [day, month, year] = (req.query.startDate as string).split('/').map(Number);
+        searchData.startDate = new Date(year, month - 1, day);
+      }
+
+      if (req.query.endDate) {
+        const [day, month, year] = (req.query.endDate as string).split('/').map(Number);
+        searchData.endDate = new Date(year, month - 1, day + 1); // thêm 1 ngày để bao trùm cả ngày cuối
+      }
+
       const result = await this.managePaymentService.searchWithTimeForTutor(tutorId, searchData);
       res.send_ok('Manage Payment with time fetch successfully', result);
     } catch (error) {
@@ -82,6 +102,16 @@ export class ManagePaymentController {
 
       searchData.periodType = req.query.periodType as any;
       searchData.periodValue = req.query.periodValue ? Number(req.query.periodValue) : undefined;
+
+      if (req.query.startDate) {
+        const [day, month, year] = (req.query.startDate as string).split('/').map(Number);
+        searchData.startDate = new Date(year, month - 1, day);
+      }
+
+      if (req.query.endDate) {
+        const [day, month, year] = (req.query.endDate as string).split('/').map(Number);
+        searchData.endDate = new Date(year, month - 1, day + 1); // thêm 1 ngày để bao trùm cả ngày cuối
+      }
 
       const result = await this.managePaymentService.searchWithTimeForTutorRevenue(searchData);
       res.send_ok('Manage Payment with time fetch successfully', result);
