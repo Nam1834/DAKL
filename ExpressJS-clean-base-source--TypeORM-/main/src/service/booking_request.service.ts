@@ -64,7 +64,11 @@ export class BookingRequestService
   async searchWithTime(searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    if (searchData.periodType) {
+    if (searchData.startDate && searchData.endDate) {
+      Object.assign(where, {
+        createdAt: Between(new Date(searchData.startDate), new Date(searchData.endDate))
+      });
+    } else if (searchData.periodType) {
       const now = new Date();
       const timeStart = new Date(now);
 
@@ -86,7 +90,6 @@ export class BookingRequestService
         createdAt: Between(timeStart, now)
       });
     }
-
     const bookingRequests = await this.bookingRequestRepository.findMany({
       filter: { status: BookingRequestStatus.ACCEPT, isHire: true, ...where },
       order: order,
@@ -104,7 +107,11 @@ export class BookingRequestService
   async searchWithTimeForTutor(tutorId: string, searchData: SearchDataDto): Promise<PagingResponseDto<BookingRequest>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    if (searchData.periodType) {
+    if (searchData.startDate && searchData.endDate) {
+      Object.assign(where, {
+        createdAt: Between(new Date(searchData.startDate), new Date(searchData.endDate))
+      });
+    } else if (searchData.periodType) {
       const now = new Date();
       const timeStart = new Date(now);
 

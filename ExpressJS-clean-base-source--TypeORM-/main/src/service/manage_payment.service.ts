@@ -78,7 +78,11 @@ export class ManagePaymentService
   ): Promise<RevenuePagingResponseDto<ManagePayment>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    if (searchData.periodType) {
+    if (searchData.startDate && searchData.endDate) {
+      Object.assign(where, {
+        createdAt: Between(new Date(searchData.startDate), new Date(searchData.endDate))
+      });
+    } else if (searchData.periodType) {
       const now = new Date();
       const timeStart = new Date(now);
 
@@ -123,7 +127,11 @@ export class ManagePaymentService
   async searchWithTime(searchData: SearchDataDto): Promise<RevenuePagingResponseDto<ManagePayment>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    if (searchData.periodType) {
+    if (searchData.startDate && searchData.endDate) {
+      Object.assign(where, {
+        createdAt: Between(new Date(searchData.startDate), new Date(searchData.endDate))
+      });
+    } else if (searchData.periodType) {
       const now = new Date();
       const timeStart = new Date(now);
 
@@ -181,40 +189,59 @@ export class ManagePaymentService
     let bookingRequests: BookingRequest[] = [];
     let managePayments: ManagePayment[] = [];
 
-    if (searchData.periodType) {
-      const now = new Date();
-      const timeStart = new Date(now);
+    let timeStart: Date | null = null;
+    let timeEnd: Date | null = null;
+
+    // Xử lý startDate và endDate (dd/MM/yyyy) hoặc ISO string
+    if (searchData.startDate && searchData.endDate) {
+      if (typeof searchData.startDate === 'string' && typeof searchData.endDate === 'string') {
+        // Parse định dạng dd/MM/yyyy
+        const [startDay, startMonth, startYear] = searchData.startDate.split('/').map(Number);
+        const [endDay, endMonth, endYear] = searchData.endDate.split('/').map(Number);
+        timeStart = new Date(startYear, startMonth - 1, startDay);
+        timeEnd = new Date(endYear, endMonth - 1, endDay + 1); // Bao trùm cả ngày end
+      } else {
+        // Nếu là Date hoặc ISO string
+        timeStart = new Date(searchData.startDate);
+        timeEnd = new Date(searchData.endDate);
+        timeEnd.setDate(timeEnd.getDate() + 1); // Bao trùm ngày end
+      }
+    } else if (searchData.periodType) {
+      timeEnd = new Date();
+      timeStart = new Date(timeEnd);
 
       switch (searchData.periodType) {
         case 'DAY':
-          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          timeStart.setDate(timeEnd.getDate() - (searchData.periodValue ?? 1));
           break;
         case 'WEEK':
-          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          timeStart.setDate(timeEnd.getDate() - 7 * (searchData.periodValue ?? 1));
           break;
         case 'MONTH':
-          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          timeStart.setMonth(timeEnd.getMonth() - (searchData.periodValue ?? 1));
           break;
         case 'YEAR':
-          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          timeStart.setFullYear(timeEnd.getFullYear() - (searchData.periodValue ?? 1));
           break;
       }
+    }
+
+    // Nếu có khoảng thời gian hợp lệ
+    if (timeStart && timeEnd) {
       Object.assign(where, {
-        createdAt: Between(timeStart, now)
+        createdAt: Between(timeStart, timeEnd)
       });
 
-      // BookingRequests có isHire = true
       bookingRequests = await this.bookingRequestRepository.findBookingRequestsByTutorIdsAndIsHire(
         tutorIds,
         timeStart,
-        now
+        timeEnd
       );
 
-      // Lấy managePayments trong thời gian
-      managePayments = await this.managePaymentRepository.findManagePaymentsByTutorIds(tutorIds, timeStart, now);
+      managePayments = await this.managePaymentRepository.findManagePaymentsByTutorIds(tutorIds, timeStart, timeEnd);
     }
 
-    // Đếm totalHire theo tutorId
+    // Đếm số lần hire theo tutorId
     const hireCountMap = new Map<string, number>();
     bookingRequests.forEach((br) => {
       const current = hireCountMap.get(br.tutorId) || 0;
@@ -228,7 +255,7 @@ export class ManagePaymentService
       revenueMap.set(mp.tutorId, current + mp.coinOfTutorReceive);
     });
 
-    // Gắn dữ liệu vào từng tutor
+    // Gắn vào từng tutor
     tutors.forEach((tutor) => {
       const tutorId = tutor.userId;
       (tutor as any).totalHire = hireCountMap.get(tutorId) || 0;

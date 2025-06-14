@@ -69,36 +69,55 @@ export class ClassroomAssessmentService
 
     let classroomAssessments: ClassroomAssessment[] = [];
 
-    if (searchData.periodType) {
-      const now = new Date();
-      const timeStart = new Date(now);
+    let timeStart: Date | null = null;
+    let timeEnd: Date | null = null;
+
+    // Ưu tiên startDate và endDate nếu được truyền vào
+    if (searchData.startDate && searchData.endDate) {
+      if (typeof searchData.startDate === 'string' && typeof searchData.endDate === 'string') {
+        const [startDay, startMonth, startYear] = searchData.startDate.split('/').map(Number);
+        const [endDay, endMonth, endYear] = searchData.endDate.split('/').map(Number);
+
+        timeStart = new Date(startYear, startMonth - 1, startDay);
+        timeEnd = new Date(endYear, endMonth - 1, endDay + 1); // Bao gồm cả ngày kết thúc
+      } else {
+        timeStart = new Date(searchData.startDate);
+        timeEnd = new Date(searchData.endDate);
+        timeEnd.setDate(timeEnd.getDate() + 1);
+      }
+    } else if (searchData.periodType) {
+      timeEnd = new Date();
+      timeStart = new Date(timeEnd);
 
       switch (searchData.periodType) {
         case 'DAY':
-          timeStart.setDate(now.getDate() - (searchData.periodValue ?? 1));
+          timeStart.setDate(timeEnd.getDate() - (searchData.periodValue ?? 1));
           break;
         case 'WEEK':
-          timeStart.setDate(now.getDate() - 7 * (searchData.periodValue ?? 1));
+          timeStart.setDate(timeEnd.getDate() - 7 * (searchData.periodValue ?? 1));
           break;
         case 'MONTH':
-          timeStart.setMonth(now.getMonth() - (searchData.periodValue ?? 1));
+          timeStart.setMonth(timeEnd.getMonth() - (searchData.periodValue ?? 1));
           break;
         case 'YEAR':
-          timeStart.setFullYear(now.getFullYear() - (searchData.periodValue ?? 1));
+          timeStart.setFullYear(timeEnd.getFullYear() - (searchData.periodValue ?? 1));
           break;
       }
+    }
+
+    if (timeStart && timeEnd) {
       Object.assign(where, {
-        createdAt: Between(timeStart, now)
+        createdAt: Between(timeStart, timeEnd)
       });
 
       classroomAssessments = await this.classroomAssessmentRepository.findClassroomAssessmentsByTutorIds(
         tutorIds,
         timeStart,
-        now
+        timeEnd
       );
     }
 
-    // Tính số lượt đánh giá và tổng điểm đánh giá
+    // Tính số lượt đánh giá và tổng điểm
     const assessmentCountMap = new Map<string, number>();
     const assessmentSumMap = new Map<string, number>();
 
@@ -114,7 +133,7 @@ export class ClassroomAssessmentService
       }
     });
 
-    // Gắn thuộc tính vào TutorProfile
+    // Gắn vào từng tutor
     tutors.forEach((tutor) => {
       const count = assessmentCountMap.get(tutor.userId) || 0;
       const sum = assessmentSumMap.get(tutor.userId) || 0;
@@ -132,7 +151,11 @@ export class ClassroomAssessmentService
   ): Promise<AssessmentPagingResponseDto<ClassroomAssessment>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    if (searchData.periodType) {
+    if (searchData.startDate && searchData.endDate) {
+      Object.assign(where, {
+        createdAt: Between(new Date(searchData.startDate), new Date(searchData.endDate))
+      });
+    } else if (searchData.periodType) {
       const now = new Date();
       const timeStart = new Date(now);
 
