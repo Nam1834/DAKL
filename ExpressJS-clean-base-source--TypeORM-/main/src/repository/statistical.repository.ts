@@ -2,6 +2,7 @@ import { ClassroomStatus } from '@/enums/classroom-status.enum';
 import { UserTypeEnum } from '@/enums/user-type.enum';
 import { Classroom } from '@/models/classroom.model';
 import { ClassroomAssessment } from '@/models/classroom_assessment.model';
+import { ManagePayment } from '@/models/manage_payment.model';
 import { Order } from '@/models/order.model';
 import { TutorRequest } from '@/models/tutor_request.model';
 import { User } from '@/models/user.model';
@@ -29,12 +30,15 @@ export class StatisticalRepository implements IStatisticalRepository {
     newClassActivePercentage: number;
     classroomRating: number;
     classroomRatingPercentage: number;
+    totalManagePayment: number;
+    totalManagePaymentPercentage: number;
   }> {
     const orderRepository = this.dataSource.getRepository(Order);
     const tutorRequestRepository = this.dataSource.getRepository(TutorRequest);
     const userRepository = this.dataSource.getRepository(User);
     const classroomRepository = this.dataSource.getRepository(Classroom);
     const classroomAssessmentRepository = this.dataSource.getRepository(ClassroomAssessment);
+    const managePaymentRepository = this.dataSource.getRepository(ManagePayment);
 
     //hai mốc thời gian
     const currentTimeEnd = new Date();
@@ -59,6 +63,24 @@ export class StatisticalRepository implements IStatisticalRepository {
 
     //tính phần trăm doanh thu
     const revenuePercentage = PercentageChange(revenue, previousRevenue);
+
+    //managepayment
+    const managePayments = await managePaymentRepository.find({
+      where: { createdAt: Between(currentTimeStart, currentTimeEnd) }
+    });
+    const totalManagePayment = managePayments.reduce((acc, payment) => acc + Number(payment.coinOfWebReceive), 0);
+
+    // Tổng coinOfWebReceive trong đợt trước
+    const previousManagePayments = await managePaymentRepository.find({
+      where: { createdAt: Between(previousTimeStart, previousTimeEnd) }
+    });
+    const previousTotalManagePayment = previousManagePayments.reduce(
+      (acc, payment) => acc + Number(payment.coinOfWebReceive),
+      0
+    );
+
+    // Phần trăm thay đổi
+    const totalManagePaymentPercentage = PercentageChange(totalManagePayment, previousTotalManagePayment);
 
     //tính số học sinh mới hiện tại
     const newUsers = await userRepository.count({
@@ -193,7 +215,9 @@ export class StatisticalRepository implements IStatisticalRepository {
       newClassActive,
       newClassActivePercentage,
       classroomRating,
-      classroomRatingPercentage
+      classroomRatingPercentage,
+      totalManagePayment,
+      totalManagePaymentPercentage
     };
   }
   async getDailyRevenue() {

@@ -22,6 +22,8 @@ export class StatisticalRes {
   newClassActivePercentage!: number;
   classroomRating!: number;
   classroomRatingPercentage!: number;
+  totalManagePayment: number;
+  totalManagePaymentPercentage: number;
   constructor(data: {
     revenue: number;
     newUsers: number;
@@ -45,6 +47,8 @@ export class StatisticalRes {
     newClassActivePercentage: number;
     classroomRating: number;
     classroomRatingPercentage: number;
+    totalManagePayment: number;
+    totalManagePaymentPercentage: number;
   }) {
     this.revenue = data.revenue;
     this.newUsers = data.newUsers;
@@ -65,5 +69,7 @@ export class StatisticalRes {
     this.newClassActivePercentage = data.newClassActivePercentage;
     this.classroomRating = data.classroomRating;
     this.classroomRatingPercentage = data.classroomRatingPercentage;
+    this.totalManagePayment = data.totalManagePayment;
+    this.totalManagePaymentPercentage = data.totalManagePaymentPercentage;
   }
 }
