@@ -122,7 +122,7 @@ export class MenuService implements IMenuService {
       icon: 'fa-solid fa-wallet'
     },
     {
-      name: 'THANH TOÁN CHO GIA SƯ',
+      name: 'THU NHẬP GIA SƯ',
       isCollapsed: false,
       permissions: [Permissions.QUAN_LY_THANH_TOAN_CHO_GIA_SU],
       children: null,
@@ -146,7 +146,7 @@ export class MenuService implements IMenuService {
       ],
       children: [
         {
-          name: 'DOANH THU',
+          name: 'DOANH THU GIASUVLU',
           isCollapsed: false,
           permissions: [Permissions.THONG_KE_DOANH_THU],
           children: null,
