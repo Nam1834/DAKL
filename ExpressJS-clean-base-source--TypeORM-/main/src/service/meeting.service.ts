@@ -297,6 +297,7 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     const meetings = await this.meetingRepository.findMany({
       filter: filterWithClassroom,
       order: order,
+      relations: ['classroom'],
       paging: paging
     });
 
