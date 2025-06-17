@@ -9,6 +9,7 @@ import { IClassroomRepository } from '@/repository/interface/i.classroom.reposit
 import { classroomRepository } from './classroom.container';
 import { ITutorProfileRepository } from '@/repository/interface/i.tutor_profile.repository';
 import { tutorProfileRepository } from './tutor_profile.container';
+import { ClassroomRepository } from '@/repository/classroom.repository';
 
 class ClassroomAssessmentContainer extends BaseContainer {
   constructor() {
@@ -22,7 +23,7 @@ class ClassroomAssessmentContainer extends BaseContainer {
     this.container.bind<ClassroomAssessmentController>(ClassroomAssessmentController).toSelf();
 
     //Import
-    this.container.bind<IClassroomRepository<any>>('ClassroomRepository').toConstantValue(classroomRepository);
+    this.container.bind<IClassroomRepository<any>>('ClassroomRepository').to(ClassroomRepository);
     this.container.bind<ITutorProfileRepository<any>>('TutorProfileRepository').toConstantValue(tutorProfileRepository);
   }
 
