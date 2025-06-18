@@ -116,11 +116,11 @@ export class UserController {
 
   async handleMicrosoftCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { code } = req.body;
-
+      const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;
       if (!code) {
         throw new Error('Authorization code not found.');
       }
+
       res.send_ok('Authorization code successful', code);
     } catch (error) {
       next(error);
@@ -136,10 +136,6 @@ export class UserController {
         return;
       }
       const result = await this.userService.exchangeCodeForToken(code);
-      res.status(200).json({
-        message: 'Microsoft Auth URL generated successfully',
-        data: result
-      });
       res.send_ok('Microsoft Auth URL generated successfully', result);
     } catch (error) {
       next(error);
