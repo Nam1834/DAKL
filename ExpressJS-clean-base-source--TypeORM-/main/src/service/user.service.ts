@@ -369,7 +369,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       client_id: MICROSOFT_CLIENT_ID,
       response_type: 'code',
       redirect_uri: MICROSOFT_REDIRECT_USER_URI,
-      response_mode: 'query',
+      response_mode: 'form_post',
       scope: MICROSOFT_CLIENT_SCOPE
     }).toString()}`;
 

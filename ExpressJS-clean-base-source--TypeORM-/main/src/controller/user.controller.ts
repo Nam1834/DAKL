@@ -116,7 +116,7 @@ export class UserController {
 
   async handleMicrosoftCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { code } = req.query;
+      const { code } = req.body;
 
       if (!code) {
         throw new Error('Authorization code not found.');
