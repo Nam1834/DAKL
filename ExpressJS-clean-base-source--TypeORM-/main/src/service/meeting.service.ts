@@ -309,13 +309,17 @@ export class MeetingService extends BaseCrudService<Meeting> implements IMeeting
     const meetingIds = meetings.map((meeting) => meeting.meetingId);
 
     // Truy vấn các ClassroomAssessment theo classroomId và meetingIds
-    const assessments = await this.classroomAssessmentRepository.findAssessmentsByClassroomAndMeetingIds(
-      classroomId,
-      meetingIds
-    );
+    let ratedMeetingIdSet = new Set<string>();
 
-    const ratedMeetingIdSet = new Set<string>(assessments.map((a) => a.meetingId));
+    // Truy vấn ClassroomAssessment chỉ khi có meetingId
+    if (meetingIds.length > 0) {
+      const assessments = await this.classroomAssessmentRepository.findAssessmentsByClassroomAndMeetingIds(
+        classroomId,
+        meetingIds
+      );
 
+      ratedMeetingIdSet = new Set<string>(assessments.map((a) => a.meetingId));
+    }
     // Gắn isRating = true/false vào từng meeting
     const enrichedMeetings = meetings.map((meeting) => ({
       ...meeting,
