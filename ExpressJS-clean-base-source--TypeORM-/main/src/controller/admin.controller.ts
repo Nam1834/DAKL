@@ -69,6 +69,19 @@ export class AdminController {
     }
   }
 
+  async handleMicrosoftCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;
+      if (!code) {
+        throw new Error('Authorization code not found.');
+      }
+
+      res.send_ok('Authorization code successful', code);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async loginMicrosoft(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const code = typeof req.body.code === 'string' ? req.body.code.trim() : undefined;

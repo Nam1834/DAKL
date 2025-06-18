@@ -167,7 +167,7 @@ export class AdminService extends BaseCrudService<Admin> implements IAdminServic
       client_id: MICROSOFT_CLIENT_ID,
       response_type: 'code',
       redirect_uri: MICROSOFT_REDIRECT_ADMIN_URI,
-      response_mode: 'query',
+      response_mode: 'form_post',
       scope: MICROSOFT_CLIENT_SCOPE
     }).toString()}`;
 
