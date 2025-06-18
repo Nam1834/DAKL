@@ -32,7 +32,8 @@ adminRouter
     adminController.searchAdmin.bind(adminController)
   )
   .get('/auth/get-uri-microsoft', adminController.getMicrosoftAuthUrl.bind(adminController))
-  .post('/auth/callback', adminController.loginMicrosoft.bind(adminController))
+  .post('/auth/callback', adminController.handleMicrosoftCallback.bind(adminController))
+  .post('/auth/login', adminController.loginMicrosoft.bind(adminController))
   .post('/login', classValidate(LoginAdminReq), adminController.login.bind(adminController))
   .get('/get-profile', authenticateJWT, adminController.getProfile.bind(adminController))
   .get(
