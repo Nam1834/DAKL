@@ -392,6 +392,7 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
 
+    console.log('Sending to Microsoft token endpoint:', response.toString());
     return response.data;
   }
 

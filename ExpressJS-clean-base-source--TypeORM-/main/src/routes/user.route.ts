@@ -28,7 +28,7 @@ userRouter
   .get('/auth/get-uri-microsoft', userController.getMicrosoftAuthUrl.bind(userController))
   .post('/auth/exchange-code', userController.exchangeCodeForToken.bind(userController))
   .post('/auth/callback', userController.handleMicrosoftCallback.bind(userController))
-  .post('/auth/callback/login', userController.loginMicrosoft.bind(userController))
+  .post('/auth/login', userController.loginMicrosoft.bind(userController))
   .get('/get-profile', authenticateJWT, userController.getProfile.bind(userController))
   .put('/update-profile', authenticateJWT, userController.updateProfile.bind(userController))
   .post('/forgot-password', classValidate(ForgotPasswordUserReq), userController.forgotPassword.bind(userController))
