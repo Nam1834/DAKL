@@ -174,18 +174,18 @@ export class MeetingController {
     try {
       const { classroomId } = req.body;
       if (!classroomId) {
-        res.status(400).send({ error: 'Missing meetingId' });
+        res.status(400).send({ error: 'Missing classroomId' });
         return;
       }
 
-      const meeting = await this.meetingService.findOne({
-        filter: { classroomId: classroomId }
-      });
+      // const meeting = await this.meetingService.findOne({
+      //   filter: { classroomId: classroomId }
+      // });
 
-      if (!meeting?.classroomId) {
-        res.status(404).send({ error: 'Meeting not found ' });
-        return;
-      }
+      // if (!meeting?.classroomId) {
+      //   res.status(404).send({ error: 'Meeting not found ' });
+      //   return;
+      // }
 
       const searchData: SearchDataDto = getSearchData(req);
 
