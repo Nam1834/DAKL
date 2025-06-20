@@ -401,13 +401,21 @@ export class UserService extends BaseCrudService<User> implements IUserService<U
       throw new Error('Invalid or missing authorization code.');
     }
 
+    const redisKey = `microsoft:code:${code}`;
+    const authCode = await redis.get(redisKey);
+    if (!authCode) {
+      throw new Error('Authorization code expired or not found in Redis.');
+    }
+
+    await redis.del(redisKey);
+
     // Bước 1: Gọi API Microsoft để lấy Access Token
     const tokenResponse = await axios.post<MicrosoftTokenRes>(
       'https://login.microsoftonline.com/common/oauth2/v2.0/token',
       new URLSearchParams({
         client_id: MICROSOFT_CLIENT_ID,
         client_secret: MICROSOFT_CLIENT_SECRET,
-        code: code,
+        code: authCode,
         grant_type: 'authorization_code',
         redirect_uri: MICROSOFT_REDIRECT_USER_URI
       }).toString(),

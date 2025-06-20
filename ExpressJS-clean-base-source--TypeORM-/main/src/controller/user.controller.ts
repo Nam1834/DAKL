@@ -21,8 +21,10 @@ import { IUserService } from '@/service/interface/i.user.service';
 import { ITYPES } from '@/types/interface.types';
 import { convertToDto } from '@/utils/dto-convert/convert-to-dto.util';
 import { getSearchData } from '@/utils/get-search-data.util';
+import redis from '@/utils/redis/redis.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
+import { v4 as uuidv4 } from 'uuid';
 
 @injectable()
 export class UserController {
@@ -121,7 +123,13 @@ export class UserController {
         throw new Error('Authorization code not found.');
       }
 
-      res.send_ok('Authorization code successful', code);
+      const tempCode = uuidv4();
+      await redis.set(`microsoft:code:${tempCode}`, code, 'EX', 300); // hết hạn sau 5 phút
+
+      const redirectUrl = `https://giasuvlu.click/trang-chu?tempCode=${tempCode}`;
+      return res.redirect(302, redirectUrl);
+
+      // res.send_ok('Authorization code successful', code);
     } catch (error) {
       next(error);
     }
